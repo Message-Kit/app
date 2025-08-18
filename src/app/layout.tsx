@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
 import { Toaster } from "@/components/ui/sonner";
+import UserProvider from "@/components/user-provider";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -33,23 +34,25 @@ export default function RootLayout({
             <body
                 className={`${inter.variable} ${interTight.variable} antialiased font-body`}
             >
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="dark"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <SidebarProvider>
-                        <AppSidebar />
-                        <main className="w-full">
-                            <div className="flex items-center gap-2 h-16 px-6 border-b">
-                                <DynamicBreadcrumb />
-                            </div>
-                            {children}
-                        </main>
-                        <Toaster position="top-center" richColors />
-                    </SidebarProvider>
-                </ThemeProvider>
+                <UserProvider>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="dark"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <SidebarProvider>
+                            <AppSidebar />
+                            <main className="w-full">
+                                <div className="flex items-center gap-2 h-16 px-6 border-b">
+                                    <DynamicBreadcrumb />
+                                </div>
+                                {children}
+                            </main>
+                            <Toaster position="top-center" richColors />
+                        </SidebarProvider>
+                    </ThemeProvider>
+                </UserProvider>
             </body>
         </html>
     );

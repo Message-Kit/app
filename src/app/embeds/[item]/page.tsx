@@ -19,7 +19,19 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Circle, Copy, Ellipsis, Send, Trash } from "lucide-react";
+import {
+    Circle,
+    Code,
+    Copy,
+    Ellipsis,
+    Home,
+    ImageIcon,
+    List,
+    Save,
+    Text,
+    Trash,
+    User,
+} from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -37,6 +49,9 @@ import {
 } from "@/components/ui/popover";
 import { HexColorPicker } from "react-colorful";
 import { toast } from "sonner";
+import { useUserStore } from "@/stores/user";
+import { Switch } from "@/components/ui/switch";
+import { useSessionStore } from "@/stores/session";
 
 export default function Page() {
     const params = useParams();
@@ -74,20 +89,28 @@ export default function Page() {
             });
         }
 
-        const res = await fetch(
-            `http://localhost:6969/channels/1063404762164379689/messages`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ embeds: [embed.toJSON()] }),
-            }
-        );
+        const req = await fetch("/api/discord", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                channelId: "2",
+                body: { content: "hi world!", embeds: [embed.toJSON()] },
+            }),
+        });
 
-        if (res.ok) {
+        const res = await req.json();
+
+        if (res.success) {
             toast.success("Embed sent to Discord!");
         } else {
-            toast.error("Failed to send embed to Discord!");
+            toast.error("Something went wrong!", {
+                description: res.error.rawError.message,
+            });
         }
+    };
+
+    const handleSave = async () => {
+        console.log("save");
     };
 
     return (
@@ -124,38 +147,47 @@ export default function Page() {
                         <CardContent>
                             <Tabs
                                 defaultValue="general"
-                                orientation="vertical"
-                                className="w-full flex flex-row items-start gap-6 h-full"
+                                // orientation="vertical"
+                                // className="w-full flex flex-row items-start gap-4 h-full"
+                                className="w-full"
                             >
-                                <TabsList className="shrink-0 grid grid-cols-1 h-auto w-fit gap-1">
+                                <TabsList
+                                    // className="shrink-0 grid grid-cols-1 h-auto w-[124px] gap-1"
+                                    className="w-full mb-4"
+                                >
                                     <TabsTrigger
                                         value="general"
-                                        className="py-1.5 px-4"
+                                        className="justify-center"
                                     >
+                                        <Text />
                                         General
                                     </TabsTrigger>
                                     <TabsTrigger
                                         value="author"
-                                        className="py-1.5 px-4"
+                                        className="justify-center"
                                     >
+                                        <User />
                                         Author
                                     </TabsTrigger>
                                     <TabsTrigger
                                         value="images"
-                                        className="py-1.5 px-4"
+                                        className="justify-center"
                                     >
+                                        <ImageIcon />
                                         Images
                                     </TabsTrigger>
                                     <TabsTrigger
                                         value="fields"
-                                        className="py-1.5 px-4"
+                                        className="justify-center"
                                     >
+                                        <List />
                                         Fields
                                     </TabsTrigger>
                                     <TabsTrigger
                                         value="other"
-                                        className="py-1.5 px-4"
+                                        className="justify-center"
                                     >
+                                        <Code />
                                         Other
                                     </TabsTrigger>
                                 </TabsList>
@@ -165,15 +197,68 @@ export default function Page() {
                                         onSubmit={handleSendToDiscord}
                                         className="space-y-6"
                                     >
-                                        <div className="space-y-2">
-                                            <Label htmlFor="title">Title</Label>
-                                            <Input
-                                                id="title"
-                                                name="title"
-                                                placeholder="Enter your title"
-                                            />
+                                        <div className="flex gap-2.5 w-full">
+                                            <div className="space-y-2.5 w-full">
+                                                <Label htmlFor="title">
+                                                    Title
+                                                </Label>
+                                                <Input
+                                                    id="title"
+                                                    name="title"
+                                                    placeholder="Enter your title"
+                                                />
+                                            </div>
+                                            <div className="space-y-2.5">
+                                                <Label htmlFor="color">
+                                                    Color
+                                                </Label>
+                                                <div className="flex gap-2.5">
+                                                    <Input
+                                                        id="color"
+                                                        name="color"
+                                                        placeholder="Enter your color (hex)"
+                                                        value={embedColor}
+                                                        onChange={(e) =>
+                                                            setEmbedColor(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    />
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button
+                                                                variant={
+                                                                    "outline"
+                                                                }
+                                                                size={"icon"}
+                                                                type="button"
+                                                            >
+                                                                <Circle
+                                                                    fill={
+                                                                        embedColor
+                                                                    }
+                                                                />
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="size-fit">
+                                                            <HexColorPicker
+                                                                color={
+                                                                    embedColor
+                                                                }
+                                                                onChange={(
+                                                                    color
+                                                                ) =>
+                                                                    setEmbedColor(
+                                                                        color
+                                                                    )
+                                                                }
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-2.5">
                                             <Label htmlFor="description">
                                                 Description
                                             </Label>
@@ -181,9 +266,10 @@ export default function Page() {
                                                 id="description"
                                                 name="description"
                                                 placeholder="Enter your description"
+                                                className="h-28"
                                             />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-2.5">
                                             <Label htmlFor="url">URL</Label>
                                             <Input
                                                 id="url"
@@ -191,48 +277,7 @@ export default function Page() {
                                                 placeholder="Enter your url"
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="color">Color</Label>
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    id="color"
-                                                    name="color"
-                                                    placeholder="Enter your color (hex)"
-                                                    value={embedColor}
-                                                    onChange={(e) =>
-                                                        setEmbedColor(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            size={"icon"}
-                                                            type="button"
-                                                        >
-                                                            <Circle
-                                                                fill={
-                                                                    embedColor
-                                                                }
-                                                            />
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="size-fit">
-                                                        <HexColorPicker
-                                                            color={embedColor}
-                                                            onChange={(color) =>
-                                                                setEmbedColor(
-                                                                    color
-                                                                )
-                                                            }
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-2.5">
                                             <Label htmlFor="footer">
                                                 Footer
                                             </Label>
@@ -242,7 +287,7 @@ export default function Page() {
                                                 placeholder="Enter your footer text"
                                             />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-2.5">
                                             <Label htmlFor="footer-icon">
                                                 Footer Icon
                                             </Label>
@@ -270,18 +315,25 @@ export default function Page() {
                         </CardContent>
                         <Separator />
                         <CardFooter className="flex justify-end gap-2">
-                            <Button variant={"ghost"}>
+                            <Button variant={"outline"}>
                                 <Copy />
                                 Copy
                             </Button>
                             <Button
+                                // variant={"outline"}
+                                onClick={handleSave}
+                            >
+                                <Save />
+                                Save
+                            </Button>
+                            {/* <Button
                                 variant={"outline"}
                                 type="submit"
                                 form="embed-form"
                             >
                                 <Send />
                                 Send to Discord
-                            </Button>
+                            </Button> */}
                         </CardFooter>
                     </Card>
                 </div>

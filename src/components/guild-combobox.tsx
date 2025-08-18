@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -19,24 +18,50 @@ import {
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { SidebarMenuButton } from "./ui/sidebar";
+import { useSessionStore } from "@/stores/session";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useGuildStore } from "@/stores/guild";
+import { Guild } from "@/stores/guild";
 
 export function GuildCombobox() {
-    const servers = [
-        { guildId: "1234567890", label: "Rony's Server" },
-        { guildId: "2345678901", label: "Pixel Palace" },
-        { guildId: "3456789012", label: "Code Cafe" },
-        { guildId: "4567890123", label: "Chill Zone" },
-        { guildId: "5678901234", label: "Tech Hub" },
-    ];
+    const [guilds, setGuilds] = useState<Guild[]>([]);
+    const { session } = useSessionStore();
+    const { selectedGuild, setSelectedGuild } = useGuildStore();
 
-    const guilds = servers.map((server) => ({
-        guildId: server.guildId,
-        label: server.label,
-        value: server.label.toLowerCase().replace(/ /g, "-"),
-    }));
+    useEffect(() => {
+        if (!session) return;
 
-    const [open, setOpen] = React.useState(false);
-    const [value, setValue] = React.useState("pixel-palace");
+        const yes = async () => {
+            const res = await fetch("/api/get-server-list", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ access_token: session.provider_token }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                setGuilds(
+                    (data.guilds as Guild[]).filter((item) => item.owner === true)
+                );
+            } else {
+                toast.error("Failed to fetch guilds!", {
+                    description: data.error,
+                });
+            }
+        };
+
+        yes();
+    }, [session]);
+
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        if (guilds.length > 0) {
+            setSelectedGuild(guilds[0]);
+        }
+    }, [guilds]);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -47,16 +72,12 @@ export function GuildCombobox() {
                     size={"lg"}
                 >
                     <Avatar className="size-8 rounded-lg overflow-hidden">
-                        <AvatarImage src="https://github.com/ronykax.png" />
+                        <AvatarImage src={"https://github.com/ronykax.png"} />
                         <AvatarFallback>RK</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                         <span className="truncate font-medium text-sm font-display">
-                            {value
-                                ? guilds.find(
-                                      (framework) => framework.value === value
-                                  )?.label
-                                : "Select framework..."}
+                            {selectedGuild ? selectedGuild.name : ""}
                         </span>
                         <span className="truncate text-xs text-muted-foreground">
                             29 Members
@@ -69,17 +90,17 @@ export function GuildCombobox() {
                 <Command>
                     <CommandInput placeholder="Search guild..." />
                     <CommandList>
-                        <CommandEmpty>No framework found.</CommandEmpty>
+                        <CommandEmpty>No guild found.</CommandEmpty>
                         <CommandGroup>
-                            {guilds.map((framework) => (
+                            {guilds.map((item, index) => (
                                 <CommandItem
-                                    key={framework.value}
-                                    value={framework.value}
+                                    key={index}
+                                    value={`${item.name}::${item.id}`}
                                     onSelect={(currentValue: string) => {
-                                        setValue(
-                                            currentValue === value
-                                                ? ""
-                                                : currentValue
+                                        const selectedId = currentValue.split("::").pop() || "";
+                                        const guild = guilds.find((g) => g.id === selectedId) || null;
+                                        setSelectedGuild(
+                                            selectedGuild?.id === selectedId ? null : guild
                                         );
                                         setOpen(false);
                                     }}
@@ -87,12 +108,12 @@ export function GuildCombobox() {
                                     <CheckIcon
                                         className={cn(
                                             "mr-2 h-4 w-4",
-                                            value === framework.value
+                                            selectedGuild?.id === item.id
                                                 ? "opacity-100"
                                                 : "opacity-0"
                                         )}
                                     />
-                                    {framework.label}
+                                    {item.name}
                                 </CommandItem>
                             ))}
                         </CommandGroup>
