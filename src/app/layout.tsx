@@ -5,6 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -46,6 +47,7 @@ export default function RootLayout({
                             </div>
                             {children}
                         </main>
+                        <Toaster position="top-center" richColors />
                     </SidebarProvider>
                 </ThemeProvider>
             </body>

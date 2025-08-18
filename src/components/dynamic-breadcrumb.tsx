@@ -22,7 +22,7 @@ export function DynamicBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Welcome</BreadcrumbPage>
+                    <BreadcrumbPage>cool embed 1</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

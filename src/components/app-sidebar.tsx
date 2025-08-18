@@ -12,25 +12,34 @@ import {
     SidebarMenuItem,
     SidebarMenuButton,
     SidebarMenuBadge,
-    SidebarFooter,
+    SidebarHeader,
 } from "./ui/sidebar";
 import {
-    Image as ImageIcon,
     Box,
-    MessageSquare,
     Layout,
     Palette,
     Component,
     Sparkle,
-    LogOut,
     Settings,
+    TextCursorInput,
+    LayoutTemplate,
+    PanelTop,
 } from "lucide-react";
 import Link from "next/link";
+import { GuildCombobox } from "./guild-combobox";
+
 export function AppSidebar() {
     const pathname = usePathname();
 
     return (
         <Sidebar>
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <GuildCombobox />
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Interactions</SidebarGroupLabel>
@@ -60,6 +69,17 @@ export function AppSidebar() {
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={pathname.startsWith("/forms")}
+                                >
+                                    <Link href="/forms">
+                                        <TextCursorInput />
+                                        <span>Forms</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
@@ -71,11 +91,11 @@ export function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
-                                    isActive={pathname.startsWith("/messages")}
+                                    isActive={pathname.startsWith("/templates")}
                                 >
-                                    <Link href="/messages">
-                                        <MessageSquare />
-                                        <span>Messages</span>
+                                    <Link href="/templates">
+                                        <LayoutTemplate />
+                                        <span>Templates</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -86,7 +106,7 @@ export function AppSidebar() {
                                     isActive={pathname.startsWith("/embeds")}
                                 >
                                     <Link href="/embeds">
-                                        <ImageIcon />
+                                        <PanelTop />
                                         <span>Embeds</span>
                                     </Link>
                                 </SidebarMenuButton>
@@ -146,7 +166,8 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter>
+
+            {/* <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton>
@@ -155,7 +176,7 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
-            </SidebarFooter>
+            </SidebarFooter> */}
         </Sidebar>
     );
 }

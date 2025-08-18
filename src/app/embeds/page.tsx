@@ -17,9 +17,9 @@ export default function Page() {
         <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             <Card>
                 <CardHeader>
-                    <CardTitle>Welcome</CardTitle>
+                    <CardTitle>cool embed 1</CardTitle>
                     <CardDescription>
-                        the main embed for #welcome
+                        the main embed for #rules
                     </CardDescription>
                     <CardAction>
                         <Link href="/embeds/ef23x1e">
