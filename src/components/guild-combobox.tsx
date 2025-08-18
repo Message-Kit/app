@@ -73,11 +73,11 @@ export function GuildCombobox() {
                 >
                     <Avatar className="size-8 rounded-lg overflow-hidden">
                         <AvatarImage src={"https://github.com/ronykax.png"} />
-                        <AvatarFallback>RK</AvatarFallback>
+                        <AvatarFallback>{selectedGuild?.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                         <span className="truncate font-medium text-sm font-display">
-                            {selectedGuild ? selectedGuild.name : ""}
+                            {selectedGuild && selectedGuild.name}
                         </span>
                         <span className="truncate text-xs text-muted-foreground">
                             29 Members
@@ -99,9 +99,7 @@ export function GuildCombobox() {
                                     onSelect={(currentValue: string) => {
                                         const selectedId = currentValue.split("::").pop() || "";
                                         const guild = guilds.find((g) => g.id === selectedId) || null;
-                                        setSelectedGuild(
-                                            selectedGuild?.id === selectedId ? null : guild
-                                        );
+                                        if (guild) setSelectedGuild(guild);
                                         setOpen(false);
                                     }}
                                 >
