@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -10,7 +9,6 @@ import {
     DialogClose,
     DialogDescription,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -30,10 +28,12 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useMemo, useState } from "react";
+import { ButtonStyle } from "discord-api-types/v10";
 
 type ButtonType = "primary" | "secondary" | "link" | "danger";
 
-type ConfiguredButton = {
+export type ConfiguredButton = {
     label: string;
     type: ButtonType;
     link?: string;
@@ -50,14 +50,18 @@ const typeToVariant: Record<
     danger: "destructive",
 };
 
-export default function Buttons() {
-    const [open, setOpen] = React.useState(false);
-    const [buttons, setButtons] = React.useState<ConfiguredButton[]>([]);
+interface Props {
+    buttons: ConfiguredButton[];
+    setButtons: (buttons: ConfiguredButton[]) => void;
+}
 
-    const [label, setLabel] = React.useState("");
-    const [type, setType] = React.useState<ButtonType | undefined>(undefined);
-    const [link, setLink] = React.useState("");
-    const [action, setAction] = React.useState<string | undefined>(undefined);
+export default function Buttons({ buttons, setButtons }: Props) {
+    const [open, setOpen] = useState(false);
+
+    const [label, setLabel] = useState("");
+    const [type, setType] = useState<ButtonType | undefined>(undefined);
+    const [link, setLink] = useState("");
+    const [action, setAction] = useState<string | undefined>(undefined);
 
     const resetForm = () => {
         setLabel("");
@@ -66,7 +70,7 @@ export default function Buttons() {
         setAction(undefined);
     };
 
-    const isValid = React.useMemo(() => {
+    const isValid = useMemo(() => {
         if (!label.trim() || !type) return false;
         if (type === "link") return Boolean(link.trim());
         return Boolean(action);
@@ -80,7 +84,7 @@ export default function Buttons() {
             link: type === "link" ? link.trim() : undefined,
             action: type !== "link" ? action : undefined,
         };
-        setButtons((prev) => [...prev, newButton]);
+        setButtons([...buttons, newButton]);
         setOpen(false);
         resetForm();
     };
@@ -182,6 +186,7 @@ export default function Buttons() {
                                             value={link}
                                             setValue={setLink}
                                             placeholder="https://example.com"
+                                            type="url"
                                         />
                                     ) : (
                                         <div className="flex flex-col gap-2">

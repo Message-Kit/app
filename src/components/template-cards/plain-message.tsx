@@ -2,16 +2,18 @@
 
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import { useId, useState } from "react";
 
-export default function PlainMessage() {
-    const id = useId();
-    const [message, setMessage] = useState("");
+interface Props {
+    message: string;
+    setMessage: (message: string) => void;
+}
+
+export default function PlainMessage({ message, setMessage }: Props) {
     return (
         <div className="flex flex-col gap-2">
-            <Label htmlFor={id}>Message</Label>
+            <Label htmlFor="plain-message">Message</Label>
             <Textarea
-                id={id}
+                id="plain-message"
                 placeholder="Enter your message"
                 className="h-24"
                 value={message}

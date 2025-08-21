@@ -1,3 +1,6 @@
+"use client";
+
+import LabelInput from "@/components/label-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,8 +11,26 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Ellipsis, Hammer, Hash, Plus } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { CircleDashed, Ellipsis, Hammer, Hash, Plus } from "lucide-react";
 
 export default function Page() {
     return (
@@ -29,10 +50,62 @@ export default function Page() {
             <div className="mt-4 md:mt-12 flex flex-col gap-2">
                 <div className="flex gap-2">
                     <Input />
-                    <Button>
-                        <Plus />
-                        New Action
-                    </Button>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <Plus />
+                                New Action
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>New Action</DialogTitle>
+                                <DialogDescription>
+                                    Create a new action to be used to trigger
+                                    actions.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex flex-col gap-6">
+                                <LabelInput
+                                    label="Name"
+                                    id="name"
+                                    placeholder="Enter name"
+                                />
+                                <div className="flex flex-col gap-2">
+                                    <Label>Type</Label>
+                                    <Select>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="reply-to-message">
+                                                <CircleDashed />
+                                                Reply to message
+                                                <span className="text-muted-foreground">
+                                                    +1
+                                                </span>
+                                            </SelectItem>
+                                            <SelectItem value="send-message">
+                                                <CircleDashed />
+                                                Send message
+                                                <span className="text-muted-foreground">
+                                                    +1
+                                                </span>
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant={"outline"}>Cancel</Button>
+                                </DialogClose>
+                                <DialogClose asChild>
+                                    <Button>Create</Button>
+                                </DialogClose>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
                 <Card>
                     <CardHeader>

@@ -1,3 +1,4 @@
+import { HTMLInputTypeAttribute } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
@@ -8,6 +9,7 @@ export default function LabelInput({
     setValue,
     helperText,
     placeholder,
+    type = "text",
 }: {
     label: string;
     id: string;
@@ -15,6 +17,7 @@ export default function LabelInput({
     setValue?: (value: string) => void;
     placeholder: string;
     helperText?: string;
+    type?: HTMLInputTypeAttribute;
 }) {
     return (
         <div className="flex flex-col gap-2 w-full">
@@ -24,6 +27,7 @@ export default function LabelInput({
                 value={value}
                 onChange={(e) => setValue?.(e.target.value)}
                 placeholder={placeholder}
+                type={type}
             />
             {helperText && (
                 <p

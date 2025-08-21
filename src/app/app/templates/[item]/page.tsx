@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Embed from "@/components/template-cards/embed";
+import Embed, { OutgoingDiscordEmbed } from "@/components/template-cards/embed";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -36,7 +36,9 @@ import {
 } from "@/components/ui/select";
 import PlainMessage from "@/components/template-cards/plain-message";
 import { toast } from "sonner";
-import Buttons from "@/components/template-cards/action-rows/buttons";
+import Buttons, {
+    ConfiguredButton,
+} from "@/components/template-cards/action-rows/buttons";
 import DropdownMenu from "@/components/template-cards/action-rows/dropdown-menu";
 
 import {
@@ -52,6 +54,10 @@ export default function Page() {
     const [items, setItems] = useState<string[]>([]);
     const [isActionRowDialogOpen, setIsActionRowDialogOpen] = useState(false);
     const [selectedActionRowType, setSelectedActionRowType] = useState("");
+
+    const [buttons, setButtons] = useState<ConfiguredButton[]>([]);
+    const [embeds, setEmbeds] = useState<OutgoingDiscordEmbed[]>([]);
+    const [message, setMessage] = useState("");
 
     const handleCreateItem = () => {
         if (selectedType === "embed") {
@@ -76,28 +82,57 @@ export default function Page() {
     };
 
     const handleSendTemplate = async () => {
-        const embed = new EmbedBuilder()
-            .setTitle("hi world")
-            .setURL("https://ronykax.xyz")
-            .setDescription("some description goes here");
+        const embedsYes = embeds.map((item) => {
+            const embed = new EmbedBuilder().setTitle(item.title);
+            // if (item.url) embed.setURL(`https://google.com`);
+            // URL is not working
+            if (item.description) embed.setDescription(item.description);
+            return embed.toJSON();
+        });
 
-        const button = new ButtonBuilder()
-            .setLabel("Click me")
-            .setStyle(ButtonStyle.Link)
-            .setURL("https://ronykax.xyz");
+        const buttonsYes = buttons.map((item) => {
+            if (item.type === "link" && item.link) {
+                return new ButtonBuilder()
+                    .setLabel(item.label)
+                    .setStyle(ButtonStyle.Link)
+                    .setURL(item.link);
+            } else if (item.type === "primary" && item.action) {
+                return new ButtonBuilder()
+                    .setLabel(item.label)
+                    .setStyle(ButtonStyle.Primary)
+                    .setCustomId(item.action);
+            } else if (item.type === "secondary" && item.action) {
+                return new ButtonBuilder()
+                    .setLabel(item.label)
+                    .setStyle(ButtonStyle.Secondary)
+                    .setCustomId(item.action);
+            } else if (item.type === "danger" && item.action) {
+                return new ButtonBuilder()
+                    .setLabel(item.label)
+                    .setStyle(ButtonStyle.Danger)
+                    .setCustomId(item.action);
+            }
+        });
 
+        const buttonComponents = buttonsYes.filter(
+            (button) => button !== undefined
+        ) as ButtonBuilder[];
         const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            button
+            buttonComponents
         );
 
         const res = await fetch("/api/send-template", {
             method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 channelId: selectedChannel,
                 body: {
-                    content: "some content goes here",
-                    embeds: [embed],
-                    components: [actionRow],
+                    content: message,
+                    embeds: embedsYes,
+                    components:
+                        buttonComponents.length !== 0
+                            ? [actionRow.toJSON()]
+                            : [],
                 },
             }),
         });
@@ -245,13 +280,21 @@ export default function Page() {
 
             {/* This is the list of items */}
             <div className="flex flex-col gap-8 mt-4 md:mt-12 w-full">
-                <PlainMessage />
+                <PlainMessage message={message} setMessage={setMessage} />
                 {items.map((type, index) =>
                     type === "embed" ? (
-                        <Embed key={index} />
+                        <Embed
+                            key={index}
+                            embeds={embeds}
+                            setEmbeds={setEmbeds}
+                        />
                     ) : type.startsWith("action-row") ? (
                         type === "action-row:buttons" ? (
-                            <Buttons key={index} />
+                            <Buttons
+                                key={index}
+                                buttons={buttons}
+                                setButtons={setButtons}
+                            />
                         ) : type === "action-row:dropdown-menu" ? (
                             <DropdownMenu key={index} />
                         ) : null
