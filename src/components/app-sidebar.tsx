@@ -1,11 +1,12 @@
+"use client";
+
 import {
-    Component,
-    FormInput,
     MessagesSquare,
     Pickaxe,
     SlashSquare,
     Sparkles,
     TextCursorInput,
+    Webhook,
 } from "lucide-react";
 import {
     Sidebar,
@@ -18,17 +19,27 @@ import {
     SidebarMenuItem,
 } from "./ui/sidebar";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function AppSidebar() {
+    const pathname = usePathname();
+
+    function isPathActive(path: string) {
+        return pathname?.startsWith(path);
+    }
+
     return (
-        <Sidebar variant="floating" className="p-4">
+        <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Platform</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isPathActive("/app/templates")}
+                                >
                                     <Link href="/app/templates">
                                         <MessagesSquare />
                                         Templates
@@ -36,7 +47,10 @@ export default function AppSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isPathActive("/app/actions")}
+                                >
                                     <Link href="/app/actions">
                                         <Pickaxe />
                                         Actions
@@ -44,7 +58,10 @@ export default function AppSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isPathActive("/app/forms")}
+                                >
                                     <Link href="/app/forms">
                                         <TextCursorInput />
                                         Forms
@@ -59,7 +76,12 @@ export default function AppSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isPathActive(
+                                        "/app/sticky-messages"
+                                    )}
+                                >
                                     <Link href="/app/sticky-messages">
                                         <SlashSquare />
                                         Commands
@@ -67,10 +89,24 @@ export default function AppSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isPathActive("/app/branding")}
+                                >
                                     <Link href="/app/branding">
                                         <Sparkles />
                                         Branding
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isPathActive("/app/webhooks")}
+                                >
+                                    <Link href="/app/webhooks">
+                                        <Webhook />
+                                        Webhooks
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

@@ -165,6 +165,7 @@
 
     --font-body: var(--font-inter);
     --font-display: var(--font-some-font);
+    --font-ass: var(--font-gg-sans);
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
@@ -191,7 +192,7 @@
     }
 }
 
-.my-gradient {
+/* .my-gradient {
     position: absolute;
     inset: 0;
     z-index: -10;
@@ -203,7 +204,7 @@
         #000000 50%,
         rgba(88, 101, 242, 0.5) 225%
     );
-}
+} */
 
 /* .my-gradient {
     position: absolute;
