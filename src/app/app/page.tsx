@@ -1,7 +1,9 @@
 export default function Page() {
     return (
-        <div className="py-16 px-4">
-            <span className="text-2xl font-bold">Home</span>
+        <div className="p-4">
+            <div className="h-96 w-full flex flex-col justify-center items-center">
+                <span className="text-muted-foreground text-sm">Nothing to see here...</span>
+            </div>
         </div>
     );
 }

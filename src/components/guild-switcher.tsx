@@ -1,95 +1,98 @@
 "use client";
 
-import * as React from "react";
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+import { CheckIcon, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-
-const guilds = [
-    {
-        value: "ronys-server",
-        label: "Rony's Server",
-    },
-    {
-        value: "sveltekit",
-        label: "SvelteKit",
-    },
-    {
-        value: "nuxt.js",
-        label: "Nuxt.js",
-    },
-    {
-        value: "remix",
-        label: "Remix",
-    },
-    {
-        value: "astro",
-        label: "Astro",
-    },
-];
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { SidebarMenuButton } from "./ui/sidebar";
+import { useUserStore } from "@/stores/user";
+import { useEffect, useState } from "react";
+import supabase from "@/lib/supabase";
+import { useGuildStore } from "@/stores/guild";
+import { Skeleton } from "./ui/skeleton";
+import { Guild } from "@/types/discord";
 
 export function GuildSwitcher() {
-    const [open, setOpen] = React.useState(false);
-    const [value, setValue] = React.useState("ronys-server");
+    const [open, setOpen] = useState(false);
+    const [guilds, setGuilds] = useState<Guild[]>([]);
+    const { user } = useUserStore();
+    const { guild, setGuild } = useGuildStore();
+
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchGuilds = async () => {
+            const { data: sessionData } = await supabase.auth.getSession();
+
+            const response = await fetch("/api/get-server-list", {
+                method: "POST",
+                body: JSON.stringify({ accessToken: sessionData.session?.access_token }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setGuilds(data.data);
+            }
+        };
+
+        fetchGuilds();
+    }, [user]);
+
+    useEffect(() => {
+        if (!guilds.length) return;
+        if (guild && !guilds.some((g) => g.id === guild.id)) {
+            setGuild(null);
+        }
+    }, [guilds, guild, setGuild]);
+
+    useEffect(() => {
+        if (!guilds.length || guild) return;
+        const storedId = typeof window !== "undefined" ? localStorage.getItem("selectedGuildId") : null;
+        if (!storedId) return;
+        const matched = guilds.find((g) => g.id === storedId);
+        if (matched) setGuild(matched);
+    }, [guilds, guild, setGuild]);
+
+    const selectedGuildName = guild?.name;
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-[200px] justify-between"
+                <SidebarMenuButton
+                    size="lg"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2.5"
                 >
-                    {value
-                        ? guilds.find((framework) => framework.value === value)
-                              ?.label
-                        : "Select guild..."}
-                    <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
+                    <div className="bg-sidebar-primary text-sidebar-primary-foreground aspect-square size-8 rounded-sm overflow-hidden"></div>
+                    <div className="flex flex-col gap-0.5 leading-tight">
+                        <span className="font-medium">
+                            {selectedGuildName ?? <Skeleton className="w-32 h-4" />}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                            {selectedGuildName ? "Basic Plan" : <Skeleton className="w-24 h-4" />}
+                        </span>
+                    </div>
+                    <ChevronsUpDown className="ml-auto" />
+                </SidebarMenuButton>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
+            <PopoverContent className="w-[220px] p-0" align="end">
                 <Command>
                     <CommandInput placeholder="Search guild..." />
                     <CommandList>
-                        <CommandEmpty>No framework found.</CommandEmpty>
+                        <CommandEmpty>No guild found.</CommandEmpty>
                         <CommandGroup>
-                            {guilds.map((framework) => (
+                            {guilds.map((option) => (
                                 <CommandItem
-                                    key={framework.value}
-                                    value={framework.value}
-                                    onSelect={(currentValue) => {
-                                        setValue(
-                                            currentValue === value
-                                                ? ""
-                                                : currentValue
-                                        );
+                                    key={option.id}
+                                    value={option.name}
+                                    onSelect={() => {
+                                        setGuild(option);
                                         setOpen(false);
                                     }}
                                 >
-                                    <CheckIcon
-                                        className={cn(
-                                            "mr-2 h-4 w-4",
-                                            value === framework.value
-                                                ? "opacity-100"
-                                                : "opacity-0"
-                                        )}
-                                    />
-                                    {framework.label}
+                                    <CheckIcon className={cn("", guild?.id === option.id ? "opacity-100" : "opacity-0")} />
+                                    {option.name}
                                 </CommandItem>
                             ))}
                         </CommandGroup>

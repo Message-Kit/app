@@ -16,10 +16,11 @@ import {
     type TypePlainContent,
     type TypeMediaGallery,
     type TypeSeparator,
+    Template,
 } from "@/types";
-import { Box, ChevronDown, ChevronUp, DiamondMinus, Ellipsis, ImagesIcon, Plus, TextIcon, Trash } from "lucide-react";
-import { useState, Fragment } from "react";
-import { Button } from "@/components/ui/button";
+import { Box, ChevronDown, ChevronUp, DiamondMinus, Ellipsis, ImagesIcon, Plus, Save, SaveIcon, Send, TextIcon, Trash } from "lucide-react";
+import { useState, Fragment, useEffect } from "react";
+import { useParams } from "next/navigation";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -31,8 +32,18 @@ import {
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SectionBuilder, ContainerBuilder, TextDisplayBuilder, ButtonBuilder, SeparatorBuilder, MediaGalleryBuilder } from "@discordjs/builders";
 import { MessageFlags, SeparatorSpacingSize } from "discord-api-types/v10";
+import { Button } from "@/components/ui/button";
+import supabase from "@/lib/supabase";
+import { toast } from "sonner";
+import ChannelSelector from "@/components/channel-selector";
+import { nanoid } from "nanoid";
 
 export default function Page() {
+    const [data, setData] = useState<Template | null>(null);
+    const [finalMessage, setFinalMessage] = useState<FinalMessage>([]);
+    const [collapsedContainers, setCollapsedContainers] = useState<Record<number, boolean>>({});
+    const [containerToDelete, setContainerToDelete] = useState<number | null>(null);
+
     function moveArrayItem<T>(arr: T[], from: number, to: number): T[] {
         const next = arr.slice();
         if (from < 0 || from >= next.length || to < 0 || to >= next.length) return arr;
@@ -66,10 +77,6 @@ export default function Page() {
             return next;
         });
     }
-
-    const [finalMessage, setFinalMessage] = useState<FinalMessage>([]);
-    const [collapsedContainers, setCollapsedContainers] = useState<Record<number, boolean>>({});
-    const [containerToDelete, setContainerToDelete] = useState<number | null>(null);
 
     function addComponentToFinalMessage(type: ItemType) {
         setFinalMessage((prev) => {
@@ -163,7 +170,8 @@ export default function Page() {
 
                 if (accessory.type === AccessoryType.Button) {
                     const { label, style, customId } = accessory.value;
-                    section.setButtonAccessory(new ButtonBuilder().setLabel(label).setStyle(style).setCustomId(customId));
+                    section.setButtonAccessory(new ButtonBuilder().setLabel(label).setStyle(style).setCustomId(nanoid(10)));
+                    // section.setButtonAccessory(new ButtonBuilder().setLabel(label).setStyle(style).setCustomId(customId));
                 } else if (accessory.type === AccessoryType.Image) {
                     const { url, alt } = accessory.value;
                     section.setThumbnailAccessory((thumbnail) => thumbnail.setURL(url).setDescription(alt));
@@ -218,7 +226,7 @@ export default function Page() {
         const res = await fetch("/api/send-template", {
             method: "POST",
             body: JSON.stringify({
-                channelId: "1063404762164379689",
+                channelId: selectedChannel,
                 body: {
                     components: theFinalMessage,
                     flags: MessageFlags.IsComponentsV2,
@@ -235,38 +243,85 @@ export default function Page() {
         }
     }
 
+    const params = useParams();
+    const templateId = params.item as string;
+
+    useEffect(() => {
+        const fetchTemplate = async () => {
+            const { data, error } = await supabase.from("templates").select("*").eq("id", templateId).single();
+
+            if (error) {
+                console.error(error);
+            } else {
+                setData(data);
+            }
+        };
+
+        fetchTemplate();
+    }, [templateId]);
+
+    useEffect(() => {
+        if (data) {
+            setFinalMessage(data.body);
+        }
+    }, [data]);
+
+    async function saveTemplateToSupabase() {
+        const { error } = await supabase.from("templates").update({ body: finalMessage }).eq("id", templateId);
+
+        if (error) {
+            console.error("failed to save template:", error);
+        } else {
+            toast.success("Template saved", { icon: <SaveIcon size={16} /> });
+        }
+    }
+
+    const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+
+    if (!data) return <div className="h-96 py-48 flex items-center justify-center text-muted-foreground text-sm">Loading...</div>;
+
     return (
-        <ResizablePanelGroup direction="horizontal">
+        <ResizablePanelGroup direction="horizontal" className="border-b">
             <ResizablePanel defaultSize={61.5}>
-                <div className="flex flex-col gap-4 w-full p-4 h-fit">
-                    <div className="flex gap-2 justify-end">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button>
-                                    <Plus />
-                                    Add Component
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => addComponentToFinalMessage(ItemType.PlainContent)}>
-                                    <TextIcon />
-                                    Plain Content
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => addComponentToFinalMessage(ItemType.MediaGallery)}>
-                                    <ImagesIcon />
-                                    Media Gallery
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => addComponentToFinalMessage(ItemType.Separator)}>
-                                    <DiamondMinus />
-                                    Separator
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => addComponentToFinalMessage(ItemType.Container)}>
-                                    <Box />
-                                    Container
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        <Button onClick={sendTemplateToDiscord}>Send Template</Button>
+                <div className="flex flex-col gap-4 w-full p-4">
+                    <div className="flex gap-2 justify-between">
+                        <div className="w-[264px]">
+                            <ChannelSelector setSelectedChannel={setSelectedChannel} />
+                        </div>
+                        <div className="flex gap-2">
+                            <Button onClick={saveTemplateToSupabase} variant={"outline"} size={"icon"}>
+                                <SaveIcon />
+                            </Button>
+                            <Button onClick={sendTemplateToDiscord} variant={"outline"} size={"icon"}>
+                                <Send />
+                            </Button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button>
+                                        <Plus />
+                                        Add Component
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => addComponentToFinalMessage(ItemType.PlainContent)}>
+                                        <TextIcon />
+                                        Plain Content
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => addComponentToFinalMessage(ItemType.MediaGallery)}>
+                                        <ImagesIcon />
+                                        Media Gallery
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => addComponentToFinalMessage(ItemType.Separator)}>
+                                        <DiamondMinus />
+                                        Separator
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => addComponentToFinalMessage(ItemType.Container)}>
+                                        <Box />
+                                        Container
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
                     {finalMessage.map((entry, index) => {
                         // Container
@@ -524,9 +579,13 @@ export default function Page() {
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel defaultSize={38.5}>
-                <div className="p-4">
-                    <MessagePreview finalMessage={finalMessage} />
-                </div>
+                {finalMessage.length === 0 ? (
+                    <div className="p-6 text-muted-foreground text-center">Add a component to see preview.</div>
+                ) : (
+                    <div className="p-4">
+                        <MessagePreview finalMessage={finalMessage} />
+                    </div>
+                )}
             </ResizablePanel>
         </ResizablePanelGroup>
     );

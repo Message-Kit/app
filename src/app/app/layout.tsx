@@ -1,30 +1,24 @@
 import AppSidebar from "@/components/app-sidebar";
-import MyBreadcrumbs from "@/components/my-breadcrumbs";
-import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
-import { Send } from "lucide-react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
-        <div>
-            <div className="fixed left-0 top-0 -z-10 h-full w-full">
-                <div className="my-gradient"></div>
-            </div>
+        <>
             <SidebarProvider>
                 <AppSidebar />
-                <main className="w-full">
-                    <div className="px-6 h-16 border-b flex gap-6 items-center justify-between sticky top-0 w-full bg-background/50 backdrop-blur-2xl z-40">
-                        <MyBreadcrumbs />
-                        <Button>
-                            <Send />
-                            Send
-                        </Button>
+                <div className="size-full">
+                    <div className="w-full h-16 sticky top-0 z-40 bg-background/50 backdrop-blur-2xl">
+                        <div className="px-8 flex gap-6 items-center justify-between h-full">
+                            <span className="text-lg font-medium">{"Templates"}</span>
+                        </div>
+                        <Separator />
                     </div>
                     {children}
-                </main>
+                </div>
             </SidebarProvider>
             <Toaster richColors position="bottom-right" />
-        </div>
+        </>
     );
 }

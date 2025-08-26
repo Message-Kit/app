@@ -41,7 +41,7 @@ interface Template {
     name: string;
     created_at: string;
     updated_at: string;
-    body: APIMessage;
+    body: FinalMessage;
     guild_id: string;
 }
 
