@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { AccessoryType, FinalMessage, ItemType, TypeContainer, TypeMediaGallery, TypePlainContent, TypeSeparator } from "@/types";
+import { ButtonStyle } from "discord-api-types/v10";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -70,18 +71,20 @@ function PreviewPlainContent({ item, fontSizeSmall }: { item: TypePlainContent; 
                         className="px-3 py-1.5 text-sm size-fit rounded-[10px] flex items-center whitespace-nowrap"
                         style={{
                             backgroundColor:
-                                item.accessory.value.style === 1
+                                item.accessory.value.style === ButtonStyle.Primary
                                     ? "#5865f2"
-                                    : item.accessory.value.style === 2
+                                    : item.accessory.value.style === ButtonStyle.Secondary || item.accessory.value.style === ButtonStyle.Link
                                     ? "#4f545c"
-                                    : item.accessory.value.style === 3
+                                    : item.accessory.value.style === ButtonStyle.Success
                                     ? "#248046"
-                                    : item.accessory.value.style === 4
+                                    : item.accessory.value.style === ButtonStyle.Danger
                                     ? "#dc2626"
                                     : "#5865f2",
                         }}
                     >
-                        <span className="font-medium whitespace-nowrap">{item.accessory.value.label}</span>
+                        <span className="font-medium whitespace-nowrap">
+                            {item.accessory.value.label}
+                        </span>
                     </div>
                 ) : (
                     <Image

@@ -37,6 +37,7 @@ import supabase from "@/lib/supabase";
 import { toast } from "sonner";
 import ChannelSelector from "@/components/channel-selector";
 import { nanoid } from "nanoid";
+import { useNavbar } from "@/stores/navbar";
 
 export default function Page() {
     const [data, setData] = useState<Template | null>(null);
@@ -277,6 +278,12 @@ export default function Page() {
     }
 
     const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+
+    const { setHeading } = useNavbar();
+
+    useEffect(() => {
+        setHeading(data?.name ?? null);
+    }, [setHeading, data]);
 
     if (!data) return <div className="h-96 py-48 flex items-center justify-center text-muted-foreground text-sm">Loading...</div>;
 

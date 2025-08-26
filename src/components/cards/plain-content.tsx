@@ -34,6 +34,7 @@ export default function PlainContent({ content, accessory, setContent, setAccess
     const [buttonLabel, setButtonLabel] = useState("");
     const [buttonStyle, setButtonStyle] = useState<ButtonStyle | undefined>(undefined);
     const [buttonCustomId, setButtonCustomId] = useState<string>("");
+    const [buttonUrl, setButtonUrl] = useState<string>("");
 
     const [imageUrl, setImageUrl] = useState("");
     const [imageAlt, setImageAlt] = useState("");
@@ -48,6 +49,7 @@ export default function PlainContent({ content, accessory, setContent, setAccess
             setButtonLabel(accessory.value.label ?? "");
             setButtonStyle(accessory.value.style);
             setButtonCustomId(accessory.value.customId ?? "");
+            setButtonUrl(accessory.value.url ?? "");
             return;
         }
         if (accessory.type === AccessoryType.Image) {
@@ -175,6 +177,8 @@ export default function PlainContent({ content, accessory, setContent, setAccess
                                                                 return "success";
                                                             case ButtonStyle.Danger:
                                                                 return "danger";
+                                                            case ButtonStyle.Link:
+                                                                return "link";
                                                             default:
                                                                 return undefined;
                                                         }
@@ -185,6 +189,7 @@ export default function PlainContent({ content, accessory, setContent, setAccess
                                                             secondary: ButtonStyle.Secondary,
                                                             success: ButtonStyle.Success,
                                                             danger: ButtonStyle.Danger,
+                                                            link: ButtonStyle.Link,
                                                         };
                                                         setButtonStyle(map[value]);
                                                     }}
@@ -197,20 +202,32 @@ export default function PlainContent({ content, accessory, setContent, setAccess
                                                         <SelectItem value="secondary">Secondary</SelectItem>
                                                         <SelectItem value="success">Success</SelectItem>
                                                         <SelectItem value="danger">Danger</SelectItem>
+                                                        <SelectItem value="link">Link</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </LabelSelect>
-                                            <LabelSelect id={id5} label="Action" required>
-                                                <Select value={buttonCustomId || undefined} onValueChange={setButtonCustomId}>
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Select an action" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {/* the value here is the custom ID of the action */}
-                                                        <SelectItem value="m6qQ4Tw7Xf">action 1</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </LabelSelect>
+                                            {buttonStyle === ButtonStyle.Link ? (
+                                                <LabelInput
+                                                    id={id5}
+                                                    label="URL"
+                                                    placeholder="https://example.com"
+                                                    value={buttonUrl}
+                                                    setValue={setButtonUrl}
+                                                    required
+                                                />
+                                            ) : (
+                                                <LabelSelect id={id5} label="Action" required>
+                                                    <Select value={buttonCustomId || undefined} onValueChange={setButtonCustomId}>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select an action" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {/* the value here is the custom ID of the action */}
+                                                            <SelectItem value="m6qQ4Tw7Xf">action 1</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </LabelSelect>
+                                            )}
                                         </>
                                     ) : selectedAccessoryType === AccessoryType.Image ? (
                                         <>
@@ -248,22 +265,38 @@ export default function PlainContent({ content, accessory, setContent, setAccess
                                             disabled={
                                                 selectedAccessoryType === null ||
                                                 (selectedAccessoryType === AccessoryType.Button
-                                                    ? !(buttonLabel.trim() && buttonCustomId.trim() && buttonStyle !== undefined)
+                                                    ? (buttonStyle === ButtonStyle.Link
+                                                        ? !(buttonLabel.trim() && buttonUrl.trim())
+                                                        : !(buttonLabel.trim() && buttonCustomId.trim() && buttonStyle !== undefined))
                                                     : selectedAccessoryType === AccessoryType.Image
                                                     ? !imageUrl
                                                     : false)
                                             }
                                             onClick={() => {
                                                 if (selectedAccessoryType === AccessoryType.Button) {
-                                                    if (!buttonLabel || !buttonCustomId || buttonStyle === undefined) return;
-                                                    setAccessory({
-                                                        type: AccessoryType.Button,
-                                                        value: {
-                                                            label: buttonLabel,
-                                                            style: buttonStyle as ButtonStyle,
-                                                            customId: buttonCustomId,
-                                                        },
-                                                    });
+                                                    if (buttonStyle === ButtonStyle.Link) {
+                                                        if (!buttonLabel.trim() || !buttonUrl.trim()) return;
+                                                        setAccessory({
+                                                            type: AccessoryType.Button,
+                                                            value: {
+                                                                label: buttonLabel,
+                                                                style: ButtonStyle.Link,
+                                                                customId: "",
+                                                                url: buttonUrl,
+                                                            },
+                                                        });
+                                                    } else {
+                                                        if (!buttonLabel.trim() || !buttonCustomId.trim() || buttonStyle === undefined) return;
+                                                        setAccessory({
+                                                            type: AccessoryType.Button,
+                                                            value: {
+                                                                label: buttonLabel,
+                                                                style: buttonStyle as ButtonStyle,
+                                                                customId: buttonCustomId,
+                                                                url: buttonUrl,
+                                                            },
+                                                        });
+                                                    }
                                                 } else if (selectedAccessoryType === AccessoryType.Image) {
                                                     if (!imageUrl) return;
                                                     setAccessory({

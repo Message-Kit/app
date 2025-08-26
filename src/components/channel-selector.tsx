@@ -59,7 +59,7 @@ export default function ChannelSelector({ setSelectedChannel }: Props) {
         }
     };
 
-    // build ordered list interleaving top-level channels and category groups by position
+    // build ordered list with top-level channels first, then category groups
     const orderedElements = (() => {
         const categories = channels
             .filter((c) => c.type === ChannelType.GuildCategory)
@@ -80,21 +80,14 @@ export default function ChannelSelector({ setSelectedChannel }: Props) {
             .filter((c) => c.parent_id === null && c.type !== ChannelType.GuildCategory)
             .sort((a, b) => a.position - b.position);
 
-        const merged: Array<{ kind: "channel"; value: Channel } | { kind: "category"; value: Channel; children: Channel[] }> = [];
-        let i = 0;
-        let j = 0;
-        while (i < topLevel.length || j < categories.length) {
-            const nextTop = topLevel[i];
-            const nextCat = categories[j];
-            if (nextTop && (!nextCat || nextTop.position <= nextCat.position)) {
-                merged.push({ kind: "channel", value: nextTop });
-                i++;
-            } else if (nextCat) {
-                merged.push({ kind: "category", value: nextCat, children: childrenByParent[nextCat.id] ?? [] });
-                j++;
-            }
+        const elements: Array<{ kind: "channel"; value: Channel } | { kind: "category"; value: Channel; children: Channel[] }> = [];
+        for (const ch of topLevel) {
+            elements.push({ kind: "channel", value: ch });
         }
-        return merged;
+        for (const cat of categories) {
+            elements.push({ kind: "category", value: cat, children: childrenByParent[cat.id] ?? [] });
+        }
+        return elements;
     })();
 
     return (

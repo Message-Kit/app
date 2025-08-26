@@ -54,6 +54,7 @@ interface FinalButton {
     label: string;
     style: ButtonStyle;
     customId: string;
+    url: string;
 }
 
 type Accessory =

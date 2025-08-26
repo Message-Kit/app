@@ -4,9 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import supabase from "@/lib/supabase";
 import { Template } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Edit, EllipsisVerticalIcon, Hash, Trash } from "lucide-react";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Template>[] = [
     {
@@ -68,6 +70,18 @@ export const columns: ColumnDef<Template>[] = [
             return <div className="px-2 py-4 font-medium text-muted-foreground">Actions</div>;
         },
         cell: ({ row }) => {
+            async function deleteTemplateInSupabase(id: string) {
+                const { error } = await supabase.from("templates").delete().eq("id", id);
+
+                if (!error) {
+                    toast.success("Template deleted");
+                } else {
+                    console.error(error);
+                }
+
+                window.location.reload();
+            }
+
             return (
                 <div className="justify-center flex">
                     <DropdownMenu>
@@ -81,7 +95,7 @@ export const columns: ColumnDef<Template>[] = [
                                 <Edit />
                                 Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
+                            <DropdownMenuItem className="text-destructive" onClick={() => deleteTemplateInSupabase(row.original.id)}>
                                 <Trash className="text-destructive" />
                                 Delete
                             </DropdownMenuItem>

@@ -21,13 +21,22 @@ import {
 import LabelInput from "@/components/label-input";
 import { useUserStore } from "@/stores/user";
 import { nanoid } from "nanoid";
+import { useNavbar } from "@/stores/navbar";
+import { useGuildStore } from "@/stores/guild";
 
 export default function Page() {
+    const { setHeading } = useNavbar();
+
+    useEffect(() => {
+        setHeading("Templates");
+    }, [setHeading]);
+
     const [templates, setTemplates] = useState<Template[]>([]);
     const [newTemplateName, setNewTemplateName] = useState("");
     const [shouldReloadTable, setShouldReloadTable] = useState(false);
 
     const { user } = useUserStore();
+    const { guild } = useGuildStore();
 
     useEffect(() => {
         if (!user) return;
@@ -53,9 +62,12 @@ export default function Page() {
     }, [shouldReloadTable]);
 
     async function createTemplateInSupabase() {
+        if (!guild?.id) return;
+        if (!user?.id) return;
+
         const { error } = await supabase
             .from("templates")
-            .insert({ id: nanoid(10), name: newTemplateName, guild_id: "1138777402684739587", uuid: user?.id });
+            .insert({ id: nanoid(10), name: newTemplateName, guild_id: guild?.id, uuid: user?.id });
 
         if (!error) {
             setShouldReloadTable(true);

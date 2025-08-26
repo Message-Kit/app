@@ -12,6 +12,7 @@ import supabase from "@/lib/supabase";
 import { useGuildStore } from "@/stores/guild";
 import { Skeleton } from "./ui/skeleton";
 import { Guild } from "@/types/discord";
+import Image from "next/image";
 
 export function GuildSwitcher() {
     const [open, setOpen] = useState(false);
@@ -22,18 +23,34 @@ export function GuildSwitcher() {
     useEffect(() => {
         if (!user) return;
 
+        // console.log("got user");
+
         const fetchGuilds = async () => {
             const { data: sessionData } = await supabase.auth.getSession();
 
+            if (!sessionData) return;
+            if (!sessionData.session) return;
+
+            // console.log("got session data and session");
+
+            const providerToken = sessionData.session.provider_token;
+            if (!providerToken) return;
+
+            // console.log("got provider token");
+
             const response = await fetch("/api/get-server-list", {
                 method: "POST",
-                body: JSON.stringify({ accessToken: sessionData.session?.access_token }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ providerToken }),
             });
+
+            // console.log("got guilds");
 
             const data = await response.json();
 
             if (data.success) {
                 setGuilds(data.data);
+                // console.log("got guilds data");
             }
         };
 
@@ -64,11 +81,21 @@ export function GuildSwitcher() {
                     size="lg"
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2.5"
                 >
-                    <div className="bg-sidebar-primary text-sidebar-primary-foreground aspect-square size-8 rounded-sm overflow-hidden"></div>
+                    {!guild ? (
+                        <Skeleton className="size-8 rounded-sm" />
+                    ) : (
+                        <div className="bg-sidebar-primary text-sidebar-primary-foreground aspect-square size-8 rounded-sm overflow-hidden">
+                            <Image
+                                src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`}
+                                alt="guild icon"
+                                width={32}
+                                height={32}
+                                className="object-cover"
+                            />
+                        </div>
+                    )}
                     <div className="flex flex-col gap-0.5 leading-tight">
-                        <span className="font-medium">
-                            {selectedGuildName ?? <Skeleton className="w-32 h-4" />}
-                        </span>
+                        <span className="font-medium">{selectedGuildName ?? <Skeleton className="w-32 h-4" />}</span>
                         <span className="text-muted-foreground text-xs">
                             {selectedGuildName ? "Basic Plan" : <Skeleton className="w-24 h-4" />}
                         </span>

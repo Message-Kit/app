@@ -1,9 +1,21 @@
 "use client";
 
-import { ChevronsUpDown, GalleryVerticalEnd, MessagesSquare, Pickaxe, SlashSquare, Sparkles, TextCursorInput, Webhook } from "lucide-react";
+import {
+    ChevronsUpDown,
+    GalleryVerticalEnd,
+    LogOut,
+    MessagesSquare,
+    Pickaxe,
+    Settings,
+    SlashSquare,
+    Sparkles,
+    TextCursorInput,
+    Webhook,
+} from "lucide-react";
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
@@ -113,6 +125,30 @@ export default function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+            <SidebarFooter>
+                <SidebarGroup>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href={"/app/settings"}>
+                                        <Settings />
+                                        Settings
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href={"/auth/logout"} className="text-destructive">
+                                        <LogOut className="text-destructive" />
+                                        Logout
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarFooter>
         </Sidebar>
     );
 }
