@@ -34,15 +34,8 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body
-                className={`${bodyFont.className} ${displayFont.variable} ${discordFont.variable} antialiased`}
-            >
-                <UserProvider />
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="dark"
-                    disableTransitionOnChange
-                >
+            <body className={`${bodyFont.className} ${displayFont.variable} ${discordFont.variable} antialiased`}>
+                <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
                     {children}
                 </ThemeProvider>
             </body>

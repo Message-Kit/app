@@ -18,7 +18,7 @@ import {
     type TypeSeparator,
     Template,
 } from "@/types";
-import { Box, ChevronDown, ChevronUp, DiamondMinus, Ellipsis, ImagesIcon, Plus, Save, SaveIcon, Send, TextIcon, Trash } from "lucide-react";
+import { Box, ChevronDown, ChevronUp, DiamondMinus, Ellipsis, ImagesIcon, Plus, SaveIcon, Send, TextIcon, Trash } from "lucide-react";
 import { useState, Fragment, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
@@ -170,7 +170,9 @@ export default function Page() {
                 const section = new SectionBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(item.content));
 
                 if (accessory.type === AccessoryType.Button) {
-                    const { label, style, customId } = accessory.value;
+                    // const { label, style, customId } = accessory.value;
+                    const { label, style } = accessory.value;
+
                     section.setButtonAccessory(new ButtonBuilder().setLabel(label).setStyle(style).setCustomId(nanoid(10)));
                     // section.setButtonAccessory(new ButtonBuilder().setLabel(label).setStyle(style).setCustomId(customId));
                 } else if (accessory.type === AccessoryType.Image) {
@@ -587,7 +589,7 @@ export default function Page() {
             <ResizableHandle />
             <ResizablePanel defaultSize={38.5}>
                 {finalMessage.length === 0 ? (
-                    <div className="p-6 text-muted-foreground text-center">Add a component to see preview.</div>
+                    <div className="p-4 h-full text-muted-foreground flex items-center justify-center">Add a component to see preview.</div>
                 ) : (
                     <div className="p-4">
                         <MessagePreview finalMessage={finalMessage} />

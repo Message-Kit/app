@@ -42,23 +42,6 @@ export default function AppSidebar() {
     return (
         <Sidebar>
             <SidebarHeader className="border-b">
-                {/* <SidebarMenu> */}
-                {/* <SidebarMenuItem> */}
-                {/* <SidebarMenuButton
-                            size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                        >
-                            <div className="bg-sidebar-primary text-sidebar-primary-foreground aspect-square size-8 rounded-md overflow-hidden">
-                                hi
-                            </div>
-                            <div className="flex flex-col gap-0.5 leading-tight">
-                                <span className="font-medium">{"Rony's Server"}</span>
-                                <span className="text-muted-foreground text-xs">Basic Plan</span>
-                            </div>
-                            <ChevronsUpDown className="ml-auto" />
-                        </SidebarMenuButton> */}
-                {/* </SidebarMenuItem> */}
-                {/* </SidebarMenu> */}
                 <GuildSwitcher />
             </SidebarHeader>
             <SidebarContent>

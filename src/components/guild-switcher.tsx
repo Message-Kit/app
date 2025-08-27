@@ -85,13 +85,27 @@ export function GuildSwitcher() {
                         <Skeleton className="size-8 rounded-sm" />
                     ) : (
                         <div className="bg-sidebar-primary text-sidebar-primary-foreground aspect-square size-8 rounded-sm overflow-hidden">
-                            <Image
-                                src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`}
-                                alt="guild icon"
-                                width={32}
-                                height={32}
-                                className="object-cover"
-                            />
+                            {guild.icon ? (
+                                <Image
+                                    src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}`}
+                                    alt="guild icon"
+                                    width={32}
+                                    height={32}
+                                    className="object-cover"
+                                />
+                            ) : (
+                                <div className="flex justify-center items-center size-full">
+                                    <span className="font-medium font-ass text-sm">
+                                        {guild.name
+                                            .split(" ")
+                                            .filter(Boolean)
+                                            .slice(0, 2)
+                                            .map((word) => word[0]?.toUpperCase())
+                                            .join("")
+                                            .slice(0, 2)}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     )}
                     <div className="flex flex-col gap-0.5 leading-tight">
