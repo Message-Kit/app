@@ -70,6 +70,7 @@
         0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
     --tracking-normal: 0em;
+    /* --spacing: 0.265rem; */
     --spacing: 0.25rem;
 }
 
@@ -192,7 +193,7 @@
     }
 }
 
-/* .my-gradient {
+.my-gradient {
     position: absolute;
     inset: 0;
     z-index: -10;
@@ -201,10 +202,10 @@
     padding: 6rem 1.25rem;
     background: radial-gradient(
         120% 120% at 50% 0%,
-        #000000 50%,
-        rgba(88, 101, 242, 0.5) 225%
+        #121214 50%,
+        rgba(88, 101, 242, 0.75) 225%
     );
-} */
+}
 
 /* .my-gradient {
     position: absolute;

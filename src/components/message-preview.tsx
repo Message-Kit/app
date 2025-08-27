@@ -13,7 +13,7 @@ interface Props {
 export default function MessagePreview({ finalMessage }: Props) {
     return (
         <div className="max-w-[598px] h-full p-6 bg-[#323339] rounded-xl border font-ass">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4">
                 {finalMessage.map((item, index) => (
                     <div key={index}>
                         {item.type === ItemType.PlainContent ? (
@@ -42,9 +42,9 @@ function PreviewPlainContent({ item, fontSizeSmall }: { item: TypePlainContent; 
                 <ReactMarkdown
                     remarkPlugins={[remarkBreaks, remarkGfm]}
                     components={{
-                        h1: ({ children }) => <h1 className={cn("font-bold", "text-2xl leading-normal")}>{children}</h1>,
-                        h2: ({ children }) => <h2 className={cn("font-bold", "text-xl leading-normal")}>{children}</h2>,
-                        h3: ({ children }) => <h3 className={cn("font-bold", "text-lg leading-normal")}>{children}</h3>,
+                        h1: ({ children }) => <h1 className={cn("font-bold", "text-2xl leading-loose")}>{children}</h1>,
+                        h2: ({ children }) => <h2 className={cn("font-bold", "text-xl leading-loose")}>{children}</h2>,
+                        h3: ({ children }) => <h3 className={cn("font-bold", "text-lg leading-loose")}>{children}</h3>,
                         h4: ({ children }) => <h4 className={cn("text-[#959ba3]", "text-[11.375px] leading-normal")}>{children}</h4>,
                         code: ({ children }) => (
                             <code className="bg-[#353748] text-[#dbdee1] px-1 py-0.5 rounded-[4px] border-[#4f505f] border leading-normal">

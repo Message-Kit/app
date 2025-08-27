@@ -109,19 +109,31 @@ export function GuildSwitcher() {
                         </div>
                     )}
                     <div className="flex flex-col gap-0.5 leading-tight">
-                        <span className="font-medium">{selectedGuildName ?? <Skeleton className="w-32 h-4" />}</span>
+                        <span className="font-medium">
+                            {selectedGuildName ? (
+                                selectedGuildName.length > 24 ? (
+                                    selectedGuildName.slice(0, 21) + "..."
+                                ) : (
+                                    selectedGuildName
+                                )
+                            ) : (
+                                <Skeleton className="w-32 h-4" />
+                            )}
+                        </span>
                         <span className="text-muted-foreground text-xs">
                             {selectedGuildName ? "Basic Plan" : <Skeleton className="w-24 h-4" />}
                         </span>
                     </div>
-                    <ChevronsUpDown className="ml-auto" />
+                    {selectedGuildName && <ChevronsUpDown className="ml-auto" />}
                 </SidebarMenuButton>
             </PopoverTrigger>
             <PopoverContent className="w-[220px] p-0" align="end">
                 <Command>
                     <CommandInput placeholder="Search guild..." />
                     <CommandList>
-                        <CommandEmpty>No guild found.</CommandEmpty>
+                        <CommandEmpty>
+                            <span className="text-muted-foreground">No guilds found :(</span>
+                        </CommandEmpty>
                         <CommandGroup>
                             {guilds.map((option) => (
                                 <CommandItem

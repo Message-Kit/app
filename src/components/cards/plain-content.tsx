@@ -265,9 +265,9 @@ export default function PlainContent({ content, accessory, setContent, setAccess
                                             disabled={
                                                 selectedAccessoryType === null ||
                                                 (selectedAccessoryType === AccessoryType.Button
-                                                    ? (buttonStyle === ButtonStyle.Link
+                                                    ? buttonStyle === ButtonStyle.Link
                                                         ? !(buttonLabel.trim() && buttonUrl.trim())
-                                                        : !(buttonLabel.trim() && buttonCustomId.trim() && buttonStyle !== undefined))
+                                                        : !(buttonLabel.trim() && buttonCustomId.trim() && buttonStyle !== undefined)
                                                     : selectedAccessoryType === AccessoryType.Image
                                                     ? !imageUrl
                                                     : false)
