@@ -771,12 +771,15 @@ export default function Page() {
                                                             onDelete={() => {
                                                                 setComponents((prev) =>
                                                                     prev.map((c, i) =>
-                                                                        i === index && c.type === ComponentType.Container
+                                                                        i === index &&
+                                                                        c.type === ComponentType.Container
                                                                             ? {
                                                                                   ...c,
                                                                                   components: (
                                                                                       c.components ?? []
-                                                                                  ).filter((_, ci) => ci !== childIndex),
+                                                                                  ).filter(
+                                                                                      (_, ci) => ci !== childIndex,
+                                                                                  ),
                                                                               }
                                                                             : c,
                                                                     ),
@@ -787,7 +790,9 @@ export default function Page() {
                                                             onChangeSpacing={(size) =>
                                                                 setComponents((prev) => {
                                                                     const arr = [...prev];
-                                                                    const container = arr[index] as APIContainerComponent;
+                                                                    const container = arr[
+                                                                        index
+                                                                    ] as APIContainerComponent;
                                                                     const children = [...container.components];
                                                                     const current = children[childIndex] as {
                                                                         type: ComponentType.Separator;
@@ -806,7 +811,9 @@ export default function Page() {
                                                             onChangeDivider={(value) =>
                                                                 setComponents((prev) => {
                                                                     const arr = [...prev];
-                                                                    const container = arr[index] as APIContainerComponent;
+                                                                    const container = arr[
+                                                                        index
+                                                                    ] as APIContainerComponent;
                                                                     const children = [...container.components];
                                                                     const current = children[childIndex] as {
                                                                         type: ComponentType.Separator;
@@ -925,7 +932,10 @@ export default function Page() {
                                                     divider: boolean;
                                                     spacing: SeparatorSpacingSize;
                                                 };
-                                                next[index] = { ...current, spacing: size } as APIMessageTopLevelComponent;
+                                                next[index] = {
+                                                    ...current,
+                                                    spacing: size,
+                                                } as APIMessageTopLevelComponent;
                                                 return next;
                                             })
                                         }
@@ -937,7 +947,10 @@ export default function Page() {
                                                     divider: boolean;
                                                     spacing: SeparatorSpacingSize;
                                                 };
-                                                next[index] = { ...current, divider: value } as APIMessageTopLevelComponent;
+                                                next[index] = {
+                                                    ...current,
+                                                    divider: value,
+                                                } as APIMessageTopLevelComponent;
                                                 return next;
                                             })
                                         }

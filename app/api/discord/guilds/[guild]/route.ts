@@ -1,8 +1,9 @@
 import { REST } from "@discordjs/rest";
 import { type APIGuild, Routes } from "discord-api-types/v10";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export async function GET(_req: Request, context: { params: Promise<{ guild: string }> }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ guild: string }> }) {
     const clientToken = process.env.DISCORD_CLIENT_TOKEN;
     if (!clientToken) {
         return NextResponse.json({ error: "DISCORD_CLIENT_TOKEN is not set" }, { status: 500 });
