@@ -1,8 +1,13 @@
 "use client";
 
 import { SiDiscord } from "@icons-pack/react-simple-icons";
-import type { RESTGetAPICurrentUserGuildsResult } from "discord-api-types/v10";
-import { CDNRoutes, ImageFormat, RouteBases } from "discord-api-types/v10";
+import {
+    CDNRoutes,
+    ImageFormat,
+    PermissionFlagsBits,
+    type RESTGetAPICurrentUserGuildsResult,
+    RouteBases,
+} from "discord-api-types/v10";
 import { ChevronRightIcon, LogOutIcon, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -59,6 +64,12 @@ function PageContent() {
                     ) : (
                         <ScrollArea className="max-h-[500px] rounded-xl border">
                             {guilds.map((guild) => {
+                                const perms = BigInt(guild.permissions);
+                                const hasAdmin =
+                                    (perms & BigInt(PermissionFlagsBits.Administrator.toString())) !== BigInt(0);
+
+                                if (!hasAdmin) return null;
+
                                 const iconExt = guild.icon?.startsWith("a_") ? ImageFormat.GIF : ImageFormat.WebP;
                                 const iconUrl = guild.icon
                                     ? RouteBases.cdn + CDNRoutes.guildIcon(guild.id, guild.icon, iconExt)
@@ -87,9 +98,7 @@ function PageContent() {
                                         </div>
                                         <div className="flex flex-col">
                                             <div className="font-medium font-display">{guild.name}</div>
-                                            <div className="text-sm text-gray-500">
-                                                {guild.approximate_member_count} members
-                                            </div>
+                                            <div className="text-sm text-gray-500">{hasAdmin ? "Admin" : "Member"}</div>
                                         </div>
                                         <div className="ml-auto my-auto">
                                             <Button variant="ghost" size="icon" asChild>

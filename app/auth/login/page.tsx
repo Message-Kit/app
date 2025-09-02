@@ -19,5 +19,7 @@ export default function Page() {
         });
     }, [supabase]);
 
-    return <div className="flex justify-center items-center h-screen">Logging you in...</div>;
+    return (
+        <div className="flex justify-center items-center h-screen text-sm text-muted-foreground">Logging you in...</div>
+    );
 }

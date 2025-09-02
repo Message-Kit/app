@@ -2,6 +2,7 @@
 
 import { EditIcon, MoreVerticalIcon, PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
 import { nanoid } from "nanoid";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,6 @@ import type { Template } from "@/types/db";
 import { createClient } from "@/utils/supabase/client";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import Link from "next/link";
 
 function MessageActions({ guildId, messageId }: { guildId: string; messageId: string }) {
     return (

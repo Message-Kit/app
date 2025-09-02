@@ -12,5 +12,9 @@ export default function Page() {
         redirect("/");
     }, [supabase]);
 
-    return <div className="flex justify-center items-center h-screen">Logging you out...</div>;
+    return (
+        <div className="flex justify-center items-center h-screen text-sm text-muted-foreground">
+            Logging you out...
+        </div>
+    );
 }

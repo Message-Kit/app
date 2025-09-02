@@ -14,7 +14,6 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ guild:
 
     try {
         const guildData = (await rest.get(Routes.guild(guild))) as APIGuild;
-
         return NextResponse.json({ guild: guildData });
     } catch (error) {
         const message = (error as Error)?.message ?? "Unknown error";

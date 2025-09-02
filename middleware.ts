@@ -1,16 +1,22 @@
 import { createServerClient } from "@supabase/ssr";
-import { type NextRequest, NextResponse } from "next/server";
+import { type MiddlewareConfig, type NextRequest, NextResponse } from "next/server";
 import { BLOCKED_REDIRECT, isPublic } from "@/utils/supabase/middleware/rules";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+const discordClientToken = process.env.DISCORD_CLIENT_TOKEN;
 
 export async function middleware(request: NextRequest) {
-    if (!supabaseUrl || !supabaseKey) {
-        throw new Error("Missing Supabase environment variables");
+    const pathname = request.nextUrl.pathname;
+    const response = NextResponse.next();
+
+    if (isPublic(pathname)) {
+        return response;
     }
 
-    const response = NextResponse.next();
+    if (!supabaseUrl || !supabaseKey || !discordClientToken) {
+        throw new Error("Missing Supabase or Discord environment variables");
+    }
 
     // create supabase client bound to cookies
     const supabase = createServerClient(supabaseUrl, supabaseKey, {
@@ -28,22 +34,18 @@ export async function middleware(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
-    const pathname = request.nextUrl.pathname;
-
-    if (isPublic(pathname)) {
-        return response; // allow
-    }
-
     if (!user) {
         const url = request.nextUrl.clone();
+
         url.pathname = BLOCKED_REDIRECT;
         url.searchParams.set("blockedFrom", pathname);
+
         return NextResponse.redirect(url);
     }
 
-    return response; // logged-in users can access everything else
+    return response;
 }
 
-export const config = {
+export const config: MiddlewareConfig = {
     matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };

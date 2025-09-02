@@ -1,9 +1,9 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+import { ExternalLinkIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Template } from "@/types/db";
-import { ExternalLinkIcon } from "lucide-react";
 
 interface TemplateWithActions extends Template {
     actions: React.ReactNode;
