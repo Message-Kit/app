@@ -401,7 +401,10 @@ export default function Page() {
                                                                     type: ComponentType.TextDisplay,
                                                                     content: "",
                                                                 });
-                                                                next[index] = { ...container, components: children };
+                                                                next[index] = {
+                                                                    ...container,
+                                                                    components: children,
+                                                                };
                                                                 return next;
                                                             })
                                                         }
@@ -428,7 +431,10 @@ export default function Page() {
                                                                     divider: true,
                                                                     spacing: SeparatorSpacingSize.Large,
                                                                 });
-                                                                next[index] = { ...container, components: children };
+                                                                next[index] = {
+                                                                    ...container,
+                                                                    components: children,
+                                                                };
                                                                 return next;
                                                             })
                                                         }
@@ -446,7 +452,10 @@ export default function Page() {
                                                                     type: ComponentType.ActionRow,
                                                                     components: [],
                                                                 });
-                                                                next[index] = { ...container, components: children };
+                                                                next[index] = {
+                                                                    ...container,
+                                                                    components: children,
+                                                                };
                                                                 return next;
                                                             })
                                                         }
@@ -464,7 +473,10 @@ export default function Page() {
                                                                     type: ComponentType.ActionRow,
                                                                     components: [],
                                                                 });
-                                                                next[index] = { ...container, components: children };
+                                                                next[index] = {
+                                                                    ...container,
+                                                                    components: children,
+                                                                };
                                                                 return next;
                                                             })
                                                         }
@@ -1126,7 +1138,6 @@ export default function Page() {
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={38.5}>
-                {/* <MessagePreview components={components} /> */}
                 <div className="p-4 flex justify-center items-center h-full text-muted-foreground">
                     No Preview Available
                 </div>

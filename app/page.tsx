@@ -6,20 +6,21 @@ import { CDNRoutes, ImageFormat, RouteBases } from "discord-api-types/v10";
 import { ChevronRightIcon, LogOutIcon, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { RedirectType, redirect, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserStore } from "@/lib/stores/user-store";
 import { fetchDiscordGuilds, getDiscordProviderToken } from "./actions";
 
-export default function Page() {
+function PageContent() {
     const { user } = useUserStore();
     const [guilds, setGuilds] = useState<RESTGetAPICurrentUserGuildsResult>([]);
 
     const params = useSearchParams();
     const blocked = params.get("blockedFrom");
+    const router = useRouter();
 
     useEffect(() => {
         if (!user) return;
@@ -37,9 +38,9 @@ export default function Page() {
     useEffect(() => {
         if (blocked) {
             alert("You cannot access this page!");
-            redirect("/", RedirectType.replace);
+            router.replace("/");
         }
-    }, [blocked]);
+    }, [blocked, router]);
 
     return (
         <div className="max-w-md mx-auto px-4 py-32 flex flex-col justify-center h-screen">
@@ -130,5 +131,19 @@ export default function Page() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function Page() {
+    return (
+        <Suspense
+            fallback={
+                <div className="flex flex-col justify-center items-center h-screen">
+                    <Spinner size={"medium"} />
+                </div>
+            }
+        >
+            <PageContent />
+        </Suspense>
     );
 }

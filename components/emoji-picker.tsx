@@ -36,7 +36,7 @@ export default function EmojiPicker({
                 <Button variant="outline" size="icon">
                     {emoji?.id ? (
                         <Image
-                            className="size-[20px]"
+                            className="size-[18px]"
                             src={
                                 RouteBases.cdn +
                                 CDNRoutes.emoji(emoji.id, emoji.animated ? ImageFormat.GIF : ImageFormat.WebP)
@@ -68,7 +68,7 @@ export default function EmojiPicker({
                                 setShowPopover(false);
                             }}
                         >
-                            <Image className="size-[20px]" src={url} alt={emoji.name} width={32} height={32} />
+                            <Image className="size-[18px]" src={url} alt={emoji.name} width={32} height={32} />
                         </Button>
                     );
                 })}
