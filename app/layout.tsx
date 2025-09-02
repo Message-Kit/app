@@ -3,6 +3,7 @@ import { Inter, Inter_Tight } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { UserProvider } from "./providers/user-provider";
 
 const body = Inter({
@@ -35,6 +36,7 @@ export default function RootLayout({
             <body className={`${body.variable} ${display.variable} ${discord.variable} font-body antialiased`}>
                 <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
                     <UserProvider>{children}</UserProvider>
+                    <Toaster richColors />
                 </ThemeProvider>
             </body>
         </html>

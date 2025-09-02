@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Template } from "@/types/db";
+import { ExternalLinkIcon } from "lucide-react";
 
 interface TemplateWithActions extends Template {
     actions: React.ReactNode;
@@ -12,7 +13,17 @@ export const columns: ColumnDef<TemplateWithActions>[] = [
     {
         accessorKey: "name",
         header: () => <div className="px-2 py-4 opacity-50">Name</div>,
-        cell: ({ row }) => <div className="p-2">{row.original.name}</div>,
+        cell: ({ row }) => (
+            <div className="p-2">
+                <a
+                    className="flex gap-2 items-center underline underline-offset-2"
+                    href={`/${row.original.guild_id}/messages/${row.original.id}`}
+                >
+                    {row.original.name.length > 32 ? `${row.original.name.slice(0, 32)}...` : row.original.name}
+                    <ExternalLinkIcon size={14} className="opacity-50" />
+                </a>
+            </div>
+        ),
     },
     {
         accessorKey: "id",

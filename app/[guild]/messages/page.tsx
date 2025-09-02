@@ -29,8 +29,9 @@ import type { Template } from "@/types/db";
 import { createClient } from "@/utils/supabase/client";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import Link from "next/link";
 
-function MessageActions() {
+function MessageActions({ guildId, messageId }: { guildId: string; messageId: string }) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -39,9 +40,11 @@ function MessageActions() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem>
-                    <EditIcon />
-                    Edit
+                <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`/${guildId}/messages/${messageId}`}>
+                        <EditIcon />
+                        Edit
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <TrashIcon />
@@ -63,6 +66,15 @@ export default function Page() {
     const { user } = useUserStore();
     const [data, setData] = useState<TemplateWithActions[] | null>(null);
     const [newMessageName, setNewMessageName] = useState<string>("Untitled message");
+    const [searchInput, setSearchInput] = useState<string>("");
+    const [search, setSearch] = useState<string>("");
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setSearch(searchInput);
+        }, 1250);
+        return () => clearTimeout(handler);
+    }, [searchInput]);
 
     useEffect(() => {
         supabase
@@ -70,14 +82,20 @@ export default function Page() {
             .select("*")
             .eq("guild_id", params.guild)
             .order("updated_at", { ascending: false })
+            .ilike("name", `%${search}%`)
             .then(({ data, error }) => {
                 if (error) {
                     console.log(error);
                 } else {
-                    setData(data.map((item) => ({ ...item, actions: <MessageActions /> })));
+                    setData(
+                        data.map((item) => ({
+                            ...item,
+                            actions: <MessageActions guildId={`${params.guild}`} messageId={item.id} />,
+                        })),
+                    );
                 }
             });
-    }, [supabase, params]);
+    }, [supabase, params, search]);
 
     async function createNewMessageInSupabase() {
         supabase
@@ -94,7 +112,7 @@ export default function Page() {
                 if (error) {
                     console.log(error);
                 } else if (newData?.[0]) {
-                    setData((prev) => [{ ...newData[0], actions: <MessageActions /> }, ...(prev ?? [])]);
+                    setData((prev) => [{ ...newData[0] }, ...(prev ?? [])]);
                 }
             });
     }
@@ -107,20 +125,32 @@ export default function Page() {
         );
     }
 
+    function handleSearchSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        setSearch(searchInput);
+    }
+
     return (
         <div className="w-full px-4 py-32 max-w-4xl mx-auto">
             <div className="mb-4 flex justify-between items-center">
-                <div className="w-fit">
+                <form className="w-fit" onSubmit={handleSearchSubmit}>
                     <Label htmlFor="search-templates" className="sr-only">
                         Search Messages
                     </Label>
                     <div className="relative w-fit">
-                        <Input id="search-templates" className="peer ps-9" placeholder="Search Messages" type="text" />
+                        <Input
+                            id="search-templates"
+                            className="peer ps-9"
+                            placeholder="Search Messages"
+                            type="text"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
                         <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
                             <SearchIcon size={16} aria-hidden="true" />
                         </div>
                     </div>
-                </div>
+                </form>
 
                 <Dialog>
                     <DialogTrigger asChild>
@@ -134,12 +164,16 @@ export default function Page() {
                             <DialogTitle>New Message</DialogTitle>
                             <DialogDescription>Create a new message for your server.</DialogDescription>
                         </DialogHeader>
-                        <Input
-                            placeholder="Name"
-                            type="text"
-                            value={newMessageName}
-                            onChange={(e) => setNewMessageName(e.target.value)}
-                        />
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="new-message-name">Name</Label>
+                            <Input
+                                id="new-message-name"
+                                placeholder="Name"
+                                type="text"
+                                value={newMessageName}
+                                onChange={(e) => setNewMessageName(e.target.value)}
+                            />
+                        </div>
                         <DialogFooter>
                             <DialogClose asChild>
                                 <Button variant="outline">Cancel</Button>

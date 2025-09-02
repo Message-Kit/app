@@ -1,39 +1,45 @@
 "use client";
 
+import { SiDiscord } from "@icons-pack/react-simple-icons";
 import type { RESTGetAPICurrentUserGuildsResult } from "discord-api-types/v10";
 import { CDNRoutes, ImageFormat, RouteBases } from "discord-api-types/v10";
-import { ChevronRightIcon, LogInIcon, LogOutIcon, PlusIcon } from "lucide-react";
+import { ChevronRightIcon, LogOutIcon, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { RedirectType, redirect } from "next/navigation";
+import { RedirectType, redirect, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserStore } from "@/lib/stores/user-store";
 import { fetchDiscordGuilds, getDiscordProviderToken } from "./actions";
-import { SiDiscord } from "@icons-pack/react-simple-icons";
 
 export default function Page() {
     const { user } = useUserStore();
     const [guilds, setGuilds] = useState<RESTGetAPICurrentUserGuildsResult>([]);
+
+    const params = useSearchParams();
+    const blocked = params.get("blockedFrom");
 
     useEffect(() => {
         if (!user) return;
 
         const run = async () => {
             const { token } = await getDiscordProviderToken();
-
-            if (!token) {
-                return redirect("/auth/login", RedirectType.replace);
-            }
-
             const { data, error: guildsError } = await fetchDiscordGuilds(token ?? "");
+
             setGuilds(guildsError ? [] : (data ?? []));
         };
 
         run();
     }, [user]);
+
+    useEffect(() => {
+        if (blocked) {
+            alert("You cannot access this page!");
+            redirect("/", RedirectType.replace);
+        }
+    }, [blocked]);
 
     return (
         <div className="max-w-md mx-auto px-4 py-32 flex flex-col justify-center h-screen">
@@ -47,9 +53,8 @@ export default function Page() {
                         )}
                         <span className="text-muted-foreground text-sm">Choose a server below to continue.</span>
                     </div>
-                    {guilds.length === 0 && <Spinner size={"medium"} className="mt-8" />}
-                    {!guilds ? (
-                        <Spinner size={"medium"} className="mt-8" />
+                    {guilds.length === 0 ? (
+                        <Spinner size={"medium"} />
                     ) : (
                         <ScrollArea className="max-h-[500px] rounded-xl border">
                             {guilds.map((guild) => {
@@ -84,7 +89,6 @@ export default function Page() {
                                             <div className="text-sm text-gray-500">
                                                 {guild.approximate_member_count} members
                                             </div>
-                                            {/* <div className="text-sm text-gray-500">{guild.owner ? "Owner" : "Member"}</div> */}
                                         </div>
                                         <div className="ml-auto my-auto">
                                             <Button variant="ghost" size="icon" asChild>
@@ -116,7 +120,7 @@ export default function Page() {
             ) : (
                 <div className="flex flex-col items-center gap-1 w-full">
                     <span className="text-xl font-semibold font-display">Sign in to continue</span>
-                    <span className="text-sm text-muted-foreground">You need to be locked in to use Message Kit.</span>
+                    <span className="text-sm text-muted-foreground">You must be logged in to use Message Kit.</span>
                     <Button asChild className="mt-8" size={"lg"}>
                         <Link href={"/auth/login"}>
                             <SiDiscord />
