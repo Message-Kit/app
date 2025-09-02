@@ -22,7 +22,6 @@ export default function Separator({
     onChangeSpacing: (size: SeparatorSpacingSize) => void;
     onChangeDivider: (value: boolean) => void;
 }) {
-
     return (
         <div className="flex flex-col border rounded-xl bg-card">
             <div className="px-2 py-2 flex justify-between items-center">

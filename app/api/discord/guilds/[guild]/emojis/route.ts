@@ -1,8 +1,8 @@
 import { REST } from "@discordjs/rest";
 import { type APIEmoji, Routes } from "discord-api-types/v10";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function GET(_req: Request, { params }: { params: Promise<{ guild: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ guild: string }> }) {
     const { guild } = await params;
     const clientToken = process.env.DISCORD_CLIENT_TOKEN;
     if (!clientToken) {
