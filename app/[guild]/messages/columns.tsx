@@ -27,7 +27,7 @@ export const columns: ColumnDef<TemplateWithActions>[] = [
     },
     {
         accessorKey: "id",
-        header: () => <div className="px-2 py-4 opacity-50">Template ID</div>,
+        header: () => <div className="px-2 py-4 opacity-50">Message ID</div>,
         cell: ({ row }) => <div className="p-2 font-mono">{row.original.id}</div>,
     },
     // {

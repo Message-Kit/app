@@ -8,7 +8,7 @@ import {
     type RESTGetAPICurrentUserGuildsResult,
     RouteBases,
 } from "discord-api-types/v10";
-import { ChevronRightIcon, LogOutIcon, PlusIcon } from "lucide-react";
+import { ChevronRightIcon, Loader2, LogOutIcon, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,6 +22,7 @@ import { fetchDiscordGuilds, getDiscordProviderToken } from "./actions";
 function PageContent() {
     const { user } = useUserStore();
     const [guilds, setGuilds] = useState<RESTGetAPICurrentUserGuildsResult>([]);
+    const [loading, setLoading] = useState<{ index: number; value: boolean }>({ index: 0, value: false });
 
     const params = useSearchParams();
     const blocked = params.get("blockedFrom");
@@ -63,7 +64,7 @@ function PageContent() {
                         <Spinner size={"medium"} />
                     ) : (
                         <ScrollArea className="max-h-[500px] rounded-xl border">
-                            {guilds.map((guild) => {
+                            {guilds.map((guild, index) => {
                                 const perms = BigInt(guild.permissions);
                                 const hasAdmin =
                                     (perms & BigInt(PermissionFlagsBits.Administrator.toString())) !== BigInt(0);
@@ -101,9 +102,18 @@ function PageContent() {
                                             <div className="text-sm text-gray-500">{hasAdmin ? "Admin" : "Member"}</div>
                                         </div>
                                         <div className="ml-auto my-auto">
-                                            <Button variant="ghost" size="icon" asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                asChild
+                                                onClick={() => setLoading({ index: index, value: true })}
+                                            >
                                                 <Link href={`/${guild.id}`}>
-                                                    <ChevronRightIcon />
+                                                    {loading.index === index && loading.value ? (
+                                                        <Loader2 className="animate-spin" />
+                                                    ) : (
+                                                        <ChevronRightIcon />
+                                                    )}
                                                 </Link>
                                             </Button>
                                         </div>

@@ -31,27 +31,66 @@ import { createClient } from "@/utils/supabase/client";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
+const bus = {
+    emit<T>(event: string, data: T) {
+        window.dispatchEvent(new CustomEvent<T>(event, { detail: data }));
+    },
+    on<T>(event: string, cb: (data: T) => void) {
+        const handler = (e: Event) => cb((e as CustomEvent<T>).detail);
+        window.addEventListener(event, handler);
+        return () => window.removeEventListener(event, handler);
+    },
+};
+
 function MessageActions({ guildId, messageId }: { guildId: string; messageId: string }) {
+    const [open, setOpen] = useState(false);
+    const supabase = createClient();
+
+    async function deleteMessageInSupabase() {
+        await supabase.from("templates").delete().eq("id", messageId);
+        bus.emit("message-deleted", messageId);
+    }
+
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                    <MoreVerticalIcon />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`/${guildId}/messages/${messageId}`}>
-                        <EditIcon />
-                        Edit
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <TrashIcon />
-                    Delete
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <MoreVerticalIcon />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link href={`/${guildId}/messages/${messageId}`}>
+                            <EditIcon />
+                            Edit
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setOpen(true)}>
+                        <TrashIcon />
+                        Delete
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Message</DialogTitle>
+                        <DialogDescription>Are you sure you want to delete this message?</DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <DialogClose asChild>
+                            <Button variant={"destructive"} onClick={deleteMessageInSupabase}>
+                                Delete
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }
 
@@ -97,6 +136,12 @@ export default function Page() {
             });
     }, [supabase, params, search]);
 
+    useEffect(() => {
+        return bus.on("message-deleted", (messageId: string) => {
+            setData((prev) => prev?.filter((item) => item.id !== messageId) ?? []);
+        });
+    }, []);
+
     async function createNewMessageInSupabase() {
         supabase
             .from("templates")
@@ -112,7 +157,13 @@ export default function Page() {
                 if (error) {
                     console.log(error);
                 } else if (newData?.[0]) {
-                    setData((prev) => [{ ...newData[0] }, ...(prev ?? [])]);
+                    setData((prev) => [
+                        {
+                            ...newData[0],
+                            actions: <MessageActions guildId={`${params.guild}`} messageId={newData[0].id} />,
+                        },
+                        ...(prev ?? []),
+                    ]);
                 }
             });
     }
