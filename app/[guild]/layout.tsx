@@ -30,7 +30,8 @@ export default function RootLayout({
         return () => controller.abort();
     }, [params.guild]);
 
-    useEffect(() => console.log(guild), [guild]);
+    // useEffect(() => console.log(guild), [guild]);
+    // useEffect(() => console.log(params.guild), [params.guild]);
 
     return (
         <SidebarProvider>

@@ -43,7 +43,9 @@ function PageContent() {
 
     useEffect(() => {
         if (blocked) {
+            setLoading({ index: 0, value: false });
             alert("You cannot access this page!");
+
             router.replace("/");
         }
     }, [blocked, router]);
