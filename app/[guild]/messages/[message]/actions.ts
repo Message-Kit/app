@@ -18,12 +18,13 @@ if (!clientToken) {
 const rest = new REST({ version: "10" }).setToken(clientToken);
 
 export async function sendMessageToDiscord(
-    messageBody: RESTPostAPIChannelMessageJSONBody["components"],
+    messageBody: RESTPostAPIChannelMessageJSONBody,
     channelId: string,
 ) {
     return await rest.post(Routes.channelMessages(channelId), {
         body: {
-            components: messageBody,
+            components: messageBody.components,
+            attachments: messageBody.attachments,
             flags: MessageFlags.IsComponentsV2,
         },
     });

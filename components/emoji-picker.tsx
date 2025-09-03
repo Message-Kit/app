@@ -7,6 +7,9 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { Input } from "./ui/input";
+import { Spinner } from "./ui/spinner";
 
 export default function EmojiPicker({
     guildId,
@@ -17,8 +20,9 @@ export default function EmojiPicker({
     emoji: APIMessageComponentEmoji | null;
     onEmojiSelect: (emoji: APIEmoji) => void;
 }) {
-    const [emojis, setEmojis] = useState<APIEmoji[]>([]);
+    const [emojis, setEmojis] = useState<APIEmoji[] | null>(null);
     const [showPopover, setShowPopover] = useState(false);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         console.log(guildId);
@@ -50,28 +54,53 @@ export default function EmojiPicker({
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-fit max-h-56 overflow-y-auto grid grid-cols-6">
-                {emojis.map((emoji) => {
-                    if (!emoji.id) return null;
-                    if (!emoji.name) return null;
+            <PopoverContent className="flex flex-col gap-3">
+                <Input
+                    placeholder="Search for an emoji"
+                    className="w-full"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                {emojis === null ? (
+                    <div className="flex justify-center">
+                        <Spinner size="medium" />
+                    </div>
+                ) : (
+                    <div className="flex flex-wrap">
+                        {emojis
+                            .filter((emoji) => emoji.name?.toLowerCase().includes(search.toLowerCase()))
+                            .map((emoji) => {
+                                if (!emoji.id) return null;
+                                if (!emoji.name) return null;
 
-                    const url =
-                        RouteBases.cdn + CDNRoutes.emoji(emoji.id, emoji.animated ? ImageFormat.GIF : ImageFormat.WebP);
+                                const url =
+                                    RouteBases.cdn +
+                                    CDNRoutes.emoji(emoji.id, emoji.animated ? ImageFormat.GIF : ImageFormat.WebP);
 
-                    return (
-                        <Button
-                            key={emoji.id}
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                                onEmojiSelect(emoji);
-                                setShowPopover(false);
-                            }}
-                        >
-                            <Image className="size-[18px]" src={url} alt={emoji.name} width={32} height={32} />
-                        </Button>
-                    );
-                })}
+                                return (
+                                    <Button
+                                        key={emoji.id}
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => {
+                                            onEmojiSelect(emoji);
+                                            setShowPopover(false);
+                                        }}
+                                        title={emoji.name}
+                                        className="overflow-hidden"
+                                    >
+                                        <Image
+                                            className="size-[18px]"
+                                            src={url}
+                                            alt={emoji.name}
+                                            width={32}
+                                            height={32}
+                                        />
+                                    </Button>
+                                );
+                            })}
+                    </div>
+                )}
             </PopoverContent>
         </Popover>
     );
