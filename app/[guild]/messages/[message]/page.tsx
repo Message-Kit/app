@@ -14,8 +14,10 @@ import {
 } from "discord-api-types/v10";
 import {
     BoxIcon,
+    DownloadIcon,
     FileIcon,
     ImageIcon,
+    ImportIcon,
     MousePointerClickIcon,
     PlusIcon,
     RectangleEllipsisIcon,
@@ -23,6 +25,7 @@ import {
     Send,
     SeparatorHorizontalIcon,
     TextIcon,
+    UploadIcon,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -67,6 +70,7 @@ export default function Page() {
     const [components, setComponents] = useState<NonNullable<RESTPostAPIChannelMessageJSONBody["components"]>>([]);
     const [result, setResult] = useState<{ success: boolean; message: string | string[] } | null>(null);
     const [selectedChannel, setSelectedChannel] = useState<string>("");
+    const [importFile, setImportFile] = useState<File | null>(null);
 
     const keyMapRef = useRef(new WeakMap<object, string>());
     const nextIdRef = useRef(0);
@@ -232,6 +236,16 @@ export default function Page() {
                 }
             });
     };
+
+    const handleImportMessage = async () => {
+        if (!importFile) return;
+        setComponents(JSON.parse(await importFile.text()));
+    };
+
+    function handleExportMessage() {
+        const blob = new Blob([JSON.stringify(components, null, 2)], { type: "application/json" });
+        return URL.createObjectURL(blob);
+    }
 
     return (
         <ResizablePanelGroup direction="horizontal">
@@ -1069,6 +1083,65 @@ export default function Page() {
                                 <SaveIcon />
                                 Save
                             </Button>
+                            <div className="flex gap-2">
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant={"outline"}>
+                                            <DownloadIcon />
+                                            Import
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Import Message</DialogTitle>
+                                            <DialogDescription>Import a message from a file.</DialogDescription>
+                                        </DialogHeader>
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor="import-message-file">File</Label>
+                                            <Input
+                                                accept=".json"
+                                                type="file"
+                                                id="import-message-file"
+                                                onChange={(e) => setImportFile(e.target.files?.[0] ?? null)}
+                                            />
+                                        </div>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button variant={"outline"}>Cancel</Button>
+                                            </DialogClose>
+                                            <DialogClose asChild>
+                                                <Button onClick={handleImportMessage}>Confirm</Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant={"outline"}>
+                                            <UploadIcon />
+                                            Export
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Export Message</DialogTitle>
+                                            <DialogDescription>Export a message to a file.</DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button variant={"outline"}>Cancel</Button>
+                                            </DialogClose>
+                                            <DialogClose asChild>
+                                                <Button asChild>
+                                                    <a href={handleExportMessage()} download={`${params.message}.json`}>
+                                                        Download
+                                                    </a>
+                                                </Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
                         </div>
                         <div className="flex gap-2">
                             {components.length > 0 && (
