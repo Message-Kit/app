@@ -5,7 +5,7 @@ import { ChevronsUpDownIcon, ExternalLinkIcon, MessagesSquare, Pickaxe, TextCurs
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import {
     Sidebar,
@@ -20,10 +20,7 @@ import {
 } from "./ui/sidebar";
 import { Skeleton } from "./ui/skeleton";
 
-export default function AppSidebar() {
-    const [guild, setGuild] = useState<APIGuild | null | undefined>(undefined);
-    const [guildIcon, setGuildIcon] = useState<string | null | undefined>(undefined);
-
+export default function AppSidebar({ guild }: { guild: APIGuild | null | undefined }) {
     const pathname = usePathname();
     const params = useParams();
 
@@ -35,6 +32,16 @@ export default function AppSidebar() {
     }
 
     const guildId = params.guild;
+
+    let guildIcon: string | null | undefined;
+    if (guild === undefined) {
+        guildIcon = undefined;
+    } else if (!guild || !guild.icon) {
+        guildIcon = null;
+    } else {
+        const format = guild.icon.startsWith("a_") ? ImageFormat.GIF : ImageFormat.WebP;
+        guildIcon = RouteBases.cdn + CDNRoutes.guildIcon(guild.id, guild.icon, format);
+    }
 
     const sidebarGroups = [
         {
@@ -58,44 +65,6 @@ export default function AppSidebar() {
             ],
         },
     ];
-
-    useEffect(() => {
-        if (!guildId) return;
-
-        setGuild(undefined);
-        setGuildIcon(undefined);
-
-        const controller = new AbortController();
-
-        fetch(`/api/discord/guilds/${guildId}`, { signal: controller.signal })
-            .then((res) => res.json())
-            .then((data) => {
-                if (controller.signal.aborted) return;
-
-                const g = data.guild as APIGuild | null | undefined;
-                if (g) {
-                    setGuild(g);
-
-                    if (g.icon) {
-                        const format = g.icon.startsWith("a_") ? ImageFormat.GIF : ImageFormat.WebP;
-                        const url = RouteBases.cdn + CDNRoutes.guildIcon(g.id, g.icon, format);
-                        setGuildIcon(url);
-                    } else {
-                        setGuildIcon(null);
-                    }
-                } else {
-                    setGuild(null);
-                    setGuildIcon(null);
-                }
-            })
-            .catch((error) => {
-                if (error instanceof DOMException && error.name === "AbortError") return;
-                setGuild(null);
-                setGuildIcon(null);
-            });
-
-        return () => controller.abort();
-    }, [guildId]);
 
     return (
         <Sidebar>

@@ -1,7 +1,9 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { ExternalLinkIcon } from "lucide-react";
+import { ExternalLinkIcon, Loader2Icon } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Template } from "@/types/db";
 
@@ -13,17 +15,26 @@ export const columns: ColumnDef<TemplateWithActions>[] = [
     {
         accessorKey: "name",
         header: () => <div className="px-2 py-4 opacity-50">Name</div>,
-        cell: ({ row }) => (
-            <div className="p-2">
-                <a
-                    className="flex gap-2 items-center underline underline-offset-2"
-                    href={`/${row.original.guild_id}/messages/${row.original.id}`}
-                >
-                    {row.original.name.length > 32 ? `${row.original.name.slice(0, 32)}...` : row.original.name}
-                    <ExternalLinkIcon size={14} className="opacity-50" />
-                </a>
-            </div>
-        ),
+        cell: ({ row }) => {
+            const [loading, setLoading] = useState(false);
+
+            return (
+                <div className="p-2">
+                    <Link
+                        className="flex gap-2 items-center underline underline-offset-2"
+                        href={`/${row.original.guild_id}/messages/${row.original.id}`}
+                        onClick={() => setLoading(true)}
+                    >
+                        {row.original.name.length > 32 ? `${row.original.name.slice(0, 32)}...` : row.original.name}
+                        {loading ? (
+                            <Loader2Icon size={14} className="animate-spin" />
+                        ) : (
+                            <ExternalLinkIcon size={14} className="opacity-50" />
+                        )}
+                    </Link>
+                </div>
+            );
+        },
     },
     {
         accessorKey: "id",
