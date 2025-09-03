@@ -1,10 +1,9 @@
+import type { RESTAPIAttachment } from "discord-api-types/v10";
 import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import { RESTAPIAttachment } from "discord-api-types/v10";
 
 export default function MediaGallery({
     onMoveUp,

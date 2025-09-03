@@ -44,14 +44,6 @@ export default function NewButtonGroup({
 }) {
     type NonPremiumButton = Exclude<APIButtonComponent, { style: ButtonStyle.Premium }>;
 
-    const [open, setOpen] = useState(false);
-    const [editingIndex, setEditingIndex] = useState<number | null>(null);
-    const [style, setStyle] = useState<"primary" | "secondary" | "success" | "danger" | "link">("primary");
-    const [label, setLabel] = useState("");
-    const [emoji, setEmoji] = useState<APIMessageComponentEmoji | null>(null);
-    const [actionId, setActionId] = useState("");
-    const [url, setUrl] = useState("");
-
     const styleToEnum = useMemo(
         () => ({
             primary: ButtonStyle.Primary,
@@ -78,58 +70,322 @@ export default function NewButtonGroup({
         }
     };
 
-    function resetForm() {
-        setEditingIndex(null);
-        setStyle("primary");
-        setLabel("");
-        setEmoji(null);
-        setActionId("");
-        setUrl("");
-    }
+    function AddButtonDialog({ onAdd }: { onAdd: (btn: APIButtonComponent) => void }) {
+        const [style, setStyle] = useState<"primary" | "secondary" | "success" | "danger" | "link">("primary");
+        const [label, setLabel] = useState("");
+        const [emoji, setEmoji] = useState<APIMessageComponentEmoji | null>(null);
+        const [actionId, setActionId] = useState("");
+        const [url, setUrl] = useState("");
 
-    function openForAdd() {
-        resetForm();
-        setOpen(true);
-    }
+        const isValid = useMemo(() => {
+            if (!label.trim()) return false;
+            if (!style) return false;
+            if (style === "link") {
+                if (!url.trim()) return false;
+                try {
+                    new URL(url);
+                    return true;
+                } catch {
+                    return false;
+                }
+            }
+            return actionId.trim().length > 0;
+        }, [label, style, url, actionId]);
 
-    function openForEdit(index: number, btn: NonPremiumButton) {
-        setEditingIndex(index);
-        setStyle(enumToStyle(btn.style));
-        setLabel(btn.label ?? "");
-        setEmoji(btn.emoji ?? null);
-        if (btn.style === ButtonStyle.Link) {
-            setUrl((btn as APIButtonComponent & { url?: string }).url ?? "");
+        function reset() {
+            setStyle("primary");
+            setLabel("");
+            setEmoji(null);
             setActionId("");
-        } else {
-            setActionId(btn.custom_id ?? "");
             setUrl("");
         }
-        setOpen(true);
+
+        function handleSave() {
+            const mappedStyle = styleToEnum[style];
+            const base: Partial<APIButtonComponent> = {
+                type: ComponentType.Button,
+                style: mappedStyle,
+                label,
+            } as APIButtonComponent;
+
+            const nextButton: APIButtonComponent = {
+                ...base,
+                ...(mappedStyle === ButtonStyle.Link ? { url } : { custom_id: actionId }),
+                ...(emoji ? { emoji } : {}),
+            } as APIButtonComponent;
+
+            onAdd(nextButton);
+            reset();
+        }
+
+        return (
+            <Dialog>
+                <DialogTrigger asChild>
+                    <button
+                        type="button"
+                        onClick={reset}
+                        className="font-body font-semibold underline underline-offset-2 px-2 text-muted-foreground hover:text-primary-foreground text-xs"
+                    >
+                        Add Button
+                    </button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add Button</DialogTitle>
+                        <DialogDescription>Add a button to the button group.</DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="btn-label">Label</Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    id="btn-label"
+                                    placeholder="Enter your label"
+                                    value={label}
+                                    onChange={(e) => setLabel(e.target.value)}
+                                />
+                                <EmojiPicker
+                                    guildId={guildId}
+                                    emoji={emoji}
+                                    onEmojiSelect={(e: APIEmoji) =>
+                                        setEmoji({
+                                            id: e.id ?? undefined,
+                                            name: e.name ?? undefined,
+                                            animated: e.animated,
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+
+                        <RadioGroup
+                            value={style}
+                            onValueChange={(v) => setStyle(v as typeof style)}
+                            defaultValue="primary"
+                        >
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="primary" id="r1" />
+                                <Label htmlFor="r1">Primary</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="secondary" id="r2" />
+                                <Label htmlFor="r2">Secondary</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="success" id="r3" />
+                                <Label htmlFor="r3">Success</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="danger" id="r4" />
+                                <Label htmlFor="r4">Danger</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="link" id="r5" />
+                                <Label htmlFor="r5">Link</Label>
+                            </div>
+                        </RadioGroup>
+
+                        {style === "link" ? (
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="btn-url">URL</Label>
+                                <Input
+                                    id="btn-url"
+                                    placeholder="Enter your URL"
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="btn-action-id">Action ID</Label>
+                                <Input
+                                    placeholder="Enter your action ID"
+                                    value={actionId}
+                                    id="btn-action-id"
+                                    onChange={(e) => setActionId(e.target.value)}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <DialogClose asChild>
+                            <Button onClick={handleSave} disabled={!isValid}>
+                                Add
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        );
     }
 
-    function handleSave() {
-        const mappedStyle = styleToEnum[style];
-        const base: Partial<APIButtonComponent> = {
-            type: ComponentType.Button,
-            style: mappedStyle,
-            label,
-        } as APIButtonComponent;
+    function EditButtonDialog({
+        button,
+        index,
+        onSave,
+    }: {
+        button: NonPremiumButton;
+        index: number;
+        onSave: (index: number, btn: APIButtonComponent) => void;
+    }) {
+        const [style, setStyle] = useState<"primary" | "secondary" | "success" | "danger" | "link">(
+            enumToStyle(button.style),
+        );
+        const [label, setLabel] = useState(button.label ?? "");
+        const [emoji, setEmoji] = useState<APIMessageComponentEmoji | null>(button.emoji ?? null);
+        const [actionId, setActionId] = useState(
+            button.style === ButtonStyle.Link
+                ? ""
+                : ((button as APIButtonComponent & { custom_id?: string }).custom_id ?? ""),
+        );
+        const [url, setUrl] = useState((button as APIButtonComponent & { url?: string }).url ?? "");
 
-        const nextButton: APIButtonComponent = {
-            ...base,
-            ...(mappedStyle === ButtonStyle.Link ? { url } : { custom_id: actionId }),
-            ...(emoji ? { emoji } : {}),
-        } as APIButtonComponent;
+        const isValid = useMemo(() => {
+            if (!label.trim()) return false;
+            if (!style) return false;
+            if (style === "link") {
+                if (!url.trim()) return false;
+                try {
+                    new URL(url);
+                    return true;
+                } catch {
+                    return false;
+                }
+            }
+            return actionId.trim().length > 0;
+        }, [label, style, url, actionId]);
 
-        const next = [...buttons];
-        if (editingIndex === null) {
-            next.push(nextButton);
-        } else {
-            next[editingIndex] = nextButton;
+        function primeFrom(btn: NonPremiumButton) {
+            setStyle(enumToStyle(btn.style));
+            setLabel(btn.label ?? "");
+            setEmoji(btn.emoji ?? null);
+            if (btn.style === ButtonStyle.Link) {
+                setUrl((btn as APIButtonComponent & { url?: string }).url ?? "");
+                setActionId("");
+            } else {
+                setActionId((btn as APIButtonComponent & { custom_id?: string }).custom_id ?? "");
+                setUrl("");
+            }
         }
-        onChangeButtons(next);
-        setOpen(false);
-        resetForm();
+
+        function handleSave() {
+            const mappedStyle = styleToEnum[style];
+            const base: Partial<APIButtonComponent> = {
+                type: ComponentType.Button,
+                style: mappedStyle,
+                label,
+            } as APIButtonComponent;
+
+            const nextButton: APIButtonComponent = {
+                ...base,
+                ...(mappedStyle === ButtonStyle.Link ? { url } : { custom_id: actionId }),
+                ...(emoji ? { emoji } : {}),
+            } as APIButtonComponent;
+
+            onSave(index, nextButton);
+        }
+
+        return (
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="outlineDashed" onClick={() => primeFrom(button)}>
+                        {button.label}
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Button</DialogTitle>
+                        <DialogDescription>Edit the selected button.</DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor="btn-label">Label</Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    id="btn-label"
+                                    placeholder="Enter your label"
+                                    value={label}
+                                    onChange={(e) => setLabel(e.target.value)}
+                                />
+                                <EmojiPicker
+                                    guildId={guildId}
+                                    emoji={emoji}
+                                    onEmojiSelect={(e: APIEmoji) =>
+                                        setEmoji({
+                                            id: e.id ?? undefined,
+                                            name: e.name ?? undefined,
+                                            animated: e.animated,
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+
+                        <RadioGroup
+                            value={style}
+                            onValueChange={(v) => setStyle(v as typeof style)}
+                            defaultValue="primary"
+                        >
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="primary" id="r1" />
+                                <Label htmlFor="r1">Primary</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="secondary" id="r2" />
+                                <Label htmlFor="r2">Secondary</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="success" id="r3" />
+                                <Label htmlFor="r3">Success</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="danger" id="r4" />
+                                <Label htmlFor="r4">Danger</Label>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <RadioGroupItem value="link" id="r5" />
+                                <Label htmlFor="r5">Link</Label>
+                            </div>
+                        </RadioGroup>
+
+                        {style === "link" ? (
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="btn-url">URL</Label>
+                                <Input
+                                    id="btn-url"
+                                    placeholder="Enter your URL"
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="btn-action-id">Action ID</Label>
+                                <Input
+                                    placeholder="Enter your action ID"
+                                    value={actionId}
+                                    id="btn-action-id"
+                                    onChange={(e) => setActionId(e.target.value)}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <DialogClose asChild>
+                            <Button onClick={handleSave} disabled={!isValid}>
+                                Save
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        );
     }
 
     return (
@@ -144,105 +400,7 @@ export default function NewButtonGroup({
                     </div>
                 </div>
                 <div className="flex gap-1 items-center">
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogTrigger asChild>
-                            <button
-                                type="button"
-                                onClick={openForAdd}
-                                className="font-body font-semibold underline underline-offset-2 px-2 text-muted-foreground hover:text-primary-foreground text-xs"
-                            >
-                                Add Button
-                            </button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Add Button</DialogTitle>
-                                <DialogDescription>Add a button to the button group.</DialogDescription>
-                            </DialogHeader>
-                            <div className="flex flex-col gap-6">
-                                <div className="flex flex-col gap-2">
-                                    <Label htmlFor="btn-label">Label</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            id="btn-label"
-                                            placeholder="Enter your label"
-                                            value={label}
-                                            onChange={(e) => setLabel(e.target.value)}
-                                        />
-                                        <EmojiPicker
-                                            guildId={guildId}
-                                            emoji={emoji}
-                                            onEmojiSelect={(e: APIEmoji) =>
-                                                setEmoji({
-                                                    id: e.id ?? undefined,
-                                                    name: e.name ?? undefined,
-                                                    animated: e.animated,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                </div>
-
-                                <RadioGroup
-                                    value={style}
-                                    onValueChange={(v) => setStyle(v as typeof style)}
-                                    defaultValue="primary"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <RadioGroupItem value="primary" id="r1" />
-                                        <Label htmlFor="r1">Primary</Label>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <RadioGroupItem value="secondary" id="r2" />
-                                        <Label htmlFor="r2">Secondary</Label>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <RadioGroupItem value="success" id="r3" />
-                                        <Label htmlFor="r3">Success</Label>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <RadioGroupItem value="danger" id="r4" />
-                                        <Label htmlFor="r4">Danger</Label>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <RadioGroupItem value="link" id="r5" />
-                                        <Label htmlFor="r5">Link</Label>
-                                    </div>
-                                </RadioGroup>
-
-                                {/* show url input if style is link, otherwise show action id input */}
-                                {style === "link" ? (
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="btn-url">URL</Label>
-                                        <Input
-                                            id="btn-url"
-                                            placeholder="Enter your URL"
-                                            value={url}
-                                            onChange={(e) => setUrl(e.target.value)}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="btn-action-id">Action ID</Label>
-                                        <Input
-                                            placeholder="Enter your action ID"
-                                            value={actionId}
-                                            id="btn-action-id"
-                                            onChange={(e) => setActionId(e.target.value)}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
-                                </DialogClose>
-                                <DialogClose asChild>
-                                    <Button onClick={handleSave}>{editingIndex === null ? "Add" : "Save"}</Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <AddButtonDialog onAdd={(btn) => onChangeButtons([...buttons, btn])} />
                     <Button variant={"ghost"} size={"icon"} className="size-7" onClick={onMoveUp}>
                         <ChevronUpIcon />
                     </Button>
@@ -265,13 +423,16 @@ export default function NewButtonGroup({
                         .filter((b): b is APIButtonComponent => b.type === ComponentType.Button)
                         .filter((button): button is NonPremiumButton => button.style !== ButtonStyle.Premium)
                         .map((button, index) => (
-                            <Button
-                                variant="outlineDashed"
-                                key={`${index}-${button.style}`}
-                                onClick={() => openForEdit(index, button)}
-                            >
-                                {button.label}
-                            </Button>
+                            <EditButtonDialog
+                                key={`${button.label ?? "btn"}-${index}-${button.style}`}
+                                button={button}
+                                index={index}
+                                onSave={(i, btn) => {
+                                    const next = [...buttons];
+                                    next[i] = btn;
+                                    onChangeButtons(next);
+                                }}
+                            />
                         ))
                 )}
             </div>

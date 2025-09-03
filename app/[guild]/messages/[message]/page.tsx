@@ -9,7 +9,7 @@ import {
     type APIMessageTopLevelComponent,
     type APITextDisplayComponent,
     ComponentType,
-    RESTAPIAttachment,
+    type RESTAPIAttachment,
     type RESTPostAPIChannelMessageJSONBody,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
@@ -18,7 +18,6 @@ import {
     DownloadIcon,
     FileIcon,
     ImageIcon,
-    ImportIcon,
     MousePointerClickIcon,
     PlusIcon,
     RectangleEllipsisIcon,
@@ -29,8 +28,9 @@ import {
     UploadIcon,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from "react";
 import Alert from "@/components/alert";
+import MediaGallery from "@/components/builders/media-gallery";
 import NewButtonGroup from "@/components/builders/new-button-group";
 import NewContainer from "@/components/builders/new-container";
 import NewTextDisplay from "@/components/builders/new-text-display";
@@ -62,7 +62,6 @@ import type { Template } from "@/types/db";
 import { createClient } from "@/utils/supabase/client";
 import { sendMessageToDiscord } from "./actions";
 import { moveChildDown, moveChildUp, moveTopLevelDown, moveTopLevelUp } from "./utils";
-import MediaGallery from "@/components/builders/media-gallery";
 
 export default function Page() {
     const params = useParams();
@@ -270,7 +269,7 @@ export default function Page() {
 
     return (
         <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel defaultSize={61.5}>
+            <ResizablePanel defaultSize={56}>
                 <div className="p-4 flex flex-col gap-4 h-full overflow-y-auto">
                     {result && <Alert title="Something went wrong!" description={result.message} />}
 
@@ -512,7 +511,7 @@ export default function Page() {
                 </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={38.5}>
+            <ResizablePanel defaultSize={44}>
                 <div className="p-4 flex justify-center items-center h-full text-muted-foreground">
                     No Preview Available
                 </div>

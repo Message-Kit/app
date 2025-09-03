@@ -1,7 +1,7 @@
 import type { APIButtonComponent, APIEmoji, APIMessageComponentEmoji } from "discord-api-types/v10";
 import { ButtonStyle, ComponentType } from "discord-api-types/v10";
 import { ChevronDown, ChevronDownIcon, ChevronUpIcon, ImageIcon, MousePointerClickIcon, TrashIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import EmojiPicker from "../emoji-picker";
 import { Button } from "../ui/button";
 import {
@@ -130,6 +130,34 @@ export default function NewTextDisplay({
             onChangeAccessory(nextThumb, value);
         }
     };
+
+    const isValid = useMemo(() => {
+        if (accessoryTab === "acc-image") {
+            if (!imageUrl.trim()) return false;
+            try {
+                new URL(imageUrl);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        if (accessoryTab === "acc-button") {
+            if (!buttonLabel.trim()) return false;
+            if (buttonStyle === "link") {
+                try {
+                    new URL(buttonUrl);
+                    return true;
+                } catch {
+                    return false;
+                }
+            } else {
+                return buttonActionId.trim().length > 0;
+            }
+        }
+
+        return false;
+    }, [accessoryTab, imageUrl, buttonLabel, buttonStyle, buttonUrl, buttonActionId]);
 
     return (
         <div className="flex flex-col border rounded-xl bg-card">
@@ -296,7 +324,9 @@ export default function NewTextDisplay({
                                     </DialogClose>
                                 )}
                                 <DialogClose asChild>
-                                    <Button onClick={handleSaveAccessory}>{accessory ? "Save" : "Add"}</Button>
+                                    <Button onClick={handleSaveAccessory} disabled={!isValid}>
+                                        {accessory ? "Save" : "Add"}
+                                    </Button>
                                 </DialogClose>
                             </DialogFooter>
                         </DialogContent>
