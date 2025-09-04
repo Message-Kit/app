@@ -13,6 +13,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import MediaGallery from "./media-gallery";
 import Separator from "./separator";
 import TextDisplay from "./text-display";
+import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
 
 export default function Container({
     onMoveUp,
@@ -28,55 +29,42 @@ export default function Container({
     setComponents: (components: APIComponentInContainer[]) => void;
 }) {
     const handleMove = (index: number, direction: "up" | "down") => {
-        const newComponents = [...components];
-
-        if (direction === "up" && index > 0) {
-            [newComponents[index - 1], newComponents[index]] = [newComponents[index], newComponents[index - 1]];
-        }
-
-        if (direction === "down" && index < newComponents.length - 1) {
-            [newComponents[index + 1], newComponents[index]] = [newComponents[index], newComponents[index + 1]];
-        }
-
-        setComponents(newComponents);
+        setComponents(moveItem(components, index, direction));
     };
 
     const handleRemove = (index: number) => {
-        const newComponents = [...components];
-        newComponents.splice(index, 1);
-        setComponents(newComponents);
+        setComponents(removeAt(components, index));
     };
 
-    const handleAddTextDisplay = () => {
-        const newComponents = [
-            ...components,
-            {
-                type: ComponentType.TextDisplay,
-                content: "",
-            } as APITextDisplayComponent,
-        ];
-        setComponents(newComponents);
+    const addComponent = <T extends APIComponentInContainer>(component: T) => {
+        setComponents(append(components, component));
     };
 
-    const handleAddSeparator = () => {
-        const newComponents = [
-            ...components,
-            {
-                type: ComponentType.Separator,
-                spacing: SeparatorSpacingSize.Small,
-                divider: true,
-            } as APISeparatorComponent,
-        ];
-        setComponents(newComponents);
-    };
-
-    const handleAddMediaGallery = () => {
-        const newComponents = [
-            ...components,
-            { type: ComponentType.MediaGallery, items: [] } as APIMediaGalleryComponent,
-        ];
-        setComponents(newComponents);
-    };
+    const componentsList = [
+        {
+            name: "Text Display",
+            type: ComponentType.TextDisplay,
+            icon: <TextIcon />,
+            onClick: () => addComponent<APITextDisplayComponent>({ type: ComponentType.TextDisplay, content: "" }),
+        },
+        {
+            name: "Media Gallery",
+            type: ComponentType.MediaGallery,
+            icon: <ImageIcon />,
+            onClick: () => addComponent<APIMediaGalleryComponent>({ type: ComponentType.MediaGallery, items: [] }),
+        },
+        {
+            name: "Separator",
+            type: ComponentType.Separator,
+            icon: <SeparatorHorizontalIcon />,
+            onClick: () =>
+                addComponent<APISeparatorComponent>({
+                    type: ComponentType.Separator,
+                    spacing: SeparatorSpacingSize.Small,
+                    divider: true,
+                }),
+        },
+    ];
 
     return (
         <NewBuilder
@@ -97,18 +85,12 @@ export default function Container({
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem onClick={handleAddTextDisplay}>
-                            <TextIcon />
-                            Text Display
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleAddMediaGallery}>
-                            <ImageIcon />
-                            Media Gallery
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleAddSeparator}>
-                            <SeparatorHorizontalIcon />
-                            Separator
-                        </DropdownMenuItem>
+                        {componentsList.map((component) => (
+                            <DropdownMenuItem key={component.type} onClick={component.onClick}>
+                                {component.icon}
+                                {component.name}
+                            </DropdownMenuItem>
+                        ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
             }
@@ -121,9 +103,7 @@ export default function Container({
                                 key={`${component.type}-${index}`}
                                 content={component.content}
                                 onContentChange={(content) => {
-                                    const newComponents = [...components];
-                                    (newComponents[index] as APITextDisplayComponent) = { ...component, content };
-                                    setComponents(newComponents);
+                                    setComponents(updateAt(components, index, () => ({ ...component, content })));
                                 }}
                                 onMoveUp={() => handleMove(index, "up")}
                                 onMoveDown={() => handleMove(index, "down")}
@@ -137,14 +117,20 @@ export default function Container({
                                 spacing={component.spacing ?? SeparatorSpacingSize.Small}
                                 divider={component.divider ?? true}
                                 onChangeSpacing={(size) => {
-                                    const newComponents = [...components];
-                                    (newComponents[index] as APISeparatorComponent).spacing = size;
-                                    setComponents(newComponents);
+                                    setComponents(
+                                        updateAt(components, index, (old) => ({
+                                            ...(old as APISeparatorComponent),
+                                            spacing: size,
+                                        })),
+                                    );
                                 }}
                                 onChangeDivider={(value) => {
-                                    const newComponents = [...components];
-                                    (newComponents[index] as APISeparatorComponent).divider = value;
-                                    setComponents(newComponents);
+                                    setComponents(
+                                        updateAt(components, index, (old) => ({
+                                            ...(old as APISeparatorComponent),
+                                            divider: value,
+                                        })),
+                                    );
                                 }}
                                 onMoveUp={() => handleMove(index, "up")}
                                 onMoveDown={() => handleMove(index, "down")}
@@ -160,9 +146,12 @@ export default function Container({
                                 onRemove={() => handleRemove(index)}
                                 images={component.items}
                                 setImages={(images) => {
-                                    const newComponents = [...components];
-                                    (newComponents[index] as APIMediaGalleryComponent).items = images;
-                                    setComponents(newComponents);
+                                    setComponents(
+                                        updateAt(components, index, (old) => ({
+                                            ...(old as APIMediaGalleryComponent),
+                                            items: images,
+                                        })),
+                                    );
                                 }}
                             />
                         );
