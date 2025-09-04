@@ -128,6 +128,14 @@ export default function Container({
                                         })),
                                     );
                                 }}
+                                removeAccessory={() =>
+                                    setComponents(
+                                        updateAt(components, index, () => ({
+                                            type: ComponentType.TextDisplay,
+                                            content: component.components[0].content,
+                                        })),
+                                    )
+                                }
                                 onMoveUp={() => handleMove(index, "up")}
                                 onMoveDown={() => handleMove(index, "down")}
                                 onRemove={() => handleRemove(index)}

@@ -52,7 +52,7 @@ export default function TextDisplay({
                                 className="h-7 text-xs font-semibold text-muted-foreground"
                             >
                                 <PlusIcon />
-                                Set Accessory
+                                {accessory ? "Edit" : "Add"} Accessory
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
