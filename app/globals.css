@@ -186,3 +186,17 @@
         letter-spacing: var(--tracking-normal);
     }
 }
+
+::-webkit-scrollbar {
+    width: 8px;
+    background: var(--background);
+}
+
+* {
+    scrollbar-color: var(--accent) var(--background);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+

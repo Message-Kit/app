@@ -30,10 +30,10 @@ import {
 import { useParams } from "next/navigation";
 import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from "react";
 import Alert from "@/components/alert";
-import MediaGallery from "@/components/builders/media-gallery";
-import NewButtonGroup from "@/components/builders/new-button-group";
-import NewContainer from "@/components/builders/new-container";
-import NewTextDisplay from "@/components/builders/new-text-display";
+import NewButtonGroup from "@/components/builders/old/button-group";
+import NewContainer from "@/components/builders/old/container";
+import MediaGallery from "@/components/builders/old/media-gallery";
+import NewTextDisplay from "@/components/builders/old/text-display";
 import DiscordSeparator from "@/components/builders/separator";
 import ChannelSelector from "@/components/channel-selector";
 import { Button } from "@/components/ui/button";
