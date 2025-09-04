@@ -24,7 +24,7 @@ function clsButtonVariant(style?: ButtonStyle) {
 }
 
 function formatBytes(bytes?: number) {
-    if (!bytes || isNaN(bytes)) return "";
+    if (!bytes || Number.isNaN(bytes)) return "";
     const units = ["B", "KB", "MB", "GB"];
     let i = 0;
     let n = bytes;

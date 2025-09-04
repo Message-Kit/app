@@ -3,20 +3,20 @@ import {
     type APIMediaGalleryComponent,
     type APIMessageTopLevelComponent,
     type APISeparatorComponent,
-    type APITextDisplayComponent,
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { BoxIcon, ImageIcon, PlusIcon, SeparatorHorizontalIcon, TextIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useOutputStore } from "@/lib/stores/output";
+import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
+import { componentDescriptors } from "../lib/options";
 import Container from "./editor/container";
 import MediaGallery from "./editor/media-gallery";
 import Separator from "./editor/separator";
 import TextDisplay from "./editor/text-display";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
 
 export default function Editor() {
     const [components, setComponents] = useState<APIMessageTopLevelComponent[]>([]);
@@ -32,37 +32,12 @@ export default function Editor() {
     const addComponent = <T extends APIMessageTopLevelComponent>(component: T) =>
         setComponents((previousComponents) => append(previousComponents, component));
 
-    const componentsList = [
-        {
-            name: "Container",
-            type: ComponentType.Container,
-            icon: <BoxIcon />,
-            onClick: () => addComponent<APIContainerComponent>({ type: ComponentType.Container, components: [] }),
-        },
-        {
-            name: "Text Display",
-            type: ComponentType.TextDisplay,
-            icon: <TextIcon />,
-            onClick: () => addComponent<APITextDisplayComponent>({ type: ComponentType.TextDisplay, content: "" }),
-        },
-        {
-            name: "Media Gallery",
-            type: ComponentType.MediaGallery,
-            icon: <ImageIcon />,
-            onClick: () => addComponent<APIMediaGalleryComponent>({ type: ComponentType.MediaGallery, items: [] }),
-        },
-        {
-            name: "Separator",
-            type: ComponentType.Separator,
-            icon: <SeparatorHorizontalIcon />,
-            onClick: () =>
-                addComponent<APISeparatorComponent>({
-                    type: ComponentType.Separator,
-                    spacing: SeparatorSpacingSize.Small,
-                    divider: true,
-                }),
-        },
-    ];
+    const componentsList = componentDescriptors.map((descriptor) => ({
+        name: descriptor.name,
+        type: descriptor.type,
+        icon: descriptor.icon,
+        onClick: () => addComponent(descriptor.create() as APIMessageTopLevelComponent),
+    }));
 
     return (
         <div className="p-4 h-full overflow-y-auto">
@@ -79,7 +54,7 @@ export default function Editor() {
                         <DropdownMenuContent>
                             {componentsList.map((component) => (
                                 <DropdownMenuItem key={component.type} onClick={component.onClick}>
-                                    {component.icon}
+                                    <component.icon />
                                     {component.name}
                                 </DropdownMenuItem>
                             ))}
@@ -111,7 +86,56 @@ function Components({
                     content={component.content}
                     onContentChange={(content) =>
                         setComponents((previousComponents) =>
-                            updateAt(previousComponents, index, () => ({ ...component, content })),
+                            updateAt(previousComponents, index, () => ({ ...component, content: content })),
+                        )
+                    }
+                    setAccessory={(accessory) =>
+                        setComponents((previousComponents) =>
+                            updateAt(previousComponents, index, () => ({
+                                type: ComponentType.Section,
+                                components: [
+                                    {
+                                        type: ComponentType.TextDisplay,
+                                        content: component.content,
+                                    },
+                                ],
+                                accessory: accessory,
+                            })),
+                        )
+                    }
+                    onMoveUp={() => handleMove(index, "up")}
+                    onMoveDown={() => handleMove(index, "down")}
+                    onRemove={() => handleRemove(index)}
+                />
+            );
+        } else if (component.type === ComponentType.Section) {
+            return (
+                <TextDisplay
+                    key={`${component.type}-${index}`}
+                    content={component.components[0].content}
+                    onContentChange={(content) =>
+                        setComponents((previousComponents) =>
+                            updateAt(previousComponents, index, () => ({
+                                ...component,
+                                components: [{ ...component.components[0], content: content }],
+                            })),
+                        )
+                    }
+                    accessory={component.accessory}
+                    setAccessory={(accessory) =>
+                        setComponents((previousComponents) =>
+                            updateAt(previousComponents, index, () => ({
+                                ...component,
+                                accessory: accessory,
+                            })),
+                        )
+                    }
+                    removeAccessory={() =>
+                        setComponents((previousComponents) =>
+                            updateAt(previousComponents, index, () => ({
+                                type: ComponentType.TextDisplay,
+                                content: component.components[0].content,
+                            })),
                         )
                     }
                     onMoveUp={() => handleMove(index, "up")}
