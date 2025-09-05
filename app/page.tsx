@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { useOutputStore } from "@/lib/stores/output";
 import { fetchDiscordGuilds, sendMessageToDiscord } from "./actions";
+import { SiDiscord } from "@icons-pack/react-simple-icons";
 
 export default function Page() {
     const { output } = useOutputStore();
@@ -43,7 +44,10 @@ export default function Page() {
                                     <CircleIcon className="size-4" fill="#ffbc2e" strokeWidth={0} />
                                     <CircleIcon className="size-4" fill="#29c940" strokeWidth={0} />
                                 </span>
-                                <span className="text-sm font-semibold text-muted-foreground">Discord</span>
+                                <span className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                                    <SiDiscord className="size-4" />
+                                    Discord
+                                </span>
                                 <div className="flex items-center gap-2">
                                     <Button
                                         variant="ghost"
