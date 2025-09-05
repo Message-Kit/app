@@ -1,10 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 
-export default function Page() {
+function LoginClient() {
     const supabase = createClient();
     const searchParams = useSearchParams();
 
@@ -24,7 +24,13 @@ export default function Page() {
         });
     }, [supabase, searchParams]);
 
+    return null;
+}
+
+export default function Page() {
     return (
-        <div className="flex justify-center items-center h-screen text-sm text-muted-foreground">Logging you in...</div>
+        <Suspense fallback={<div className="flex justify-center items-center h-screen text-sm text-muted-foreground">Logging you in...</div>}>
+            <LoginClient />
+        </Suspense>
     );
 }
