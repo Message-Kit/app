@@ -1,4 +1,6 @@
 import {
+    type APIActionRowComponent,
+    type APIButtonComponent,
     type APIComponentInContainer,
     type APIMediaGalleryComponent,
     type APISeparatorComponent,
@@ -11,6 +13,7 @@ import { componentDescriptors } from "../../lib/options";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import ButtonGroup from "./button-group";
 import MediaGallery from "./media-gallery";
 import Separator from "./separator";
 import TextDisplay from "./text-display";
@@ -120,6 +123,7 @@ export default function Container({
                                         })),
                                     );
                                 }}
+                                accessory={component.accessory}
                                 setAccessory={(accessory) => {
                                     setComponents(
                                         updateAt(components, index, () => ({
@@ -184,6 +188,24 @@ export default function Container({
                                         })),
                                     );
                                 }}
+                            />
+                        );
+                    } else if (component.type === ComponentType.ActionRow) {
+                        return (
+                            <ButtonGroup
+                                key={`${component.type}-${index}`}
+                                onMoveUp={() => handleMove(index, "up")}
+                                onMoveDown={() => handleMove(index, "down")}
+                                onRemove={() => handleRemove(index)}
+                                components={component.components as APIButtonComponent[]}
+                                setComponents={(actionRowComponents) =>
+                                    setComponents(
+                                        updateAt(components, index, (old) => ({
+                                            ...(old as APIActionRowComponent<APIButtonComponent>),
+                                            components: actionRowComponents,
+                                        })),
+                                    )
+                                }
                             />
                         );
                     }

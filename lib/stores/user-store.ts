@@ -4,11 +4,11 @@ import type { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
 type UserStore = {
-    user: User | null;
-    setUser: (user: User | null) => void;
+    user: User | null | undefined;
+    setUser: (user: User | null | undefined) => void;
 };
 
 export const useUserStore = create<UserStore>((set) => ({
-    user: null,
+    user: undefined,
     setUser: (user) => set({ user }),
 }));

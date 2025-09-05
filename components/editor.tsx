@@ -1,4 +1,6 @@
 import {
+    type APIActionRowComponent,
+    type APIButtonComponent,
     type APIContainerComponent,
     type APIMediaGalleryComponent,
     type APIMessageTopLevelComponent,
@@ -11,6 +13,7 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useOutputStore } from "@/lib/stores/output";
 import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
 import { componentDescriptors } from "../lib/options";
+import ButtonGroup from "./editor/button-group";
 import Container from "./editor/container";
 import MediaGallery from "./editor/media-gallery";
 import Separator from "./editor/separator";
@@ -27,6 +30,7 @@ export default function Editor() {
             setOutput(components);
         }, 100);
         return () => clearTimeout(handler);
+        // setOutput(components);
     }, [components, setOutput]);
 
     const addComponent = <T extends APIMessageTopLevelComponent>(component: T) =>
@@ -43,7 +47,7 @@ export default function Editor() {
         <div className="p-4 h-full overflow-y-auto">
             <div className="flex flex-col gap-4">
                 <Components components={components} setComponents={setComponents} />
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button>
@@ -204,6 +208,24 @@ function Components({
                             })),
                         );
                     }}
+                />
+            );
+        } else if (component.type === ComponentType.ActionRow) {
+            return (
+                <ButtonGroup
+                    key={`${component.type}-${index}`}
+                    components={component.components as APIButtonComponent[]}
+                    setComponents={(components) => {
+                        setComponents((previousComponents) =>
+                            updateAt(previousComponents, index, (old) => ({
+                                ...(old as APIActionRowComponent<APIButtonComponent>),
+                                components: components,
+                            })),
+                        );
+                    }}
+                    onMoveUp={() => handleMove(index, "up")}
+                    onMoveDown={() => handleMove(index, "down")}
+                    onRemove={() => handleRemove(index)}
                 />
             );
         }

@@ -1,15 +1,33 @@
 "use server";
 
 import { REST } from "@discordjs/rest";
-import type { RESTGetAPICurrentUserGuildsResult } from "discord-api-types/v10";
-import { RouteBases, Routes } from "discord-api-types/v10";
+import type { RESTGetAPICurrentUserGuildsResult, RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
+import { PermissionFlagsBits, RouteBases, Routes } from "discord-api-types/v10";
 import { createClient as createServerClient } from "@/utils/supabase/server";
 
-export async function fetchDiscordGuilds(providerToken: string): Promise<{
+const clientToken = process.env.DISCORD_CLIENT_TOKEN;
+
+if (!clientToken) {
+    throw new Error("DISCORD_CLIENT_TOKEN is not set");
+}
+
+export async function fetchDiscordGuilds(): Promise<{
     data: RESTGetAPICurrentUserGuildsResult | null;
     error: string | null;
 }> {
     try {
+        const supabase = await createServerClient();
+
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
+
+        const providerToken = session?.provider_token;
+
+        if (!providerToken) {
+            return { data: null, error: "provider token unavailable" };
+        }
+
         const response = await fetch(RouteBases.api + Routes.userGuilds(), {
             method: "GET",
             headers: {
@@ -50,7 +68,13 @@ export async function fetchDiscordGuilds(providerToken: string): Promise<{
                     .map((r) => r.value),
             );
 
-            const filtered = guilds.filter((g) => botGuildIds.has(g.id));
+            const filtered = guilds
+                .filter((g) => botGuildIds.has(g.id)) // only guilds bot is in
+                .filter((g) => {
+                    const perms = BigInt(g.permissions);
+                    return (perms & PermissionFlagsBits.Administrator) !== BigInt(0);
+                });
+
             return { data: filtered, error: null };
         } catch {
             return { data: guilds, error: null };
@@ -60,38 +84,10 @@ export async function fetchDiscordGuilds(providerToken: string): Promise<{
     }
 }
 
-export async function getDiscordProviderToken(): Promise<{
-    token: string | null;
-    error: string | null;
-}> {
-    try {
-        const supabase = await createServerClient();
+const rest = new REST({ version: "10" }).setToken(clientToken);
 
-        const {
-            data: { session },
-            error,
-        } = await supabase.auth.getSession();
-
-        if (error) {
-            return { token: null, error: error.message };
-        }
-
-        if (session?.provider_token) {
-            return { token: session.provider_token, error: null };
-        }
-
-        const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
-
-        if (refreshError) {
-            return { token: null, error: refreshError.message };
-        }
-
-        const providerToken = refreshed.session?.provider_token ?? null;
-        return {
-            token: providerToken,
-            error: providerToken ? null : "provider token unavailable",
-        };
-    } catch (e) {
-        return { token: null, error: (e as Error).message };
-    }
+export async function sendMessageToDiscord(messageBody: RESTPostAPIChannelMessageJSONBody, channelId: string) {
+    return await rest.post(Routes.channelMessages(channelId), {
+        body: messageBody,
+    });
 }

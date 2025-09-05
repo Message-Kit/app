@@ -7,14 +7,15 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 interface Props {
     setSelectedChannel: (channel: string) => void;
     guildId: string;
+    disabled: boolean;
 }
 
-export default function ChannelSelector({ setSelectedChannel, guildId }: Props) {
+export default function ChannelSelector({ setSelectedChannel, guildId, disabled }: Props) {
     const [channels, setChannels] = useState<APIGuildChannel<GuildChannelType>[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (!guildId) return;
+        if (!guildId || disabled) return;
         let isMounted = true;
         setIsLoading(true);
         fetch(`/api/discord/guilds/${guildId}/channels`)
@@ -35,7 +36,7 @@ export default function ChannelSelector({ setSelectedChannel, guildId }: Props) 
         return () => {
             isMounted = false;
         };
-    }, [guildId]);
+    }, [guildId, disabled]);
 
     const renderIcon = (type: ChannelType) => {
         switch (type) {
@@ -106,7 +107,7 @@ export default function ChannelSelector({ setSelectedChannel, guildId }: Props) 
     })();
 
     return (
-        <Select onValueChange={setSelectedChannel} disabled={!guildId || isLoading}>
+        <Select onValueChange={setSelectedChannel} disabled={!guildId || isLoading || disabled}>
             <SelectTrigger className="w-full">
                 <SelectValue placeholder={isLoading ? "Loading channels..." : "Select a channel"} />
             </SelectTrigger>
