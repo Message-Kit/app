@@ -1,6 +1,9 @@
 import { type APIButtonComponent, ButtonStyle, ComponentType } from "discord-api-types/v10";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon, DotIcon, EditIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
+import { motionProps } from "@/lib/motion-props";
+import { generateRandomNumber } from "@/lib/random-number";
 import { moveItem, removeAt } from "@/lib/utils";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
@@ -117,6 +120,7 @@ export default function ButtonGroup({
                                     <Input
                                         id="btn-url"
                                         placeholder="Enter your URL"
+                                        inputMode="url"
                                         value={buttonUrl}
                                         onChange={(e) => setButtonUrl(e.target.value)}
                                     />
@@ -142,6 +146,7 @@ export default function ButtonGroup({
                                             setComponents([
                                                 ...components,
                                                 {
+                                                    id: generateRandomNumber(),
                                                     type: ComponentType.Button,
                                                     label: buttonLabel,
                                                     style: ButtonStyle.Link,
@@ -152,6 +157,7 @@ export default function ButtonGroup({
                                             setComponents([
                                                 ...components,
                                                 {
+                                                    id: generateRandomNumber(),
                                                     type: ComponentType.Button,
                                                     label: buttonLabel,
                                                     style:
@@ -178,63 +184,64 @@ export default function ButtonGroup({
             }
         >
             <div className="flex flex-col gap-2">
-                {components.length === 0 && (
+                {/* {components.length === 0 && (
                     <div className="text-muted-foreground text-sm flex items-center justify-center p-4">
                         Add a button to this group.
                     </div>
-                )}
-                {components
-                    .filter((component) => component.style !== ButtonStyle.Premium)
-                    .map((component, index) => {
-                        return (
-                            <div
-                                key={`${component.type}-${component.style}-${index}`}
-                                className="rounded-lg border p-2 text-sm flex justify-between bg-input/15"
-                            >
-                                <div className="flex gap-2 items-center">
-                                    <Button className="size-7" variant={"ghost"} size={"icon"}>
-                                        <EditIcon />
-                                    </Button>
-                                    <div className="flex gap-1 items-center">
-                                        <span className="font-medium">{component.label}</span>
-                                        <DotIcon size={16} className="text-muted-foreground" />
-                                        <span className="text-muted-foreground font-medium">
-                                            {ButtonStyle[component.style]}
-                                        </span>
+                )} */}
+                <AnimatePresence>
+                    {components
+                        .filter((component) => component.style !== ButtonStyle.Premium)
+                        .map((component, index) => {
+                            return (
+                                <motion.div {...motionProps} key={component.id}>
+                                    <div className="rounded-lg border p-2 text-sm flex justify-between bg-input/15">
+                                        <div className="flex gap-2 items-center">
+                                            <Button className="size-7" variant={"ghost"} size={"icon"}>
+                                                <EditIcon />
+                                            </Button>
+                                            <div className="flex gap-1 items-center">
+                                                <span className="font-medium">{component.label}</span>
+                                                <DotIcon size={16} className="text-muted-foreground" />
+                                                <span className="text-muted-foreground font-medium">
+                                                    {ButtonStyle[component.style]}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Button
+                                                className="size-7"
+                                                variant="ghost"
+                                                onClick={() => {
+                                                    setComponents(moveItem(components, index, "up"));
+                                                }}
+                                            >
+                                                <ChevronUpIcon />
+                                            </Button>
+                                            <Button
+                                                className="size-7"
+                                                variant="ghost"
+                                                onClick={() => {
+                                                    setComponents(moveItem(components, index, "down"));
+                                                }}
+                                            >
+                                                <ChevronDownIcon />
+                                            </Button>
+                                            <Button
+                                                className="size-7"
+                                                variant="ghost"
+                                                onClick={() => {
+                                                    setComponents(removeAt(components, index));
+                                                }}
+                                            >
+                                                <TrashIcon />
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Button
-                                        className="size-7"
-                                        variant="ghost"
-                                        onClick={() => {
-                                            setComponents(moveItem(components, index, "up"));
-                                        }}
-                                    >
-                                        <ChevronUpIcon />
-                                    </Button>
-                                    <Button
-                                        className="size-7"
-                                        variant="ghost"
-                                        onClick={() => {
-                                            setComponents(moveItem(components, index, "down"));
-                                        }}
-                                    >
-                                        <ChevronDownIcon />
-                                    </Button>
-                                    <Button
-                                        className="size-7"
-                                        variant="ghost"
-                                        onClick={() => {
-                                            setComponents(removeAt(components, index));
-                                        }}
-                                    >
-                                        <TrashIcon />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })}
+                                </motion.div>
+                            );
+                        })}
+                </AnimatePresence>
             </div>
         </NewBuilder>
     );

@@ -86,20 +86,52 @@ export async function fetchDiscordGuilds(): Promise<{
 
 const rest = new REST({ version: "10" }).setToken(clientToken);
 
-export async function sendMessageToChannel(messageBody: RESTPostAPIChannelMessageJSONBody, channelId: string) {
+type UploadFile = { name: string; mimeType: string; dataBase64: string };
+
+export async function sendMessageToChannel(
+    messageBody: RESTPostAPIChannelMessageJSONBody,
+    channelId: string,
+    files?: UploadFile[],
+) {
+    if (files && files.length > 0) {
+        const form = new FormData();
+        form.append("payload_json", JSON.stringify(messageBody));
+        files.forEach((file, i) => {
+            const buffer = Buffer.from(file.dataBase64, "base64");
+            form.append(`files[${i}]`, new Blob([buffer], { type: file.mimeType }), file.name);
+        });
+        return await rest.post(Routes.channelMessages(channelId), {
+            body: form,
+        });
+    }
     return await rest.post(Routes.channelMessages(channelId), {
         body: messageBody,
     });
 }
 
-export async function sendMessageToWebhook(messageBody: RESTPostAPIChannelMessageJSONBody, webhookUrl: string) {
+export async function sendMessageToWebhook(
+    messageBody: RESTPostAPIChannelMessageJSONBody,
+    webhookUrl: string,
+    files?: UploadFile[],
+) {
     const url = new URL(webhookUrl);
     url.searchParams.set("with_components", "true");
 
+    const hasFiles = files && files.length > 0;
     const res = await fetch(url.toString(), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(messageBody),
+        headers: hasFiles ? undefined : { "Content-Type": "application/json" },
+        body: hasFiles
+            ? (() => {
+                  const form = new FormData();
+                  form.append("payload_json", JSON.stringify(messageBody));
+                  (files ?? []).forEach((file, i) => {
+                      const buffer = Buffer.from(file.dataBase64, "base64");
+                      form.append(`files[${i}]`, new Blob([buffer], { type: file.mimeType }), file.name);
+                  });
+                  return form;
+              })()
+            : JSON.stringify(messageBody),
     });
 
     if (!res.ok) {
@@ -107,5 +139,5 @@ export async function sendMessageToWebhook(messageBody: RESTPostAPIChannelMessag
         throw new Error(`Failed to send message: ${res.status} ${text}`);
     }
 
-    return true; // just signal success
+    return true;
 }

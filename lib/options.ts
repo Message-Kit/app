@@ -5,24 +5,12 @@ import {
     type APIFileComponent,
     type APIMediaGalleryComponent,
     type APISeparatorComponent,
-    type APIStringSelectComponent,
     type APITextDisplayComponent,
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import {
-    BoxIcon,
-    FileIcon,
-    ImageIcon,
-    MousePointerClickIcon,
-    SeparatorHorizontalIcon,
-    SquareChevronDownIcon,
-    TextIcon,
-} from "lucide-react";
-
-export function generateRandomNumber(): number {
-    return Math.floor(Math.random() * 1_000_000_000);
-}
+import { BoxIcon, FileIcon, ImageIcon, MousePointerClickIcon, SeparatorHorizontalIcon, TextIcon } from "lucide-react";
+import { generateRandomNumber } from "./random-number";
 
 export const componentDescriptors = [
     {

@@ -11,6 +11,8 @@ import {
 import { PlusIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { motionProps } from "@/lib/motion-props";
+import { generateRandomNumber } from "@/lib/random-number";
 import { useOutputStore } from "@/lib/stores/output";
 import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
 import { componentDescriptors } from "../lib/options";
@@ -52,7 +54,8 @@ export default function Editor() {
                 <div className="flex justify-end gap-2">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <motion.div layout="position" transition={{ duration: 0.1 }}>
+                            <motion.div {...motionProps}>
+                                {/* <motion.div layout="position" transition={{ duration: 0.1 }}> */}
                                 <Button>
                                     <PlusIcon />
                                     Add Component
@@ -102,6 +105,7 @@ function Components({
                             setAccessory={(accessory) =>
                                 setComponents((previousComponents) =>
                                     updateAt(previousComponents, index, () => ({
+                                        id: generateRandomNumber(),
                                         type: ComponentType.Section,
                                         components: [
                                             {
@@ -137,6 +141,7 @@ function Components({
                                     updateAt(previousComponents, index, () => ({
                                         ...component,
                                         accessory: accessory,
+                                        id: generateRandomNumber(),
                                     })),
                                 )
                             }
@@ -145,6 +150,7 @@ function Components({
                                     updateAt(previousComponents, index, () => ({
                                         type: ComponentType.TextDisplay,
                                         content: component.components[0].content,
+                                        id: generateRandomNumber(),
                                     })),
                                 )
                             }

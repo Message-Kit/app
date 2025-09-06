@@ -58,7 +58,7 @@ export default function Page() {
                                         size="icon"
                                         className="size-7"
                                         onClick={() => {
-                                            navigator.clipboard.writeText(JSON.stringify(output, null, 2));
+                                            navigator.clipboard.writeText(JSON.stringify(output, null, 4));
                                             setCopied(true);
                                         }}
                                         disabled={output.length === 0}
@@ -73,7 +73,7 @@ export default function Page() {
                                     Add a component to view output.
                                 </div>
                             ) : (
-                                <pre className="p-4 whitespace-pre-wrap">{JSON.stringify(output, null, 2)}</pre>
+                                <pre className="p-4 whitespace-pre-wrap">{JSON.stringify(output, null, 4)}</pre>
                             )}
                         </div>
                     </div>

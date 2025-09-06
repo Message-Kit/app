@@ -1,4 +1,12 @@
-import { type APISectionAccessoryComponent, ButtonStyle, ComponentType } from "discord-api-types/v10";
+import {
+    type APIButtonComponent,
+    type APIButtonComponentWithCustomId,
+    type APIButtonComponentWithURL,
+    type APISectionAccessoryComponent,
+    type APIThumbnailComponent,
+    ButtonStyle,
+    ComponentType,
+} from "discord-api-types/v10";
 import { CheckIcon, ImageIcon, MousePointerClickIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import NewBuilder from "../new-builder";
@@ -78,6 +86,28 @@ export default function TextDisplay({
         return false;
     }, [imageUrl, buttonLabel, buttonStyle, buttonUrl, buttonActionId, tab]);
 
+    function isThumbnailComponent(a: APISectionAccessoryComponent | undefined): a is APIThumbnailComponent {
+        return !!a && a.type === ComponentType.Thumbnail;
+    }
+
+    function isButtonComponent(a: APISectionAccessoryComponent | undefined): a is APIButtonComponent {
+        return !!a && a.type === ComponentType.Button;
+    }
+
+    function isButtonWithURL(a: APISectionAccessoryComponent | undefined): a is APIButtonComponentWithURL {
+        return isButtonComponent(a) && a.style === ButtonStyle.Link;
+    }
+
+    function isButtonWithCustomId(a: APISectionAccessoryComponent | undefined): a is APIButtonComponentWithCustomId {
+        return (
+            isButtonComponent(a) &&
+            (a.style === ButtonStyle.Primary ||
+                a.style === ButtonStyle.Secondary ||
+                a.style === ButtonStyle.Success ||
+                a.style === ButtonStyle.Danger)
+        );
+    }
+
     function buttonTypeToButtonStyle(type: string) {
         switch (type) {
             case "link":
@@ -92,6 +122,29 @@ export default function TextDisplay({
                 return ButtonStyle.Primary;
         }
     }
+
+    function buttonStyleToButtonType(style: ButtonStyle) {
+        switch (style) {
+            case ButtonStyle.Link:
+                return "link";
+            case ButtonStyle.Secondary:
+                return "secondary";
+            case ButtonStyle.Success:
+                return "success";
+            case ButtonStyle.Danger:
+                return "danger";
+            default:
+                return "primary";
+        }
+    }
+
+    const imageUrlValue = isThumbnailComponent(accessory) ? accessory.media.url : imageUrl;
+    const imageAltValue = isThumbnailComponent(accessory) ? (accessory.description ?? "") : imageAlt;
+    const buttonLabelValue =
+        isButtonWithURL(accessory) || isButtonWithCustomId(accessory) ? (accessory.label ?? "") : buttonLabel;
+    const buttonStyleValue = isButtonComponent(accessory) ? buttonStyleToButtonType(accessory.style) : buttonStyle;
+    const buttonUrlValue = isButtonWithURL(accessory) ? accessory.url : buttonUrl;
+    const buttonActionIdValue = isButtonWithCustomId(accessory) ? accessory.custom_id : buttonActionId;
 
     return (
         <>
@@ -177,7 +230,7 @@ export default function TextDisplay({
                                         <Input
                                             id="image-url"
                                             placeholder="https://example.com/image.png"
-                                            value={imageUrl}
+                                            value={imageUrlValue}
                                             onChange={(e) => setImageUrl(e.target.value)}
                                         />
                                     </div>
@@ -186,7 +239,7 @@ export default function TextDisplay({
                                         <Input
                                             id="image-alt"
                                             placeholder="Add a description"
-                                            value={imageAlt}
+                                            value={imageAltValue}
                                             onChange={(e) => setImageAlt(e.target.value)}
                                         />
                                     </div>
@@ -198,15 +251,15 @@ export default function TextDisplay({
                                             <Input
                                                 id="btn-label"
                                                 placeholder="Enter your label"
-                                                value={buttonLabel}
+                                                value={buttonLabelValue}
                                                 onChange={(e) => setButtonLabel(e.target.value)}
                                             />
                                         </div>
                                     </div>
                                     <RadioGroup
-                                        value={buttonStyle}
+                                        value={buttonStyleValue}
                                         onValueChange={(v) => setButtonStyle(v as typeof buttonStyle)}
-                                        defaultValue="primary"
+                                        // defaultValue={buttonStyleToButtonType(accessory?.style)}
                                     >
                                         <div className="flex items-center gap-3">
                                             <RadioGroupItem value="primary" id="r1" />
@@ -237,7 +290,7 @@ export default function TextDisplay({
                                             <Input
                                                 id="btn-url"
                                                 placeholder="Enter your URL"
-                                                value={buttonUrl}
+                                                value={buttonUrlValue}
                                                 onChange={(e) => setButtonUrl(e.target.value)}
                                             />
                                         </div>
@@ -246,7 +299,7 @@ export default function TextDisplay({
                                             <Label htmlFor="btn-action-id">Action ID</Label>
                                             <Input
                                                 placeholder="Enter your action ID"
-                                                value={buttonActionId}
+                                                value={buttonActionIdValue}
                                                 id="btn-action-id"
                                                 onChange={(e) => setButtonActionId(e.target.value)}
                                             />
@@ -310,13 +363,22 @@ export default function TextDisplay({
                                                     description: imageAlt,
                                                 });
                                             } else if (tab === "button") {
-                                                setAccessory?.({
-                                                    type: ComponentType.Button,
-                                                    label: buttonLabel,
-                                                    style: buttonTypeToButtonStyle(buttonStyle),
-                                                    url: buttonUrl,
-                                                    custom_id: buttonActionId,
-                                                });
+                                                const style = buttonTypeToButtonStyle(buttonStyle);
+                                                if (style === ButtonStyle.Link) {
+                                                    setAccessory?.({
+                                                        type: ComponentType.Button,
+                                                        label: buttonLabel,
+                                                        style: style,
+                                                        url: buttonUrl,
+                                                    });
+                                                } else {
+                                                    setAccessory?.({
+                                                        type: ComponentType.Button,
+                                                        label: buttonLabel,
+                                                        style: style,
+                                                        custom_id: buttonActionId,
+                                                    });
+                                                }
                                             }
                                         }}
                                         disabled={!isValid}

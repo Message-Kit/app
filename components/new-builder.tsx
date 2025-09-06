@@ -1,6 +1,7 @@
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { type PropsWithChildren, useState } from "react";
+import { motionProps } from "@/lib/motion-props";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 
@@ -16,13 +17,7 @@ export default function NewBuilder({ name, onMoveUp, onMoveDown, onRemove, extra
     const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <motion.div
-            layout="position"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.1 }}
-        >
+        <motion.div {...motionProps}>
             <div className="flex flex-col border rounded-xl bg-card">
                 <div className="flex justify-between items-center gap-2 p-2">
                     <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@
 import { SiDiscord } from "@icons-pack/react-simple-icons";
 import {
     MessageFlags,
+    type RESTAPIAttachment,
     type RESTGetAPICurrentUserGuildsResult,
     type RESTPostAPIChannelMessageJSONBody,
 } from "discord-api-types/v10";
@@ -11,6 +12,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import type { AttachmentPayload } from "@/lib/stores/attachments";
+import { useAttachmentStore } from "@/lib/stores/attachments";
 import { useOutputStore } from "@/lib/stores/output";
 import { useUserStore } from "@/lib/stores/user-store";
 import ChannelSelector from "./channel-selector";
@@ -36,8 +39,16 @@ export default function Navbar({
     sendMessageToWebhook,
     fetchDiscordGuilds,
 }: {
-    sendMessageToChannel: (messageBody: RESTPostAPIChannelMessageJSONBody, channelId: string) => Promise<unknown>;
-    sendMessageToWebhook: (messageBody: RESTPostAPIChannelMessageJSONBody, webhookUrl: string) => Promise<unknown>;
+    sendMessageToChannel: (
+        messageBody: RESTPostAPIChannelMessageJSONBody,
+        channelId: string,
+        files?: AttachmentPayload[],
+    ) => Promise<unknown>;
+    sendMessageToWebhook: (
+        messageBody: RESTPostAPIChannelMessageJSONBody,
+        webhookUrl: string,
+        files?: AttachmentPayload[],
+    ) => Promise<unknown>;
     fetchDiscordGuilds: () => Promise<{
         data: RESTGetAPICurrentUserGuildsResult | null;
         error: string | null;
@@ -94,22 +105,37 @@ export default function Navbar({
     }, [selectedTab, fetchDiscordGuilds]);
 
     async function handleSendMessage() {
-        if (selectedTab === "webhook") {
-            await sendMessageToWebhook({ components: output, flags: MessageFlags.IsComponentsV2 }, webhookUrl)
-                .then(() => {
-                    toast.success("Sent successfully!");
-                })
-                .catch(() => {
-                    toast.error("Failed to send message!");
-                });
-        } else if (selectedTab === "bot") {
-            await sendMessageToChannel({ components: output, flags: MessageFlags.IsComponentsV2 }, selectedChannel)
-                .then(() => {
-                    toast.success("Sent successfully!");
-                })
-                .catch(() => {
-                    toast.error("Failed to send message!");
-                });
+        let attachments: RESTAPIAttachment[] = [];
+        const files = useAttachmentStore.getState().getAll();
+
+        if (files.length > 0) {
+            attachments = files.map((file, index) => ({
+                id: index,
+                filename: file.name,
+            }));
+        }
+
+        const messageBody: RESTPostAPIChannelMessageJSONBody = {
+            components: output,
+            flags: MessageFlags.IsComponentsV2,
+            attachments,
+        };
+
+        const options =
+            selectedTab === "webhook"
+                ? { type: "webhook" as const, webhookUrl }
+                : { type: "bot" as const, channelId: selectedChannel };
+
+        try {
+            await fetch("/api/discord/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ messageBody, options, files }),
+            });
+
+            toast.success("Sent successfully!");
+        } catch (err) {
+            toast.error("Failed to send message!");
         }
     }
 
@@ -174,6 +200,7 @@ export default function Navbar({
                                     <Textarea
                                         placeholder="Enter webhook URL"
                                         value={webhookUrl}
+                                        inputMode="url"
                                         onChange={(e) => setWebhookUrl(e.target.value)}
                                         className="wrap-anywhere"
                                     />

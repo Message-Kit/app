@@ -24,18 +24,14 @@ function LoginClient() {
         });
     }, [supabase, searchParams]);
 
-    return null;
+    return (
+        <div className="flex justify-center items-center h-screen text-sm text-muted-foreground">Logging you in...</div>
+    );
 }
 
 export default function Page() {
     return (
-        <Suspense
-            fallback={
-                <div className="flex justify-center items-center h-screen text-sm text-muted-foreground">
-                    Logging you in...
-                </div>
-            }
-        >
+        <Suspense fallback={null}>
             <LoginClient />
         </Suspense>
     );

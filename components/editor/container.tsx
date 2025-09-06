@@ -8,6 +8,8 @@ import {
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
 import { PlusIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
+import { generateRandomNumber } from "@/lib/random-number";
 import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
 import { componentDescriptors } from "../../lib/options";
 import NewBuilder from "../new-builder";
@@ -83,152 +85,149 @@ export default function Container({
             }
         >
             <div className="flex flex-col gap-4">
-                {/* <AnimatePresence> */}
-                {components.map((component, index) => {
-                    if (component.type === ComponentType.TextDisplay) {
-                        return (
-                            <TextDisplay
-                                key={component.id}
-                                content={component.content}
-                                onContentChange={(content) => {
-                                    setComponents(updateAt(components, index, () => ({ ...component, content })));
-                                }}
-                                setAccessory={(accessory) => {
-                                    setComponents(
-                                        updateAt(components, index, () => ({
-                                            type: ComponentType.Section,
-                                            components: [
-                                                {
-                                                    type: ComponentType.TextDisplay,
-                                                    content: component.content,
-                                                },
-                                            ],
-                                            accessory,
-                                        })),
-                                    );
-                                }}
-                                onMoveUp={() => handleMove(index, "up")}
-                                onMoveDown={() => handleMove(index, "down")}
-                                onRemove={() => handleRemove(index)}
-                            />
-                        );
-                    } else if (component.type === ComponentType.Section) {
-                        return (
-                            <TextDisplay
-                                key={component.id}
-                                content={component.components[0].content}
-                                onContentChange={(content) => {
-                                    setComponents(
-                                        updateAt(components, index, () => ({
-                                            ...component,
-                                            components: [{ ...component.components[0], content: content }],
-                                        })),
-                                    );
-                                }}
-                                accessory={component.accessory}
-                                setAccessory={(accessory) => {
-                                    setComponents(
-                                        updateAt(components, index, () => ({
-                                            ...component,
-                                            accessory,
-                                        })),
-                                    );
-                                }}
-                                removeAccessory={() =>
-                                    setComponents(
-                                        updateAt(components, index, () => ({
-                                            type: ComponentType.TextDisplay,
-                                            content: component.components[0].content,
-                                        })),
-                                    )
-                                }
-                                onMoveUp={() => handleMove(index, "up")}
-                                onMoveDown={() => handleMove(index, "down")}
-                                onRemove={() => handleRemove(index)}
-                            />
-                        );
-                    } else if (component.type === ComponentType.Separator) {
-                        return (
-                            <Separator
-                                key={component.id}
-                                spacing={component.spacing ?? SeparatorSpacingSize.Small}
-                                divider={component.divider ?? true}
-                                onChangeSpacing={(size) => {
-                                    setComponents(
-                                        updateAt(components, index, (old) => ({
-                                            ...(old as APISeparatorComponent),
-                                            spacing: size,
-                                        })),
-                                    );
-                                }}
-                                onChangeDivider={(value) => {
-                                    setComponents(
-                                        updateAt(components, index, (old) => ({
-                                            ...(old as APISeparatorComponent),
-                                            divider: value,
-                                        })),
-                                    );
-                                }}
-                                onMoveUp={() => handleMove(index, "up")}
-                                onMoveDown={() => handleMove(index, "down")}
-                                onRemove={() => handleRemove(index)}
-                            />
-                        );
-                    } else if (component.type === ComponentType.MediaGallery) {
-                        return (
-                            <MediaGallery
-                                key={component.id}
-                                onMoveUp={() => handleMove(index, "up")}
-                                onMoveDown={() => handleMove(index, "down")}
-                                onRemove={() => handleRemove(index)}
-                                images={component.items}
-                                setImages={(images) => {
-                                    setComponents(
-                                        updateAt(components, index, (old) => ({
-                                            ...(old as APIMediaGalleryComponent),
-                                            items: images,
-                                        })),
-                                    );
-                                }}
-                            />
-                        );
-                    } else if (component.type === ComponentType.ActionRow) {
-                        return (
-                            <ButtonGroup
-                                key={component.id}
-                                onMoveUp={() => handleMove(index, "up")}
-                                onMoveDown={() => handleMove(index, "down")}
-                                onRemove={() => handleRemove(index)}
-                                components={component.components as APIButtonComponent[]}
-                                setComponents={(actionRowComponents) =>
-                                    setComponents(
-                                        updateAt(components, index, (old) => ({
-                                            ...(old as APIActionRowComponent<APIButtonComponent>),
-                                            components: actionRowComponents,
-                                        })),
-                                    )
-                                }
-                            />
-                        );
-                    } else if (component.type === ComponentType.File) {
-                        return (
-                            <File
-                                key={component.id}
-                                onMoveUp={() => handleMove(index, "up")}
-                                onMoveDown={() => handleMove(index, "down")}
-                                onRemove={() => handleRemove(index)}
-                            />
-                        );
-                    }
+                <AnimatePresence>
+                    {components.map((component, index) => {
+                        if (component.type === ComponentType.TextDisplay) {
+                            return (
+                                <TextDisplay
+                                    key={component.id}
+                                    content={component.content}
+                                    onContentChange={(content) => {
+                                        setComponents(updateAt(components, index, () => ({ ...component, content })));
+                                    }}
+                                    setAccessory={(accessory) => {
+                                        setComponents(
+                                            updateAt(components, index, () => ({
+                                                id: generateRandomNumber(),
+                                                type: ComponentType.Section,
+                                                components: [
+                                                    {
+                                                        type: ComponentType.TextDisplay,
+                                                        content: component.content,
+                                                    },
+                                                ],
+                                                accessory,
+                                            })),
+                                        );
+                                    }}
+                                    onMoveUp={() => handleMove(index, "up")}
+                                    onMoveDown={() => handleMove(index, "down")}
+                                    onRemove={() => handleRemove(index)}
+                                />
+                            );
+                        } else if (component.type === ComponentType.Section) {
+                            return (
+                                <TextDisplay
+                                    key={component.id}
+                                    content={component.components[0].content}
+                                    onContentChange={(content) => {
+                                        setComponents(
+                                            updateAt(components, index, () => ({
+                                                ...component,
+                                                components: [{ ...component.components[0], content: content }],
+                                            })),
+                                        );
+                                    }}
+                                    accessory={component.accessory}
+                                    setAccessory={(accessory) => {
+                                        setComponents(
+                                            updateAt(components, index, () => ({
+                                                ...component,
+                                                accessory,
+                                            })),
+                                        );
+                                    }}
+                                    removeAccessory={() =>
+                                        setComponents(
+                                            updateAt(components, index, () => ({
+                                                type: ComponentType.TextDisplay,
+                                                content: component.components[0].content,
+                                                id: generateRandomNumber(),
+                                            })),
+                                        )
+                                    }
+                                    onMoveUp={() => handleMove(index, "up")}
+                                    onMoveDown={() => handleMove(index, "down")}
+                                    onRemove={() => handleRemove(index)}
+                                />
+                            );
+                        } else if (component.type === ComponentType.Separator) {
+                            return (
+                                <Separator
+                                    key={component.id}
+                                    spacing={component.spacing ?? SeparatorSpacingSize.Small}
+                                    divider={component.divider ?? true}
+                                    onChangeSpacing={(size) => {
+                                        setComponents(
+                                            updateAt(components, index, (old) => ({
+                                                ...(old as APISeparatorComponent),
+                                                spacing: size,
+                                            })),
+                                        );
+                                    }}
+                                    onChangeDivider={(value) => {
+                                        setComponents(
+                                            updateAt(components, index, (old) => ({
+                                                ...(old as APISeparatorComponent),
+                                                divider: value,
+                                            })),
+                                        );
+                                    }}
+                                    onMoveUp={() => handleMove(index, "up")}
+                                    onMoveDown={() => handleMove(index, "down")}
+                                    onRemove={() => handleRemove(index)}
+                                />
+                            );
+                        } else if (component.type === ComponentType.MediaGallery) {
+                            return (
+                                <MediaGallery
+                                    key={component.id}
+                                    onMoveUp={() => handleMove(index, "up")}
+                                    onMoveDown={() => handleMove(index, "down")}
+                                    onRemove={() => handleRemove(index)}
+                                    images={component.items}
+                                    setImages={(images) => {
+                                        setComponents(
+                                            updateAt(components, index, (old) => ({
+                                                ...(old as APIMediaGalleryComponent),
+                                                items: images,
+                                            })),
+                                        );
+                                    }}
+                                />
+                            );
+                        } else if (component.type === ComponentType.ActionRow) {
+                            return (
+                                <ButtonGroup
+                                    key={component.id}
+                                    onMoveUp={() => handleMove(index, "up")}
+                                    onMoveDown={() => handleMove(index, "down")}
+                                    onRemove={() => handleRemove(index)}
+                                    components={component.components as APIButtonComponent[]}
+                                    setComponents={(actionRowComponents) =>
+                                        setComponents(
+                                            updateAt(components, index, (old) => ({
+                                                ...(old as APIActionRowComponent<APIButtonComponent>),
+                                                components: actionRowComponents,
+                                            })),
+                                        )
+                                    }
+                                />
+                            );
+                        } else if (component.type === ComponentType.File) {
+                            return (
+                                <File
+                                    key={component.id}
+                                    onMoveUp={() => handleMove(index, "up")}
+                                    onMoveDown={() => handleMove(index, "down")}
+                                    onRemove={() => handleRemove(index)}
+                                />
+                            );
+                        }
 
-                    return null;
-                })}
-                {/* </AnimatePresence> */}
-                {components.length === 0 && (
-                    <div className="text-muted-foreground text-sm flex items-center justify-center p-4">
-                        Add a component to the container
-                    </div>
-                )}
+                        return null;
+                    })}
+                </AnimatePresence>
             </div>
         </NewBuilder>
     );
