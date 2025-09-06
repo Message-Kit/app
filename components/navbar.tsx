@@ -10,6 +10,7 @@ import { BotIcon, CheckIcon, ExternalLinkIcon, SendIcon, WebhookIcon } from "luc
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useOutputStore } from "@/lib/stores/output";
 import { useUserStore } from "@/lib/stores/user-store";
 import ChannelSelector from "./channel-selector";
@@ -31,10 +32,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
 
 export default function Navbar({
-    sendMessageToDiscord,
+    sendMessageToChannel,
+    sendMessageToWebhook,
     fetchDiscordGuilds,
 }: {
-    sendMessageToDiscord: (messageBody: RESTPostAPIChannelMessageJSONBody, channelId: string) => Promise<unknown>;
+    sendMessageToChannel: (messageBody: RESTPostAPIChannelMessageJSONBody, channelId: string) => Promise<unknown>;
+    sendMessageToWebhook: (messageBody: RESTPostAPIChannelMessageJSONBody, webhookUrl: string) => Promise<unknown>;
     fetchDiscordGuilds: () => Promise<{
         data: RESTGetAPICurrentUserGuildsResult | null;
         error: string | null;
@@ -91,7 +94,23 @@ export default function Navbar({
     }, [selectedTab, fetchDiscordGuilds]);
 
     async function handleSendMessage() {
-        await sendMessageToDiscord({ components: output, flags: MessageFlags.IsComponentsV2 }, selectedChannel);
+        if (selectedTab === "webhook") {
+            await sendMessageToWebhook({ components: output, flags: MessageFlags.IsComponentsV2 }, webhookUrl)
+                .then(() => {
+                    toast.success("Sent successfully!");
+                })
+                .catch(() => {
+                    toast.error("Failed to send message!");
+                });
+        } else if (selectedTab === "bot") {
+            await sendMessageToChannel({ components: output, flags: MessageFlags.IsComponentsV2 }, selectedChannel)
+                .then(() => {
+                    toast.success("Sent successfully!");
+                })
+                .catch(() => {
+                    toast.error("Failed to send message!");
+                });
+        }
     }
 
     return (

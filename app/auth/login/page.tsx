@@ -29,7 +29,13 @@ function LoginClient() {
 
 export default function Page() {
     return (
-        <Suspense fallback={<div className="flex justify-center items-center h-screen text-sm text-muted-foreground">Logging you in...</div>}>
+        <Suspense
+            fallback={
+                <div className="flex justify-center items-center h-screen text-sm text-muted-foreground">
+                    Logging you in...
+                </div>
+            }
+        >
             <LoginClient />
         </Suspense>
     );

@@ -14,6 +14,7 @@ import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import ButtonGroup from "./button-group";
+import File from "./file";
 import MediaGallery from "./media-gallery";
 import Separator from "./separator";
 import TextDisplay from "./text-display";
@@ -82,11 +83,12 @@ export default function Container({
             }
         >
             <div className="flex flex-col gap-4">
+                {/* <AnimatePresence> */}
                 {components.map((component, index) => {
                     if (component.type === ComponentType.TextDisplay) {
                         return (
                             <TextDisplay
-                                key={`${component.type}-${index}`}
+                                key={component.id}
                                 content={component.content}
                                 onContentChange={(content) => {
                                     setComponents(updateAt(components, index, () => ({ ...component, content })));
@@ -113,7 +115,7 @@ export default function Container({
                     } else if (component.type === ComponentType.Section) {
                         return (
                             <TextDisplay
-                                key={`${component.type}-${index}`}
+                                key={component.id}
                                 content={component.components[0].content}
                                 onContentChange={(content) => {
                                     setComponents(
@@ -148,7 +150,7 @@ export default function Container({
                     } else if (component.type === ComponentType.Separator) {
                         return (
                             <Separator
-                                key={`${component.type}-${index}`}
+                                key={component.id}
                                 spacing={component.spacing ?? SeparatorSpacingSize.Small}
                                 divider={component.divider ?? true}
                                 onChangeSpacing={(size) => {
@@ -175,7 +177,7 @@ export default function Container({
                     } else if (component.type === ComponentType.MediaGallery) {
                         return (
                             <MediaGallery
-                                key={`${component.type}-${index}`}
+                                key={component.id}
                                 onMoveUp={() => handleMove(index, "up")}
                                 onMoveDown={() => handleMove(index, "down")}
                                 onRemove={() => handleRemove(index)}
@@ -193,7 +195,7 @@ export default function Container({
                     } else if (component.type === ComponentType.ActionRow) {
                         return (
                             <ButtonGroup
-                                key={`${component.type}-${index}`}
+                                key={component.id}
                                 onMoveUp={() => handleMove(index, "up")}
                                 onMoveDown={() => handleMove(index, "down")}
                                 onRemove={() => handleRemove(index)}
@@ -208,10 +210,20 @@ export default function Container({
                                 }
                             />
                         );
+                    } else if (component.type === ComponentType.File) {
+                        return (
+                            <File
+                                key={component.id}
+                                onMoveUp={() => handleMove(index, "up")}
+                                onMoveDown={() => handleMove(index, "down")}
+                                onRemove={() => handleRemove(index)}
+                            />
+                        );
                     }
 
                     return null;
                 })}
+                {/* </AnimatePresence> */}
                 {components.length === 0 && (
                     <div className="text-muted-foreground text-sm flex items-center justify-center p-4">
                         Add a component to the container

@@ -1,5 +1,6 @@
 "use client";
 
+import { SiDiscord } from "@icons-pack/react-simple-icons";
 import { CheckIcon, CircleIcon, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import Editor from "@/components/editor";
@@ -7,8 +8,7 @@ import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { useOutputStore } from "@/lib/stores/output";
-import { fetchDiscordGuilds, sendMessageToDiscord } from "./actions";
-import { SiDiscord } from "@icons-pack/react-simple-icons";
+import { fetchDiscordGuilds, sendMessageToChannel, sendMessageToWebhook } from "./actions";
 
 export default function Page() {
     const { output } = useOutputStore();
@@ -25,7 +25,11 @@ export default function Page() {
 
     return (
         <div className="h-screen flex flex-col">
-            <Navbar sendMessageToDiscord={sendMessageToDiscord} fetchDiscordGuilds={fetchDiscordGuilds} />
+            <Navbar
+                sendMessageToChannel={sendMessageToChannel}
+                sendMessageToWebhook={sendMessageToWebhook}
+                fetchDiscordGuilds={fetchDiscordGuilds}
+            />
             <ResizablePanelGroup direction="horizontal">
                 <ResizablePanel defaultSize={55}>
                     <Editor />

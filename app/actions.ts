@@ -86,8 +86,26 @@ export async function fetchDiscordGuilds(): Promise<{
 
 const rest = new REST({ version: "10" }).setToken(clientToken);
 
-export async function sendMessageToDiscord(messageBody: RESTPostAPIChannelMessageJSONBody, channelId: string) {
+export async function sendMessageToChannel(messageBody: RESTPostAPIChannelMessageJSONBody, channelId: string) {
     return await rest.post(Routes.channelMessages(channelId), {
         body: messageBody,
     });
+}
+
+export async function sendMessageToWebhook(messageBody: RESTPostAPIChannelMessageJSONBody, webhookUrl: string) {
+    const url = new URL(webhookUrl);
+    url.searchParams.set("with_components", "true");
+
+    const res = await fetch(url.toString(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(messageBody),
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to send message: ${res.status} ${text}`);
+    }
+
+    return true; // just signal success
 }
