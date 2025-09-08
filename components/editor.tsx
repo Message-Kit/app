@@ -8,10 +8,9 @@ import {
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { PlusIcon } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { PlusIcon, SaveIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
-import { motionProps } from "@/lib/motion-props";
 import { generateRandomNumber } from "@/lib/random-number";
 import { useOutputStore } from "@/lib/stores/output";
 import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
@@ -50,17 +49,17 @@ export default function Editor() {
     return (
         <div className="p-4 h-full overflow-y-auto">
             <div className="flex flex-col gap-4">
-                <Components components={components} setComponents={setComponents} />
                 <div className="flex justify-end gap-2">
+                    <Button variant="outline">
+                        <SaveIcon />
+                        Save
+                    </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <motion.div {...motionProps}>
-                                {/* <motion.div layout="position" transition={{ duration: 0.1 }}> */}
-                                <Button>
-                                    <PlusIcon />
-                                    Add Component
-                                </Button>
-                            </motion.div>
+                            <Button>
+                                <PlusIcon />
+                                Add Component
+                            </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             {componentsList.map((component) => (
@@ -72,6 +71,7 @@ export default function Editor() {
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
+                <Components components={components} setComponents={setComponents} />
             </div>
         </div>
     );

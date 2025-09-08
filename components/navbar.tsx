@@ -35,8 +35,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
 
 export default function Navbar({
-    sendMessageToChannel,
-    sendMessageToWebhook,
     fetchDiscordGuilds,
 }: {
     sendMessageToChannel: (
@@ -134,7 +132,7 @@ export default function Navbar({
             });
 
             toast.success("Sent successfully!");
-        } catch (err) {
+        } catch (_err) {
             toast.error("Failed to send message!");
         }
     }

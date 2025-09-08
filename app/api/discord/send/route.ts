@@ -1,11 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { RESTPostAPIChannelMessageJSONBody, Routes } from "discord-api-types/v10";
+import { type RESTPostAPIChannelMessageJSONBody, Routes } from "discord-api-types/v10";
+import { type NextRequest, NextResponse } from "next/server";
 
 type UploadFile = {
     name: string;
     mimeType: string;
     dataBase64: string;
 };
+
+const botToken = process.env.DISCORD_CLIENT_TOKEN;
+
+if (!botToken) {
+    throw new Error("DISCORD_CLIENT_TOKEN is not set");
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -40,10 +46,10 @@ export async function POST(req: NextRequest) {
             const res = await fetch(url, {
                 method: "POST",
                 headers: hasFiles
-                    ? { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN!}` }
+                    ? { Authorization: `Bot ${botToken}` }
                     : {
                           "Content-Type": "application/json",
-                          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN!}`,
+                          Authorization: `Bot ${botToken}`,
                       },
                 body: hasFiles ? makeForm() : JSON.stringify(messageBody),
             });
@@ -68,6 +74,7 @@ export async function POST(req: NextRequest) {
 
             if (!res.ok) {
                 const text = await res.text();
+                console.log("error:", text);
                 throw new Error(`Webhook send failed: ${res.status} ${text}`);
             }
 

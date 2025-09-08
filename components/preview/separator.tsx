@@ -1,0 +1,14 @@
+import { type APISeparatorComponent, SeparatorSpacingSize } from "discord-api-types/v10";
+import { cn } from "@/lib/utils";
+
+export default function PreviewSeparator({ component }: { component: APISeparatorComponent }) {
+    return (
+        <div
+            className={cn(
+                "h-[1px] bg-[#46474e]",
+                component.spacing === SeparatorSpacingSize.Large ? "my-[8px]" : "my-[2px]",
+                component.divider ? "bg-[#46474e]" : "bg-[#323339]",
+            )}
+        />
+    );
+}

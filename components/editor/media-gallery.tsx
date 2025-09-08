@@ -111,7 +111,10 @@ export default function MediaGallery({
 
                                 const entries = selected.map(
                                     (file) =>
-                                        [`attachment://${sanitizeFileName(file.name)}`, URL.createObjectURL(file)] as const,
+                                        [
+                                            `attachment://${sanitizeFileName(file.name)}`,
+                                            URL.createObjectURL(file),
+                                        ] as const,
                                 );
 
                                 setAttachmentPreviewMap((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
