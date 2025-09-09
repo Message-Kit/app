@@ -8,7 +8,7 @@ import {
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { PlusIcon, SaveIcon } from "lucide-react";
+import { PlusIcon, Redo2Icon, RedoIcon, SaveIcon, SearchIcon, Undo2Icon, UndoIcon, UploadIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { generateRandomNumber } from "@/lib/random-number";
@@ -19,10 +19,12 @@ import ButtonGroup from "./editor/button-group";
 import Container from "./editor/container";
 import File from "./editor/file";
 import MediaGallery from "./editor/media-gallery";
-import Separator from "./editor/separator";
+import YesSeparator from "./editor/separator";
 import TextDisplay from "./editor/text-display";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Separator } from "./ui/separator";
+import { Input } from "./ui/input";
 
 export default function Editor() {
     const [components, setComponents] = useState<APIMessageTopLevelComponent[]>([]);
@@ -47,31 +49,53 @@ export default function Editor() {
     }));
 
     return (
-        <div className="p-4 h-full overflow-y-auto">
-            <div className="flex flex-col gap-4">
-                <div className="flex justify-end gap-2">
-                    <Button variant="outline">
-                        <SaveIcon />
-                        Save
-                    </Button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button>
-                                <PlusIcon />
-                                Add Component
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {componentsList.map((component) => (
-                                <DropdownMenuItem key={component.type} onClick={component.onClick}>
-                                    <component.icon />
-                                    {component.name}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+        <div className="h-full overflow-y-auto">
+            <div className="flex flex-col">
+                <div className="flex justify-between gap-2 p-4">
+                    <div className="flex gap-2">
+                        <div className="relative">
+                            <Input className="peer pe-9" placeholder="Search components" />
+                            <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 peer-disabled:opacity-50">
+                                <SearchIcon size={16} aria-hidden="true" />
+                            </div>
+                        </div>
+                        <Button variant={"outline"}>
+                            <UploadIcon />
+                            Upload
+                        </Button>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="ghost" size="icon">
+                            <Undo2Icon />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                            <Redo2Icon />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                            <SaveIcon />
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant={"outline"}>
+                                    <PlusIcon />
+                                    Add Component
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                {componentsList.map((component) => (
+                                    <DropdownMenuItem key={component.type} onClick={component.onClick}>
+                                        <component.icon />
+                                        {component.name}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
-                <Components components={components} setComponents={setComponents} />
+                <Separator />
+                <div className="p-4 flex flex-col gap-4">
+                    <Components components={components} setComponents={setComponents} />
+                </div>
             </div>
         </div>
     );
@@ -105,7 +129,7 @@ function Components({
                             setAccessory={(accessory) =>
                                 setComponents((previousComponents) =>
                                     updateAt(previousComponents, index, () => ({
-                                        id: generateRandomNumber(),
+                                        id: component.id,
                                         type: ComponentType.Section,
                                         components: [
                                             {
@@ -139,18 +163,18 @@ function Components({
                             setAccessory={(accessory) =>
                                 setComponents((previousComponents) =>
                                     updateAt(previousComponents, index, () => ({
+                                        id: generateRandomNumber(),
                                         ...component,
                                         accessory: accessory,
-                                        id: generateRandomNumber(),
                                     })),
                                 )
                             }
                             removeAccessory={() =>
                                 setComponents((previousComponents) =>
                                     updateAt(previousComponents, index, () => ({
+                                        id: component.id,
                                         type: ComponentType.TextDisplay,
                                         content: component.components[0].content,
-                                        id: generateRandomNumber(),
                                     })),
                                 )
                             }
@@ -161,7 +185,7 @@ function Components({
                     );
                 } else if (component.type === ComponentType.Separator) {
                     return (
-                        <Separator
+                        <YesSeparator
                             key={component.id}
                             spacing={component.spacing ?? SeparatorSpacingSize.Small}
                             divider={component.divider ?? true}

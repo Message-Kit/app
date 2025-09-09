@@ -1,20 +1,35 @@
+import { useAttachmentStore } from "@/lib/stores/attachments";
 import type { APIMediaGalleryComponent } from "discord-api-types/v10";
 
 export default function PreviewMediaGallery({ component }: { component: APIMediaGalleryComponent }) {
+    const attachmentItems = useAttachmentStore((s) => s.items);
     const items = component.items;
 
     type MediaItem = (typeof items)[number];
 
-    const Tile = ({ item, aspect, className }: { item: MediaItem; aspect: "square" | "video"; className?: string }) => (
+    const Tile = ({
+        item,
+        aspect,
+        className,
+    }: {
+        item: MediaItem;
+        aspect: "square" | "video" | "auto";
+        className?: string;
+    }) => (
         <div
-            className={`rounded-[4px] overflow-hidden ${aspect === "video" ? "aspect-video" : "aspect-square"} ${className ?? ""}`}
+            className={`rounded-[4px] overflow-hidden ${aspect === "video" ? "aspect-video" : aspect === "square" ? "aspect-square" : ""} ${className ?? ""}`}
         >
             {/* biome-ignore lint/performance/noImgElement: image preview */}
             <img
-                src={"https://github.com/ronykax.png"}
-                // src={item.media.url}
+                src={
+                    item.media.url.startsWith("attachment://")
+                        ? attachmentItems[item.media.url]
+                            ? `data:${attachmentItems[item.media.url].mimeType};base64,${attachmentItems[item.media.url].dataBase64}`
+                            : "https://github.com/ronykax.png"
+                        : item.media.url
+                }
                 alt={item.description ?? "image"}
-                className="size-full object-cover"
+                className={`${aspect === "auto" ? "w-full h-auto" : "size-full"} object-cover`}
             />
         </div>
     );
@@ -25,8 +40,8 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 1) {
         return (
-            <div className="rounded-[8px] overflow-hidden max-w-[350px]">
-                <Tile item={items[0]} aspect="square" />
+            <div className="rounded-[8px] overflow-hidden">
+                <Tile item={items[0]} aspect="auto" />
             </div>
         );
     }

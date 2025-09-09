@@ -153,6 +153,7 @@ export default function TextDisplay({
                 onMoveUp={onMoveUp}
                 onMoveDown={onMoveDown}
                 onRemove={onRemove}
+                helperText={`(${content.length}/4000)`}
                 extraButton={
                     <Dialog>
                         <DialogTrigger asChild>
@@ -186,32 +187,6 @@ export default function TextDisplay({
                                           ? "button"
                                           : "balls"
                                 }
-                                // onValueChange={(value) => {
-                                //     if (value === "thumbnail") {
-                                //         setAccessory?.({
-                                //             type: ComponentType.Thumbnail,
-                                //             media: { url: imageUrl },
-                                //             description: imageAlt,
-                                //         });
-                                //     } else if (value === "button") {
-                                //         setAccessory?.({
-                                //             type: ComponentType.Button,
-                                //             label: buttonLabel,
-                                //             style:
-                                //                 buttonStyle === "link"
-                                //                     ? ButtonStyle.Link
-                                //                     : buttonStyle === "secondary"
-                                //                       ? ButtonStyle.Secondary
-                                //                       : buttonStyle === "success"
-                                //                         ? ButtonStyle.Success
-                                //                         : buttonStyle === "danger"
-                                //                           ? ButtonStyle.Danger
-                                //                           : ButtonStyle.Primary,
-                                //             url: buttonUrl,
-                                //             custom_id: buttonActionId,
-                                //         });
-                                //     }
-                                // }}
                                 onValueChange={(value) => setTab(value as "thumbnail" | "button")}
                             >
                                 <TabsList className="mb-3 w-full">
@@ -226,7 +201,10 @@ export default function TextDisplay({
                                 </TabsList>
                                 <TabsContent value="thumbnail" className="flex flex-col gap-6">
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="image-url">Image</Label>
+                                        <Label htmlFor="image-url">
+                                            Image
+                                            <span className="text-destructive">*</span>
+                                        </Label>
                                         <Input
                                             id="image-url"
                                             placeholder="https://example.com/image.png"
@@ -246,7 +224,10 @@ export default function TextDisplay({
                                 </TabsContent>
                                 <TabsContent value="button" className="flex flex-col gap-6">
                                     <div className="flex flex-col gap-2">
-                                        <Label htmlFor="btn-label">Label</Label>
+                                        <Label htmlFor="btn-label">
+                                            Label
+                                            <span className="text-destructive">*</span>
+                                        </Label>
                                         <div className="flex gap-2">
                                             <Input
                                                 id="btn-label"
@@ -286,7 +267,10 @@ export default function TextDisplay({
                                     {/* show url input if style is link, otherwise show action id input */}
                                     {buttonStyle === "link" ? (
                                         <div className="flex flex-col gap-2">
-                                            <Label htmlFor="btn-url">URL</Label>
+                                            <Label htmlFor="btn-url">
+                                                URL
+                                                <span className="text-destructive">*</span>
+                                            </Label>
                                             <Input
                                                 id="btn-url"
                                                 placeholder="Enter your URL"
@@ -296,7 +280,10 @@ export default function TextDisplay({
                                         </div>
                                     ) : (
                                         <div className="flex flex-col gap-2">
-                                            <Label htmlFor="btn-action-id">Action ID</Label>
+                                            <Label htmlFor="btn-action-id">
+                                                Action ID
+                                                <span className="text-destructive">*</span>
+                                            </Label>
                                             <Input
                                                 placeholder="Enter your action ID"
                                                 value={buttonActionIdValue}
@@ -326,35 +313,6 @@ export default function TextDisplay({
                                 )}
                                 <DialogClose asChild>
                                     <Button
-                                        // onClick={() =>
-                                        //     setTimeout(() => {
-                                        //         if (accessory?.type === ComponentType.Thumbnail) {
-                                        //             setAccessory?.({
-                                        //                 type: ComponentType.Thumbnail,
-                                        //                 media: { url: imageUrl },
-                                        //                 description: imageAlt,
-                                        //             });
-                                        //         } else if (accessory?.type === ComponentType.Button) {
-                                        //             const style = buttonTypeToButtonStyle(buttonStyle);
-
-                                        //             if (style === ButtonStyle.Link) {
-                                        //                 setAccessory?.({
-                                        //                     type: ComponentType.Button,
-                                        //                     label: buttonLabel,
-                                        //                     style: style,
-                                        //                     url: buttonUrl,
-                                        //                 });
-                                        //             } else {
-                                        //                 setAccessory?.({
-                                        //                     type: ComponentType.Button,
-                                        //                     label: buttonLabel,
-                                        //                     style: style,
-                                        //                     custom_id: buttonActionId,
-                                        //                 });
-                                        //             }
-                                        //         }
-                                        //     }, 50)
-                                        // }
                                         onClick={() => {
                                             if (tab === "thumbnail") {
                                                 setAccessory?.({

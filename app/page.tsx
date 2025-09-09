@@ -4,7 +4,7 @@ import { SiDiscord } from "@icons-pack/react-simple-icons";
 import { CheckIcon, CircleIcon, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import Editor from "@/components/editor";
-import Preview from "@/components/editor/preview";
+import Preview from "@/components/preview";
 import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -35,7 +35,7 @@ export default function Page() {
                 <ResizablePanel defaultSize={55}>
                     <Editor />
                 </ResizablePanel>
-                <ResizableHandle />
+                <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={100 - 55}>
                     <div className="p-4 whitespace-pre-wrap h-full overflow-y-auto">
                         <div className="flex flex-col bg-card rounded-xl border overflow-hidden">

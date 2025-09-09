@@ -145,7 +145,7 @@
 
     --font-body: var(--font-body-font);
     --font-display: var(--font-display-font);
-    --font-discord: var(--font-discord-font);
+    --font-discord: var(--font-preview-font);
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
@@ -199,6 +199,12 @@
 html {
     scroll-behavior: smooth;
 }
-.font-discord {
-    font-family: var(--font-preview-font);
-}
+
+/* @layer utilities {
+    .focus-visible\:ring-\[3px\]:focus-visible {
+        --tw-ring-offset-width: 1px !important;
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color) !important;
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color) !important;
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000) !important;
+    }
+} */

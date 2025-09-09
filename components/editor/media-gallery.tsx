@@ -49,6 +49,7 @@ export default function MediaGallery({
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
+            helperText={`(${images.length}/10)`}
             extraButton={
                 <Button
                     variant={"ghost"}

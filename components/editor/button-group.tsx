@@ -1,5 +1,14 @@
 import { type APIButtonComponent, ButtonStyle, ComponentType } from "discord-api-types/v10";
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon, DotIcon, EditIcon, PlusIcon, TrashIcon } from "lucide-react";
+import {
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    DotIcon,
+    EditIcon,
+    ExternalLinkIcon,
+    PlusIcon,
+    TrashIcon,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
@@ -58,6 +67,7 @@ export default function ButtonGroup({
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
+            helperText={`(${components.length}/5)`}
             extraButton={
                 <Dialog>
                     <DialogTrigger asChild>
@@ -78,7 +88,10 @@ export default function ButtonGroup({
                         </DialogHeader>
                         <div className="flex flex-col gap-6">
                             <div className="flex flex-col gap-2">
-                                <Label htmlFor="btn-label">Label</Label>
+                                <Label htmlFor="btn-label">
+                                    Label
+                                    <span className="text-destructive">*</span>
+                                </Label>
                                 <div className="flex gap-2">
                                     <Input
                                         id="btn-label"
@@ -116,7 +129,10 @@ export default function ButtonGroup({
                             </RadioGroup>
                             {buttonStyle === "link" ? (
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="btn-url">URL</Label>
+                                    <Label htmlFor="btn-url">
+                                        URL
+                                        <span className="text-destructive">*</span>
+                                    </Label>
                                     <Input
                                         id="btn-url"
                                         placeholder="Enter your URL"
@@ -127,7 +143,10 @@ export default function ButtonGroup({
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="btn-action-id">Action ID</Label>
+                                    <Label htmlFor="btn-action-id">
+                                        Action ID
+                                        <span className="text-destructive">*</span>
+                                    </Label>
                                     <Input
                                         placeholder="Enter your action ID"
                                         value={buttonActionId}
@@ -184,11 +203,6 @@ export default function ButtonGroup({
             }
         >
             <div className="flex flex-col gap-2">
-                {/* {components.length === 0 && (
-                    <div className="text-muted-foreground text-sm flex items-center justify-center p-4">
-                        Add a button to this group.
-                    </div>
-                )} */}
                 <AnimatePresence>
                     {components
                         .filter((component) => component.style !== ButtonStyle.Premium)
@@ -206,6 +220,18 @@ export default function ButtonGroup({
                                                 <span className="text-muted-foreground font-medium">
                                                     {ButtonStyle[component.style]}
                                                 </span>
+                                                <DotIcon size={16} className="text-muted-foreground" />
+                                                {component.style === ButtonStyle.Link ? (
+                                                    <a
+                                                        href={component.url}
+                                                        className="text-muted-foreground underline underline-offset-2 flex gap-1.5 items-center hover:text-primary-foreground duration-100"
+                                                    >
+                                                        {component.url}
+                                                        <ExternalLinkIcon className="size-4" />
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-muted-foreground">{component.custom_id}</span>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-1">

@@ -10,8 +10,10 @@ export default function PreviewContainer({ component: comp }: { component: APICo
             {comp.components.map((component) => {
                 if (component.type === ComponentType.TextDisplay) {
                     return <PreviewTextDisplay key={component.id} component={component} />;
+                } else if (component.type === ComponentType.Section) {
+                    return <PreviewTextDisplay key={component.id} component={component} />;
                 } else if (component.type === ComponentType.MediaGallery) {
-                    return <PreviewMediaGallery component={component} />;
+                    return <PreviewMediaGallery key={component.id} component={component} />;
                 } else if (component.type === ComponentType.Separator) {
                     return <PreviewSeparator key={component.id} component={component} />;
                 } else if (component.type === ComponentType.ActionRow) {

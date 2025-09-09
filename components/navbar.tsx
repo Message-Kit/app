@@ -143,7 +143,7 @@ export default function Navbar({
                 <a href="https://messagekit.app">
                     <div className="flex items-center gap-2.5">
                         <Image src="/logo.svg" className="size-7" alt="Logo" width={32} height={32} />
-                        <span className="text-lg leading-none font-semibold font-display">Message Kit</span>
+                        <span className="text-lg font-bold font-display">Message Kit</span>
                     </div>
                 </a>
             </div>
@@ -194,7 +194,10 @@ export default function Navbar({
                             </TabsList>
                             <TabsContent value="webhook">
                                 <div className="flex flex-col gap-2">
-                                    <Label>Webhook URL</Label>
+                                    <Label>
+                                        Webhook URL
+                                        <span className="text-destructive">*</span>
+                                    </Label>
                                     <Textarea
                                         placeholder="Enter webhook URL"
                                         value={webhookUrl}
@@ -210,7 +213,9 @@ export default function Navbar({
                             <TabsContent value="bot">
                                 <div className="flex flex-col gap-6">
                                     <div className="flex flex-col gap-2">
-                                        <Label>Guild</Label>
+                                        <Label>
+                                            Guild<span className="text-destructive">*</span>
+                                        </Label>
                                         <Select
                                             onValueChange={(value) => setSelectedGuild(value)}
                                             value={selectedGuild}
@@ -256,7 +261,9 @@ export default function Navbar({
                                         </p>
                                     </div>
                                     <div className="flex flex-col gap-2">
-                                        <Label>Channel</Label>
+                                        <Label>
+                                            Channel<span className="text-destructive">*</span>
+                                        </Label>
                                         <ChannelSelector
                                             setSelectedChannel={setSelectedChannel}
                                             guildId={selectedGuild}

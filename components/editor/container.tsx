@@ -98,7 +98,7 @@ export default function Container({
                                     setAccessory={(accessory) => {
                                         setComponents(
                                             updateAt(components, index, () => ({
-                                                id: generateRandomNumber(),
+                                                id: component.id,
                                                 type: ComponentType.Section,
                                                 components: [
                                                     {
@@ -140,9 +140,9 @@ export default function Container({
                                     removeAccessory={() =>
                                         setComponents(
                                             updateAt(components, index, () => ({
+                                                id: component.id,
                                                 type: ComponentType.TextDisplay,
                                                 content: component.components[0].content,
-                                                id: generateRandomNumber(),
                                             })),
                                         )
                                     }

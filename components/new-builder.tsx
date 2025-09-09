@@ -11,9 +11,10 @@ interface Props extends PropsWithChildren {
     onMoveDown: () => void;
     onRemove: () => void;
     extraButton?: React.ReactNode;
+    helperText?: string;
 }
 
-export default function NewBuilder({ name, onMoveUp, onMoveDown, onRemove, extraButton, children }: Props) {
+export default function NewBuilder({ name, onMoveUp, onMoveDown, onRemove, extraButton, helperText, children }: Props) {
     const [collapsed, setCollapsed] = useState(false);
 
     return (
@@ -30,6 +31,11 @@ export default function NewBuilder({ name, onMoveUp, onMoveDown, onRemove, extra
                             {collapsed ? <ChevronRightIcon /> : <ChevronDownIcon />}
                         </Button>
                         <span className="font-semibold text-sm">{name}</span>
+                        {helperText && (
+                            <span className="text-sm text-muted-foreground font-medium tracking-wide hidden md:block">
+                                {helperText}
+                            </span>
+                        )}
                     </div>
                     <div className="flex items-center gap-1">
                         {extraButton}
