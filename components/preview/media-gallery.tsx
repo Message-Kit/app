@@ -1,11 +1,13 @@
-import { useAttachmentStore } from "@/lib/stores/attachments";
 import type { APIMediaGalleryComponent } from "discord-api-types/v10";
+import { useEffect, useState } from "react";
+import useFilesStore from "@/lib/stores/files";
+import { sanitizeFileName } from "@/lib/utils";
 
 export default function PreviewMediaGallery({ component }: { component: APIMediaGalleryComponent }) {
-    const attachmentItems = useAttachmentStore((s) => s.items);
-    const items = component.items;
-
     type MediaItem = (typeof items)[number];
+
+    const { files } = useFilesStore();
+    const items = component.items;
 
     const Tile = ({
         item,
@@ -15,24 +17,39 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
         item: MediaItem;
         aspect: "square" | "video" | "auto";
         className?: string;
-    }) => (
-        <div
-            className={`rounded-[4px] overflow-hidden ${aspect === "video" ? "aspect-video" : aspect === "square" ? "aspect-square" : ""} ${className ?? ""}`}
-        >
-            {/* biome-ignore lint/performance/noImgElement: image preview */}
-            <img
-                src={
-                    item.media.url.startsWith("attachment://")
-                        ? attachmentItems[item.media.url]
-                            ? `data:${attachmentItems[item.media.url].mimeType};base64,${attachmentItems[item.media.url].dataBase64}`
-                            : "https://github.com/ronykax.png"
-                        : item.media.url
+    }) => {
+        const [url, setUrl] = useState<string | null>(null);
+
+        useEffect(() => {
+            if (item.media.url.startsWith("attachment://")) {
+                const file = files.find((file) => sanitizeFileName(file.name) === item.media.url.split("/").pop());
+                if (file) {
+                    const objectUrl = URL.createObjectURL(file);
+                    setUrl(objectUrl);
+                    return () => URL.revokeObjectURL(objectUrl); // cleanup
                 }
-                alt={item.description ?? "image"}
-                className={`${aspect === "auto" ? "w-full h-auto" : "size-full"} object-cover`}
-            />
-        </div>
-    );
+            } else {
+                setUrl(item.media.url);
+            }
+        }, [item.media.url]);
+
+        if (!url) return null;
+
+        return (
+            <div
+                className={`rounded-[4px] overflow-hidden ${aspect === "video" ? "aspect-video" : aspect === "square" ? "aspect-square" : ""} ${className ?? ""}`}
+            >
+                {/* biome-ignore lint/performance/noImgElement: image preview */}
+                <img
+                    src={url}
+                    className={`${aspect === "auto" ? "w-full h-auto" : "size-full"} object-cover`}
+                    alt={item.description ?? "image"}
+                    width={256}
+                    height={256}
+                />
+            </div>
+        );
+    };
 
     const count = items.length;
 
@@ -40,7 +57,7 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 1) {
         return (
-            <div className="rounded-[8px] overflow-hidden">
+            <div className="rounded-[8px] overflow-hidden max-w-[550px]">
                 <Tile item={items[0]} aspect="auto" />
             </div>
         );

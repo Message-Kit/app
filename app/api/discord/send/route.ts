@@ -1,11 +1,5 @@
-import { type RESTPostAPIChannelMessageJSONBody, Routes } from "discord-api-types/v10";
+import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { type NextRequest, NextResponse } from "next/server";
-
-type UploadFile = {
-    name: string;
-    mimeType: string;
-    dataBase64: string;
-};
 
 const botToken = process.env.DISCORD_CLIENT_TOKEN;
 
@@ -13,77 +7,39 @@ if (!botToken) {
     throw new Error("DISCORD_CLIENT_TOKEN is not set");
 }
 
+const webhookUrl =
+    "https://discord.com/api/webhooks/1413482921423274065/Kds1jalCKsOIHHzP9hJg5ckbhnC4O-Bk45-O6QRVYlQLLu2OBruGVMI0BRhu97VIWXO3";
+
 export async function POST(req: NextRequest) {
-    try {
-        const {
-            messageBody,
-            options,
-            files,
-        }: {
-            messageBody: RESTPostAPIChannelMessageJSONBody;
-            options: { type: "bot"; channelId: string } | { type: "webhook"; webhookUrl: string };
-            files?: UploadFile[];
-        } = await req.json();
+    const formData = await req.formData();
+    const files = formData.getAll("images") as File[];
+    const messagePayload = formData.get("message") as string;
 
-        if (!messageBody || !options) {
-            return NextResponse.json({ error: "messageBody and options are required" }, { status: 400 });
-        }
+    const message = JSON.parse(messagePayload) as RESTPostAPIChannelMessageJSONBody;
 
-        const hasFiles = files && files.length > 0;
+    const forwardForm = new FormData();
 
-        const makeForm = () => {
-            const form = new FormData();
-            form.append("payload_json", JSON.stringify(messageBody));
-            (files ?? []).forEach((file, i) => {
-                const buffer = Buffer.from(file.dataBase64, "base64");
-                form.append(`files[${i}]`, new Blob([buffer], { type: file.mimeType }), file.name);
-            });
-            return form;
-        };
+    // Attach message as payload_json
+    forwardForm.append("payload_json", JSON.stringify(message));
 
-        if (options.type === "bot") {
-            const url = `https://discord.com/api/v10${Routes.channelMessages(options.channelId)}`;
-            const res = await fetch(url, {
-                method: "POST",
-                headers: hasFiles
-                    ? { Authorization: `Bot ${botToken}` }
-                    : {
-                          "Content-Type": "application/json",
-                          Authorization: `Bot ${botToken}`,
-                      },
-                body: hasFiles ? makeForm() : JSON.stringify(messageBody),
-            });
+    // Attach files
+    files.forEach((file, i) => {
+        forwardForm.append(`files[${i}]`, file, file.name);
+    });
 
-            if (!res.ok) {
-                const text = await res.text();
-                throw new Error(`Bot send failed: ${res.status} ${text}`);
-            }
+    const url = new URL(webhookUrl);
+    url.searchParams.set("with_components", "true");
 
-            return NextResponse.json({ success: true });
-        }
+    const res = await fetch(url.toString(), {
+        method: "POST",
+        body: forwardForm, // <-- send multipart
+    });
 
-        if (options.type === "webhook") {
-            const url = new URL(options.webhookUrl);
-            url.searchParams.set("with_components", "true");
-
-            const res = await fetch(url.toString(), {
-                method: "POST",
-                headers: hasFiles ? undefined : { "Content-Type": "application/json" },
-                body: hasFiles ? makeForm() : JSON.stringify(messageBody),
-            });
-
-            if (!res.ok) {
-                const text = await res.text();
-                console.log("error:", text);
-                throw new Error(`Webhook send failed: ${res.status} ${text}`);
-            }
-
-            return NextResponse.json({ success: true });
-        }
-
-        return NextResponse.json({ error: "Invalid options type" }, { status: 400 });
-    } catch (err) {
-        console.error("API error:", err);
-        return NextResponse.json({ error: err instanceof Error ? err.message : "Unknown error" }, { status: 500 });
+    if (!res.ok) {
+        const text = await res.text();
+        console.log("error:", text);
+        throw new Error(`Webhook send failed: ${res.status} ${text}`);
     }
+
+    return NextResponse.json({ success: true });
 }

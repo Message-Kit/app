@@ -32,3 +32,14 @@ export function moveItem<T>(array: readonly T[], index: number, direction: "up" 
     }
     return result;
 }
+
+export function hexToNumber(hex: string): number {
+    if (hex.startsWith("#")) hex = hex.slice(1);
+    return parseInt(hex, 16);
+}
+
+export function numberToHex(num: number): string {
+    return `#${num.toString(16).padStart(6, "0")}`;
+}
+
+export const sanitizeFileName = (name: string) => name.trim().replace(/\s+/g, "_");

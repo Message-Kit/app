@@ -24,11 +24,9 @@ export default function EmojiPicker({
     const [search, setSearch] = useState("");
 
     useEffect(() => {
-        console.log(guildId);
         fetch(`/api/discord/guilds/${guildId}/emojis`)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data);
                 setEmojis(data);
             });
     }, [guildId]);

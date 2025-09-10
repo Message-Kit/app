@@ -1,19 +1,12 @@
 "use client";
 
 import { SiDiscord } from "@icons-pack/react-simple-icons";
-import {
-    MessageFlags,
-    type RESTAPIAttachment,
-    type RESTGetAPICurrentUserGuildsResult,
-    type RESTPostAPIChannelMessageJSONBody,
-} from "discord-api-types/v10";
+import { MessageFlags, type RESTGetAPICurrentUserGuildsResult } from "discord-api-types/v10";
 import { BotIcon, CheckIcon, ExternalLinkIcon, SendIcon, WebhookIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-import type { AttachmentPayload } from "@/lib/stores/attachments";
-import { useAttachmentStore } from "@/lib/stores/attachments";
+import useFilesStore from "@/lib/stores/files";
 import { useOutputStore } from "@/lib/stores/output";
 import { useUserStore } from "@/lib/stores/user-store";
 import ChannelSelector from "./channel-selector";
@@ -37,16 +30,6 @@ import { Textarea } from "./ui/textarea";
 export default function Navbar({
     fetchDiscordGuilds,
 }: {
-    sendMessageToChannel: (
-        messageBody: RESTPostAPIChannelMessageJSONBody,
-        channelId: string,
-        files?: AttachmentPayload[],
-    ) => Promise<unknown>;
-    sendMessageToWebhook: (
-        messageBody: RESTPostAPIChannelMessageJSONBody,
-        webhookUrl: string,
-        files?: AttachmentPayload[],
-    ) => Promise<unknown>;
     fetchDiscordGuilds: () => Promise<{
         data: RESTGetAPICurrentUserGuildsResult | null;
         error: string | null;
@@ -89,7 +72,6 @@ export default function Navbar({
             setGuildsLoading(true);
             fetchDiscordGuilds()
                 .then((data) => {
-                    console.log(data);
                     setGuilds(data.data ?? []);
                     setGuildsLoading(false);
                 })
@@ -102,39 +84,27 @@ export default function Navbar({
         }
     }, [selectedTab, fetchDiscordGuilds]);
 
+    const { files } = useFilesStore();
+
     async function handleSendMessage() {
-        let attachments: RESTAPIAttachment[] = [];
-        const files = useAttachmentStore.getState().getAll();
+        const formData = new FormData();
 
-        if (files.length > 0) {
-            attachments = files.map((file, index) => ({
-                id: index,
-                filename: file.name,
-            }));
-        }
+        files.forEach((file) => {
+            formData.append("images", file);
+        });
 
-        const messageBody: RESTPostAPIChannelMessageJSONBody = {
-            components: output,
-            flags: MessageFlags.IsComponentsV2,
-            attachments,
-        };
+        formData.append(
+            "message",
+            JSON.stringify({
+                components: output,
+                flags: MessageFlags.IsComponentsV2,
+            }),
+        );
 
-        const options =
-            selectedTab === "webhook"
-                ? { type: "webhook" as const, webhookUrl }
-                : { type: "bot" as const, channelId: selectedChannel };
-
-        try {
-            await fetch("/api/discord/send", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ messageBody, options, files }),
-            });
-
-            toast.success("Sent successfully!");
-        } catch (_err) {
-            toast.error("Failed to send message!");
-        }
+        await fetch("/api/discord/send", {
+            method: "POST",
+            body: formData,
+        });
     }
 
     return (
@@ -143,7 +113,7 @@ export default function Navbar({
                 <a href="https://messagekit.app">
                     <div className="flex items-center gap-2.5">
                         <Image src="/logo.svg" className="size-7" alt="Logo" width={32} height={32} />
-                        <span className="text-lg font-bold font-display">Message Kit</span>
+                        <span className="text-lg font-bold font-display md:block hidden">Message Kit</span>
                     </div>
                 </a>
             </div>

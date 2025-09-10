@@ -1,3 +1,4 @@
+import { PopoverClose } from "@radix-ui/react-popover";
 import {
     type APIActionRowComponent,
     type APIButtonComponent,
@@ -7,14 +8,16 @@ import {
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { PlusIcon } from "lucide-react";
+import { CheckIcon, PaintbrushIcon, PlusIcon, XIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
-import { generateRandomNumber } from "@/lib/random-number";
-import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
+import { useState } from "react";
+import { HexColorPicker } from "react-colorful";
+import { append, hexToNumber, moveItem, removeAt, updateAt } from "@/lib/utils";
 import { componentDescriptors } from "../../lib/options";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import ButtonGroup from "./button-group";
 import File from "./file";
 import MediaGallery from "./media-gallery";
@@ -27,13 +30,19 @@ export default function Container({
     onRemove,
     components,
     setComponents,
+    setColor,
+    color,
 }: {
     onMoveUp: () => void;
     onMoveDown: () => void;
     onRemove: () => void;
     components: APIComponentInContainer[];
     setComponents: (components: APIComponentInContainer[]) => void;
+    color: number | null;
+    setColor: (color: number | null) => void;
 }) {
+    const [colorToSet, setColorToSet] = useState("#000000");
+
     const handleMove = (index: number, direction: "up" | "down") => {
         setComponents(moveItem(components, index, direction));
     };
@@ -57,31 +66,67 @@ export default function Container({
 
     return (
         <NewBuilder
+            style={
+                color
+                    ? { borderLeftColor: `#${color.toString(16).padStart(6, "0")}`, borderLeftWidth: "4px" }
+                    : undefined
+            }
             name="Container"
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
             extraButton={
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant={"ghost"}
-                            size={"sm"}
-                            className="h-7 text-xs font-semibold text-muted-foreground"
-                        >
-                            <PlusIcon />
-                            Add Component
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        {componentsList.map((component) => (
-                            <DropdownMenuItem key={component.type} onClick={component.onClick}>
-                                <component.icon />
-                                {component.name}
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant={"ghost"}
+                                size={"sm"}
+                                className="h-7 text-xs font-semibold text-muted-foreground"
+                            >
+                                <PlusIcon />
+                                Add Component
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            {componentsList.map((component) => (
+                                <DropdownMenuItem key={component.type} onClick={component.onClick}>
+                                    <component.icon />
+                                    {component.name}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button className="size-7" size={"icon"} variant={"ghost"}>
+                                <PaintbrushIcon />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="size-fit flex flex-col gap-4">
+                            <HexColorPicker color={colorToSet} onChange={setColorToSet} />
+                            <div className="flex gap-2 w-full">
+                                <PopoverClose asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="flex-1"
+                                        onClick={() => setColor(null)}
+                                        disabled={color === null}
+                                    >
+                                        <XIcon />
+                                        Clear
+                                    </Button>
+                                </PopoverClose>
+                                <PopoverClose asChild>
+                                    <Button className="flex-1" onClick={() => setColor(hexToNumber(colorToSet))}>
+                                        <CheckIcon />
+                                        Set
+                                    </Button>
+                                </PopoverClose>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                </>
             }
         >
             <div className="flex flex-col gap-4">

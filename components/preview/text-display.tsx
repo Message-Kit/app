@@ -1,13 +1,13 @@
 import {
-    ButtonStyle,
-    ComponentType,
     type APISectionComponent,
     type APITextDisplayComponent,
+    ButtonStyle,
+    ComponentType,
 } from "discord-api-types/v10";
+import type { PropsWithChildren, ReactElement, ReactNode } from "react";
+import { Children, cloneElement, Fragment, isValidElement } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Fragment, isValidElement, cloneElement, Children } from "react";
-import type { ReactNode, ReactElement, PropsWithChildren } from "react";
 import { generateRandomNumber } from "@/lib/random-number";
 import { cn } from "@/lib/utils";
 import ExternalLinkIcon from "../misc/external-link-icon";

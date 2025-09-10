@@ -2,6 +2,7 @@ import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, TrashIcon } from "luc
 import { motion } from "motion/react";
 import { type PropsWithChildren, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
+import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 
@@ -12,14 +13,26 @@ interface Props extends PropsWithChildren {
     onRemove: () => void;
     extraButton?: React.ReactNode;
     helperText?: string;
+    className?: string;
+    style?: React.CSSProperties;
 }
 
-export default function NewBuilder({ name, onMoveUp, onMoveDown, onRemove, extraButton, helperText, children }: Props) {
+export default function NewBuilder({
+    name,
+    onMoveUp,
+    onMoveDown,
+    onRemove,
+    extraButton,
+    helperText,
+    children,
+    className,
+    style,
+}: Props) {
     const [collapsed, setCollapsed] = useState(false);
 
     return (
         <motion.div {...motionProps}>
-            <div className="flex flex-col border rounded-xl bg-card">
+            <div className={cn("flex flex-col border rounded-xl bg-card", className)} style={style}>
                 <div className="flex justify-between items-center gap-2 p-2">
                     <div className="flex items-center gap-2">
                         <Button
