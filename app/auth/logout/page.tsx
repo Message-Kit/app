@@ -1,6 +1,5 @@
 "use client";
 
-import { redirect } from "next/navigation";
 import { useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 
@@ -9,7 +8,7 @@ export default function Page() {
 
     useEffect(() => {
         supabase.auth.signOut();
-        redirect("/");
+        window.location.href = "/";
     }, [supabase]);
 
     return (

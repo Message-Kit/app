@@ -36,7 +36,7 @@ export default function RootLayout({
             <body className={`${body.variable} ${display.variable} ${discord.variable} font-body antialiased`}>
                 <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
                     <UserProvider>{children}</UserProvider>
-                    <Toaster richColors />
+                    <Toaster richColors position="top-center" />
                 </ThemeProvider>
             </body>
         </html>
