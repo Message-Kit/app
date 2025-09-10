@@ -1,6 +1,6 @@
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { type PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useEffect, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -29,6 +29,12 @@ export default function NewBuilder({
     style,
 }: Props) {
     const [collapsed, setCollapsed] = useState(false);
+
+    useEffect(() => {
+        if (name === "Media Gallery") {
+            setCollapsed(true);
+        }
+    }, [name]);
 
     return (
         <motion.div {...motionProps}>
