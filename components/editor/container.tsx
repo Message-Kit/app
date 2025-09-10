@@ -3,12 +3,13 @@ import {
     type APIActionRowComponent,
     type APIButtonComponent,
     type APIComponentInContainer,
+    type APIFileComponent,
     type APIMediaGalleryComponent,
     type APISeparatorComponent,
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { CheckIcon, PaintbrushIcon, PlusIcon, XIcon } from "lucide-react";
+import { CheckIcon, PaintBucketIcon, PlusIcon, XIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
@@ -100,7 +101,7 @@ export default function Container({
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button className="size-7" size={"icon"} variant={"ghost"}>
-                                <PaintbrushIcon />
+                                <PaintBucketIcon />
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="size-fit flex flex-col gap-4">
@@ -266,6 +267,24 @@ export default function Container({
                                     onMoveUp={() => handleMove(index, "up")}
                                     onMoveDown={() => handleMove(index, "down")}
                                     onRemove={() => handleRemove(index)}
+                                    spoiler={component.spoiler ?? false}
+                                    onChangeSpoiler={(value) => {
+                                        setComponents(
+                                            updateAt(components, index, (old) => ({
+                                                ...(old as APIFileComponent),
+                                                spoiler: value,
+                                            })),
+                                        );
+                                    }}
+                                    file={component}
+                                    setFile={(file) => {
+                                        setComponents(
+                                            updateAt(components, index, (old) => ({
+                                                ...(old as APIFileComponent),
+                                                file: file.file,
+                                            })),
+                                        );
+                                    }}
                                 />
                             );
                         }

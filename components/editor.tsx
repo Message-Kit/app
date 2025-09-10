@@ -2,14 +2,16 @@ import {
     type APIActionRowComponent,
     type APIButtonComponent,
     type APIContainerComponent,
+    type APIFileComponent,
     type APIMediaGalleryComponent,
     type APIMessageTopLevelComponent,
     type APISeparatorComponent,
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { PlusIcon, Redo2Icon, SaveIcon, SearchIcon, Undo2Icon } from "lucide-react";
+import { PlusIcon, Redo2Icon, SaveIcon, Undo2Icon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
+import Image from "next/image";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { generateRandomNumber } from "@/lib/random-number";
 import { useOutputStore } from "@/lib/stores/output";
@@ -23,7 +25,6 @@ import YesSeparator from "./editor/separator";
 import TextDisplay from "./editor/text-display";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Input } from "./ui/input";
 import { Separator } from "./ui/separator";
 
 export default function Editor() {
@@ -56,21 +57,11 @@ export default function Editor() {
         <div className="h-full overflow-y-auto">
             <div className="flex flex-col">
                 <div className="flex justify-between gap-2 p-4 overflow-x-auto">
-                    <div className="flex gap-2">
-                        <div className="relative">
-                            <Input className="peer pe-9 max-w-28 md:max-w-[300px]" placeholder="Search components" />
-                            <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 peer-disabled:opacity-50">
-                                <SearchIcon size={16} aria-hidden="true" />
-                            </div>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex items-center gap-2.5">
+                            <Image src="/logo.svg" className="size-[30px]" alt="Logo" width={32} height={32} />
+                            <span className="text-xl font-bold font-display md:block hidden">Message Kit</span>
                         </div>
-                        {/* <Button variant={"outline"}>
-                            <DownloadIcon />
-                            Import
-                        </Button> */}
-                        {/* <Button variant={"outline"}>
-                            <UploadIcon />
-                            Export
-                        </Button> */}
                     </div>
                     <div className="flex gap-2">
                         <Button variant="ghost" size="icon">
@@ -288,6 +279,24 @@ function Components({
                             onMoveUp={() => handleMove(index, "up")}
                             onMoveDown={() => handleMove(index, "down")}
                             onRemove={() => handleRemove(index)}
+                            spoiler={component.spoiler ?? false}
+                            onChangeSpoiler={(value) => {
+                                setComponents((previousComponents) =>
+                                    updateAt(previousComponents, index, (old) => ({
+                                        ...(old as APIFileComponent),
+                                        spoiler: value,
+                                    })),
+                                );
+                            }}
+                            file={component}
+                            setFile={(file) => {
+                                setComponents((previousComponents) =>
+                                    updateAt(previousComponents, index, (old) => ({
+                                        ...(old as APIFileComponent),
+                                        file: file.file,
+                                    })),
+                                );
+                            }}
                         />
                     );
                 }

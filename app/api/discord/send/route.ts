@@ -1,7 +1,7 @@
-import { REST } from "@discordjs/rest";
+import { type RawFile, REST } from "@discordjs/rest";
 import { type RESTPostAPIChannelMessageJSONBody, Routes } from "discord-api-types/v10";
 import { type NextRequest, NextResponse } from "next/server";
-import { parseDiscordWebhook, type SendOptions } from "@/lib/utils";
+import { parseDiscordWebhook, type SendOptions, sanitizeFileName } from "@/lib/utils";
 
 const botToken = process.env.DISCORD_CLIENT_TOKEN;
 
@@ -21,15 +21,14 @@ export async function POST(req: NextRequest) {
     const message = JSON.parse(messagePayload) as RESTPostAPIChannelMessageJSONBody;
     const options = JSON.parse(optionsPayload) as SendOptions;
 
-    const forwardForm = new FormData();
-
-    // Attach message as payload_json
-    forwardForm.append("payload_json", JSON.stringify(message));
-
-    // Attach files
-    files.forEach((file, i) => {
-        forwardForm.append(`files[${i}]`, file, file.name);
-    });
+    // prepare files for discord rest (multipart)
+    const rawFiles: RawFile[] = await Promise.all(
+        files.map(async (file) => ({
+            name: sanitizeFileName(file.name),
+            data: Buffer.from(await file.arrayBuffer()),
+            contentType: file.type || undefined,
+        })),
+    );
 
     if (options.via === "webhook") {
         const webhook = parseDiscordWebhook(options.webhook_url);
@@ -37,7 +36,8 @@ export async function POST(req: NextRequest) {
 
         try {
             await rest.post(Routes.webhook(webhook.id, webhook.token), {
-                body: JSON.parse(forwardForm.get("payload_json") as string), // <-- send multipart
+                body: message,
+                files: rawFiles.length > 0 ? rawFiles : undefined,
                 query: new URLSearchParams({ with_components: "true" }),
             });
 
@@ -49,7 +49,8 @@ export async function POST(req: NextRequest) {
     } else if (options.via === "bot") {
         try {
             await rest.post(Routes.channelMessages(options.channel_id), {
-                body: JSON.parse(forwardForm.get("payload_json") as string), // <-- send multipart
+                body: message,
+                files: rawFiles.length > 0 ? rawFiles : undefined,
             });
 
             return NextResponse.json({ success: true });

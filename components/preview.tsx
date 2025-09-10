@@ -2,6 +2,7 @@ import { ComponentType } from "discord-api-types/v10";
 import { useOutputStore } from "@/lib/stores/output";
 import PreviewButtonGroup from "./preview/button-group";
 import PreviewContainer from "./preview/container";
+import PreviewFile from "./preview/file";
 import PreviewMediaGallery from "./preview/media-gallery";
 import PreviewSeparator from "./preview/separator";
 import PreviewTextDisplay from "./preview/text-display";
@@ -37,7 +38,10 @@ export default function Preview() {
                             return <PreviewButtonGroup key={component.id} component={component} />;
                         } else if (component.type === ComponentType.Container) {
                             return <PreviewContainer key={component.id} component={component} />;
-                        } else return null;
+                        } else if (component.type === ComponentType.File) {
+                            return <PreviewFile key={component.id} component={component} />;
+                        }
+                        return null;
                     })}
                 </div>
             </div>

@@ -1,13 +1,11 @@
 import { create } from "zustand";
 
-type FilesStore = {
+type FileStore = {
     files: File[];
     setFiles: (files: File[]) => void;
 };
 
-const useFilesStore = create<FilesStore>((set) => ({
+export const useFiles = create<FileStore>((set) => ({
     files: [],
     setFiles: (files) => set({ files }),
 }));
-
-export default useFilesStore;

@@ -1,6 +1,6 @@
 import type { APIMediaGalleryComponent } from "discord-api-types/v10";
 import { memo, useEffect, useState } from "react";
-import useFilesStore from "@/lib/stores/files";
+import { useFiles } from "@/lib/stores/files";
 import { sanitizeFileName } from "@/lib/utils";
 
 type PreviewMediaTileProps = {
@@ -16,7 +16,7 @@ const PreviewMediaTile = memo(function PreviewMediaTile({
     aspect,
     className,
 }: PreviewMediaTileProps) {
-    const { files } = useFilesStore();
+    const { files } = useFiles();
     const [url, setUrl] = useState<string | null>(null);
 
     useEffect(() => {
