@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import useFilesStore from "@/lib/stores/files";
 import { useOutputStore } from "@/lib/stores/output";
 import { useUserStore } from "@/lib/stores/user-store";
+import type { SendOptions } from "@/lib/utils";
 import ChannelSelector from "./channel-selector";
 import { Button } from "./ui/button";
 import {
@@ -99,6 +100,15 @@ export default function Navbar({
                 components: output,
                 flags: MessageFlags.IsComponentsV2,
             }),
+        );
+
+        formData.append(
+            "options",
+            JSON.stringify({
+                via: selectedTab === "webhook" ? "webhook" : "bot",
+                channel_id: selectedTab === "bot" ? selectedChannel : undefined,
+                webhook_url: selectedTab === "webhook" ? webhookUrl : undefined,
+            } as SendOptions),
         );
 
         await fetch("/api/discord/send", {

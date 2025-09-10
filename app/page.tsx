@@ -11,8 +11,11 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useOutputStore } from "@/lib/stores/output";
 import { fetchDiscordGuilds } from "./actions";
+import { cn } from "@/lib/utils";
 
 export default function Page() {
+    const [selectedTab, setSelectedTab] = useState("editor");
+
     return (
         <div className="h-screen flex flex-col">
             <Navbar fetchDiscordGuilds={fetchDiscordGuilds} />
@@ -31,10 +34,14 @@ export default function Page() {
             </div>
 
             {/* Mobile */}
-            <div className="flex md:hidden flex-1">
-                <Tabs defaultValue="editor" className="w-full gap-0">
-                    <div className="p-0.5 border-b m-0 bg-muted">
-                        <TabsList className="w-full h-10">
+            <div className="flex flex-col md:hidden flex-1">
+                <Tabs
+                    defaultValue="editor"
+                    className="w-full gap-0"
+                    onValueChange={(value) => setSelectedTab(value as "editor" | "preview")}
+                >
+                    <div className="p-2 border-b m-0 bg-card">
+                        <TabsList className="w-full h-12 bg-card">
                             <TabsTrigger value="editor">
                                 <SlidersVerticalIcon />
                                 Editor
@@ -45,13 +52,13 @@ export default function Page() {
                             </TabsTrigger>
                         </TabsList>
                     </div>
-                    <TabsContent value="editor" className="flex-1 overflow-auto">
-                        <Editor />
-                    </TabsContent>
-                    <TabsContent value="preview" className="flex-1 overflow-auto">
-                        <PreviewWrapper />
-                    </TabsContent>
                 </Tabs>
+                <div className={cn("size-full overflow-auto hidden", selectedTab === "editor" && "block")}>
+                    <Editor />
+                </div>
+                <div className={cn("size-full overflow-auto hidden", selectedTab === "preview" && "block")}>
+                    <PreviewWrapper />
+                </div>
             </div>
         </div>
     );

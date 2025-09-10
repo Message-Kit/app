@@ -1,5 +1,7 @@
-import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
+import { REST } from "@discordjs/rest";
+import { type RESTPostAPIChannelMessageJSONBody, Routes } from "discord-api-types/v10";
 import { type NextRequest, NextResponse } from "next/server";
+import { parseDiscordWebhook, type SendOptions } from "@/lib/utils";
 
 const botToken = process.env.DISCORD_CLIENT_TOKEN;
 
@@ -7,15 +9,17 @@ if (!botToken) {
     throw new Error("DISCORD_CLIENT_TOKEN is not set");
 }
 
-const webhookUrl =
-    "https://discord.com/api/webhooks/1413482921423274065/Kds1jalCKsOIHHzP9hJg5ckbhnC4O-Bk45-O6QRVYlQLLu2OBruGVMI0BRhu97VIWXO3";
+const rest = new REST({ version: "10" }).setToken(botToken);
 
 export async function POST(req: NextRequest) {
     const formData = await req.formData();
+
     const files = formData.getAll("images") as File[];
     const messagePayload = formData.get("message") as string;
+    const optionsPayload = formData.get("options") as string;
 
     const message = JSON.parse(messagePayload) as RESTPostAPIChannelMessageJSONBody;
+    const options = JSON.parse(optionsPayload) as SendOptions;
 
     const forwardForm = new FormData();
 
@@ -27,19 +31,33 @@ export async function POST(req: NextRequest) {
         forwardForm.append(`files[${i}]`, file, file.name);
     });
 
-    const url = new URL(webhookUrl);
-    url.searchParams.set("with_components", "true");
+    if (options.via === "webhook") {
+        const webhook = parseDiscordWebhook(options.webhook_url);
+        if (!webhook) return NextResponse.json({ success: false });
 
-    const res = await fetch(url.toString(), {
-        method: "POST",
-        body: forwardForm, // <-- send multipart
-    });
+        try {
+            await rest.post(Routes.webhook(webhook.id, webhook.token), {
+                body: JSON.parse(forwardForm.get("payload_json") as string), // <-- send multipart
+                query: new URLSearchParams({ with_components: "true" }),
+            });
 
-    if (!res.ok) {
-        const text = await res.text();
-        console.log("error:", text);
-        throw new Error(`Webhook send failed: ${res.status} ${text}`);
+            return NextResponse.json({ success: true });
+        } catch (error) {
+            console.log("error:", error);
+            return NextResponse.json({ success: false });
+        }
+    } else if (options.via === "bot") {
+        try {
+            await rest.post(Routes.channelMessages(options.channel_id), {
+                body: JSON.parse(forwardForm.get("payload_json") as string), // <-- send multipart
+            });
+
+            return NextResponse.json({ success: true });
+        } catch (error) {
+            console.log("error:", error);
+            return NextResponse.json({ success: false });
+        }
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: false });
 }

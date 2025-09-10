@@ -22,29 +22,89 @@ export async function fetchDiscordGuilds(): Promise<{
             data: { session },
         } = await supabase.auth.getSession();
 
-        const providerToken = session?.provider_token;
+        let providerToken = session?.provider_token;
+        const providerRefreshToken = session?.provider_refresh_token;
+
+        const exchangeRefreshToken = async (refreshToken: string) => {
+            const clientId = process.env.DISCORD_CLIENT_ID;
+            const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+            if (!clientId || !clientSecret) throw new Error("missing discord client id/secret");
+
+            const res = await fetch("https://discord.com/api/oauth2/token", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    grant_type: "refresh_token",
+                    refresh_token: refreshToken,
+                }),
+            });
+
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error(`discord token refresh failed ${res.status}: ${txt}`);
+            }
+
+            const json = await res.json();
+            // json.access_token, json.refresh_token (may exist), json.expires_in
+            return json as { access_token: string; refresh_token?: string; expires_in?: number };
+        };
+
+        const tryFetchGuildsWithToken = async (token: string) => {
+            const response = await fetch(RouteBases.api + Routes.userGuilds(), {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                cache: "no-store",
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                const status = response.status;
+                return { ok: false, status, errorText, json: null as RESTGetAPICurrentUserGuildsResult | null };
+            }
+
+            const guilds = (await response.json()) as RESTGetAPICurrentUserGuildsResult;
+            return { ok: true, status: 200, errorText: null, json: guilds };
+        };
+
+        // If we don't have a provider token, try to refresh it right away (if refresh token exists)
+        if (!providerToken && providerRefreshToken) {
+            try {
+                const refreshed = await exchangeRefreshToken(providerRefreshToken);
+                providerToken = refreshed.access_token;
+                // NOTE: Discord may return a new refresh_token; if you want persistence, save refreshed.refresh_token somewhere.
+            } catch (err) {
+                return { data: null, error: (err as Error).message };
+            }
+        }
 
         if (!providerToken) {
             return { data: null, error: "provider token unavailable" };
         }
 
-        const response = await fetch(RouteBases.api + Routes.userGuilds(), {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${providerToken}`,
-            },
-            cache: "no-store",
-        });
+        // First attempt to fetch guilds
+        let attempt = await tryFetchGuildsWithToken(providerToken);
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            return {
-                data: null,
-                error: `discord error ${response.status}: ${errorText}`,
-            };
+        // If unauthorized, try refreshing once (if refresh token exists)
+        if (!attempt.ok && (attempt.status === 401 || attempt.status === 403) && providerRefreshToken) {
+            try {
+                const refreshed = await exchangeRefreshToken(providerRefreshToken);
+                providerToken = refreshed.access_token;
+                // Again: consider persisting refreshed.refresh_token if present
+                attempt = await tryFetchGuildsWithToken(providerToken);
+            } catch (err) {
+                return { data: null, error: (err as Error).message };
+            }
         }
 
-        const guilds = (await response.json()) as RESTGetAPICurrentUserGuildsResult;
+        if (!attempt.ok) {
+            return { data: null, error: `discord error ${attempt.status}: ${attempt.errorText}` };
+        }
+
+        const guilds = attempt.json as RESTGetAPICurrentUserGuildsResult;
 
         const clientToken = process.env.DISCORD_CLIENT_TOKEN;
         if (!clientToken) {
@@ -55,9 +115,7 @@ export async function fetchDiscordGuilds(): Promise<{
             const rest = new REST({ version: "10" }).setToken(clientToken);
             const results = await Promise.allSettled(
                 guilds.map(async (guild) => {
-                    const url = `${Routes.guild(guild.id)}?${new URLSearchParams({ with_counts: "true" })}`;
-                    await rest.get(url as `/guilds/${string}`);
-
+                    await rest.get(Routes.guild(guild.id));
                     return guild.id;
                 }),
             );

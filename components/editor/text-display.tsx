@@ -161,17 +161,9 @@ export default function TextDisplay({
                                 variant={"ghost"}
                                 size={"sm"}
                                 className="h-7 text-xs font-semibold text-muted-foreground"
-                                // onClick={() => {
-                                //     if (accessory?.type) return;
-                                //     setAccessory?.({
-                                //         type: ComponentType.Thumbnail,
-                                //         media: { url: imageUrl },
-                                //         description: imageAlt,
-                                //     });
-                                // }}
                             >
                                 <PlusIcon />
-                                {accessory?.type ? "Edit" : "Add"} Accessory
+                                {accessory?.type ? "Edit" : "Set"} Accessory
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
