@@ -9,7 +9,7 @@ import {
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { PlusIcon, Redo2Icon, SaveIcon, Undo2Icon } from "lucide-react";
+import { DownloadIcon, ImportIcon, PlusIcon, Redo2Icon, SaveIcon, Undo2Icon, UploadIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
@@ -28,7 +28,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from "./ui/separator";
 
 export default function Editor() {
-    const [components, setComponents] = useState<APIMessageTopLevelComponent[]>([]);
+    const [components, setComponents] = useState<APIMessageTopLevelComponent[]>(exampleComponents);
     const { setOutput } = useOutputStore();
 
     useEffect(() => {
@@ -64,6 +64,13 @@ export default function Editor() {
                         </div>
                     </div>
                     <div className="flex gap-2">
+                        <Button variant="ghost" size="icon">
+                            <UploadIcon />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                            <DownloadIcon />
+                        </Button>
+                        <Separator orientation="vertical" />
                         <Button variant="ghost" size="icon">
                             <Undo2Icon />
                         </Button>
@@ -306,3 +313,62 @@ function Components({
         </AnimatePresence>
     );
 }
+
+const exampleComponents = [
+    {
+        id: 272089724,
+        type: 17,
+        components: [
+            {
+                id: 542608968,
+                type: 12,
+                items: [
+                    {
+                        media: {
+                            url: "https://use.messagekit.app/example-header.png",
+                        },
+                    },
+                ],
+            },
+            {
+                id: 720534108,
+                type: 10,
+                content:
+                    "# Create rich and interactive mesages!\nThe easiest way to personalize your Discord server. We give you a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
+            },
+            {
+                id: 506754460,
+                type: 14,
+                spacing: 1,
+                divider: false,
+            },
+            {
+                id: 238015939,
+                type: 10,
+                content:
+                    '## Get started\n- Install Message Kit in your server.\n- Create a message. Click on "Add Component" to add various components to your message.\n- Send it! You can send your message via our bot or use webhooks. Note that you cannot send buttons that are able to trigger actions.',
+            },
+        ],
+        accent_color: 4285144,
+    },
+    {
+        id: 177701759,
+        type: 1,
+        components: [
+            {
+                id: 185764366,
+                type: 2,
+                label: "Support Server",
+                style: 5,
+                url: "https://discord.gg/5bBM2TVDD3",
+            },
+            {
+                id: 294842992,
+                type: 2,
+                label: "Donate",
+                style: 5,
+                url: "https://ko-fi.com/ronykax",
+            },
+        ],
+    },
+];

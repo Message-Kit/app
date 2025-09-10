@@ -18,8 +18,9 @@ export default function PreviewButtonGroup({
                 .filter((child) => child.type === ComponentType.Button && child.style !== ButtonStyle.Premium)
                 .map((child) => {
                     return (
-                        <div
+                        <a
                             key={`${child.type}-${child.id}`}
+                            href={child.style === ButtonStyle.Link ? child.url : "/actions/undefined"}
                             className={cn(
                                 "flex px-[11px] h-[32px] rounded-[8px] duration-150 cursor-pointer",
 
@@ -45,7 +46,7 @@ export default function PreviewButtonGroup({
                                     <ExternalLinkIcon />
                                 </span>
                             )}
-                        </div>
+                        </a>
                     );
                 })}
         </div>

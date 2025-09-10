@@ -10,7 +10,7 @@ export default function PreviewContainer({ component: comp }: { component: APICo
     return (
         <div className="flex border-[#44454c] border rounded-[8px] w-fit overflow-hidden">
             {comp.accent_color && (
-                <div className="w-[4px]" style={{ backgroundColor: numberToHex(comp.accent_color) }} />
+                <div className="min-w-[4px] max-w-[4px]" style={{ backgroundColor: numberToHex(comp.accent_color) }} />
             )}
             <div className="flex flex-col gap-[8px] p-[16px] bg-[#393a41] text-[14px]">
                 {comp.components.map((component) => {
