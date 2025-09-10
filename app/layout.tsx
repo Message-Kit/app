@@ -22,8 +22,8 @@ const discord = localFont({
 });
 
 export const metadata: Metadata = {
-    title: "Admin Dashboard",
-    description: "Dashboard to manage messages for Message Kit.",
+    title: "Message Kit",
+    description: "The easiest way to personalize your Discord server.",
 };
 
 export default function RootLayout({
