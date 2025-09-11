@@ -66,7 +66,7 @@ export default function Page() {
                     onValueChange={(value) => setSelectedTab(value as "editor" | "preview")}
                 >
                     <div className="p-2 border-b m-0 bg-card">
-                        <TabsList className="w-full h-12 bg-card">
+                        <TabsList className="w-full bg-card">
                             <TabsTrigger value="editor">
                                 <SlidersVerticalIcon />
                                 Editor
@@ -104,7 +104,7 @@ function PreviewWrapper() {
 
     return (
         <div className="h-full flex flex-col">
-            <div className="p-4 flex items-center justify-between border-b">
+            <div className="p-4 flex items-center justify-between border-b overflow-x-auto">
                 <div className="flex items-center gap-2">
                     <Button variant="link" asChild>
                         <a href="https://discord.gg/5bBM2TVDD3" target="_blank" rel="noopener noreferrer">

@@ -55,7 +55,13 @@ const PreviewMediaTile = memo(function PreviewMediaTile({
     );
 });
 
-export default function PreviewMediaGallery({ component }: { component: APIMediaGalleryComponent }) {
+export default function PreviewMediaGallery({
+    component,
+    container,
+}: {
+    component: APIMediaGalleryComponent;
+    container?: boolean;
+}) {
     const items = component.items;
     const count = items.length;
 
@@ -63,7 +69,7 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 1) {
         return (
-            <div className="rounded-[8px] overflow-hidden max-w-[550px]">
+            <div className="rounded-[8px] overflow-hidden" style={{ maxWidth: container ? "100%" : "550px" }}>
                 <PreviewMediaTile mediaUrl={items[0].media.url} description={items[0].description} aspect="auto" />
             </div>
         );
@@ -71,7 +77,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 2) {
         return (
-            <div className="rounded-[8px] overflow-hidden grid grid-cols-2 gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden grid grid-cols-2 gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 {items.map((item, i) => (
                     <PreviewMediaTile
                         key={`${item.media.url}-${i}`}
@@ -86,7 +95,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 3) {
         return (
-            <div className="rounded-[8px] overflow-hidden grid grid-cols-3 grid-rows-2 gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden grid grid-cols-3 grid-rows-2 gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 <div className="col-span-2 row-span-2">
                     <PreviewMediaTile
                         mediaUrl={items[0].media.url}
@@ -112,7 +124,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 4) {
         return (
-            <div className="rounded-[8px] overflow-hidden grid grid-cols-2 gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden grid grid-cols-2 gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 {items.map((item, i) => (
                     <PreviewMediaTile
                         key={`${item.media.url}-${i}`}
@@ -127,7 +142,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 5) {
         return (
-            <div className="rounded-[8px] overflow-hidden flex flex-col gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden flex flex-col gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 <div className="grid grid-cols-2 gap-[4px]">
                     <PreviewMediaTile
                         key={`${items[0].media.url}-0`}
@@ -168,7 +186,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 6) {
         return (
-            <div className="rounded-[8px] overflow-hidden grid grid-cols-3 gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden grid grid-cols-3 gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 {items.map((item, i) => (
                     <PreviewMediaTile
                         key={`${item.media.url}-${i}`}
@@ -183,7 +204,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 7) {
         return (
-            <div className="rounded-[8px] overflow-hidden flex flex-col gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden flex flex-col gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 <PreviewMediaTile
                     key={`${items[0].media.url}-0`}
                     mediaUrl={items[0].media.url}
@@ -206,7 +230,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 8) {
         return (
-            <div className="rounded-[8px] overflow-hidden flex flex-col gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden flex flex-col gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 <div className="grid grid-cols-2 gap-[4px]">
                     <PreviewMediaTile
                         key={`${items[0].media.url}-0`}
@@ -237,7 +264,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 9) {
         return (
-            <div className="rounded-[8px] overflow-hidden grid grid-cols-3 gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden grid grid-cols-3 gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 {items.map((item, i) => (
                     <PreviewMediaTile
                         key={`${item.media.url}-${i}`}
@@ -252,7 +282,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     if (count === 10) {
         return (
-            <div className="rounded-[8px] overflow-hidden flex flex-col gap-[4px] max-w-[550px]">
+            <div
+                className="rounded-[8px] overflow-hidden flex flex-col gap-[4px]"
+                style={{ maxWidth: container ? "100%" : "550px" }}
+            >
                 <PreviewMediaTile
                     key={`${items[0].media.url}-0`}
                     mediaUrl={items[0].media.url}
@@ -275,7 +308,10 @@ export default function PreviewMediaGallery({ component }: { component: APIMedia
 
     // fallback: simple grid
     return (
-        <div className="rounded-[8px] overflow-hidden grid grid-cols-3 gap-[4px] max-w-[550px]">
+        <div
+            className="rounded-[8px] overflow-hidden grid grid-cols-3 gap-[4px]"
+            style={{ maxWidth: container ? "100%" : "550px" }}
+        >
             {items.map((item, i) => (
                 <PreviewMediaTile
                     key={`${item.media.url}-${i}`}

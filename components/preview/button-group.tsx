@@ -42,7 +42,7 @@ export default function PreviewButtonGroup({
                                 {child.label}
                             </span>
                             {child.style === ButtonStyle.Link && (
-                                <span className="ml-[2px] my-auto">
+                                <span className="ml-[8px] my-auto">
                                     <ExternalLinkIcon />
                                 </span>
                             )}

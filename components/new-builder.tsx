@@ -31,7 +31,7 @@ export default function NewBuilder({
     const [collapsed, setCollapsed] = useState(false);
 
     useEffect(() => {
-        if (name === "Media Gallery") {
+        if (name === "Media Gallery" || name === "Separator") {
             setCollapsed(true);
         }
     }, [name]);

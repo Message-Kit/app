@@ -83,18 +83,18 @@ function renderNodesWithMentions(node: ReactNode): ReactNode {
 
 export default function PreviewTextDisplay({
     component,
-    _container,
+    container,
 }: {
     component: APITextDisplayComponent | APISectionComponent;
-    _container?: boolean;
+    container?: boolean;
 }) {
     return (
         <div className="flex gap-[12px]">
-            <div className="text-[#dbdee1] text-[16px] leading-[0]">
+            <div className="text-[#dbdee1] leading-[0]" style={{ fontSize: container ? "14px" : "16px" }}>
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                        p: ({ children }) => <p className="leading-[1.375rem]">{renderNodesWithMentions(children)}</p>,
+                        p: ({ children }) => <p className="leading-[1.375rem]" style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}>{renderNodesWithMentions(children)}</p>,
                         h1: ({ children }) => (
                             <h1 className="text-[24px] font-bold my-[8px] leading-[1.375em]">
                                 {renderNodesWithMentions(children)}
@@ -121,7 +121,7 @@ export default function PreviewTextDisplay({
                             </ul>
                         ),
                         li: ({ children }) => (
-                            <li className="leading-[1.375rem] mb-[4px]">{renderNodesWithMentions(children)}</li>
+                            <li className="mb-[4px]" style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}>{renderNodesWithMentions(children)}</li>
                         ),
                         h6: ({ children }) => (
                             <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>
