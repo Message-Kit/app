@@ -271,7 +271,7 @@ const exampleComponents = [
                 id: 720534108,
                 type: 10,
                 content:
-                    "# Create rich and interactive mesages!\nMessage Kit is the easiest way to personalize your Discord server. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
+                    "# Create modular, interactive messages\nMessage Kit lets you build interactive messages fast. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
             },
             {
                 id: 506754460,
@@ -298,7 +298,7 @@ const exampleComponents = [
                     {
                         type: 10,
                         content:
-                            "- Feeling stuck? Read our docs to get a better understanding on how you can get started with Message Kit.",
+                            "- Feeling stuck? Read our docs to get a better understanding on how you can use Message Kit.",
                     },
                 ],
                 accessory: {
@@ -315,7 +315,7 @@ const exampleComponents = [
                     {
                         type: 10,
                         content:
-                            "- Looking to contribute? Message Kit is open source! Anyone can contribute or create an issue in our Github organization.",
+                            "- Looking to contribute? Message Kit is open source! Create an issue or open a PR in our Github organization.",
                     },
                 ],
                 accessory: {
