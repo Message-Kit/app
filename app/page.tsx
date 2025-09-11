@@ -233,8 +233,6 @@ function SendMessageButton() {
             } as SendOptions),
         );
 
-        console.log(formData.getAll("images"));
-
         await fetch("/api/discord/send", {
             method: "POST",
             body: formData,

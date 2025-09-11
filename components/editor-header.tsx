@@ -1,14 +1,15 @@
 import type { APIMessageTopLevelComponent } from "discord-api-types/v10";
-import { DownloadIcon, PlusIcon, SaveIcon, UploadIcon } from "lucide-react";
+import { DownloadIcon, PlusIcon, SaveIcon, SquareDashedMousePointerIcon, UploadIcon } from "lucide-react";
 import Image from "next/image";
 import { type Dispatch, type SetStateAction, useRef } from "react";
 import { componentDescriptors } from "@/lib/options";
 import { append } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Separator } from "./ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 
 export default function EditorHeader({
     setComponents,
@@ -17,6 +18,7 @@ export default function EditorHeader({
     setComponents: Dispatch<SetStateAction<APIMessageTopLevelComponent[]>>;
     components: APIMessageTopLevelComponent[];
 }) {
+    const { shouldInspect, setShouldInspect } = useShouldInspectStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const addComponent = <T extends APIMessageTopLevelComponent>(component: T) =>
@@ -84,6 +86,20 @@ export default function EditorHeader({
                     <TooltipContent>Import from JSON</TooltipContent>
                 </Tooltip>
                 <Separator orientation="vertical" />
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant={shouldInspect ? "secondary" : "ghost"}
+                            size="icon"
+                            onClick={() => {
+                                setShouldInspect(!shouldInspect);
+                            }}
+                        >
+                            <SquareDashedMousePointerIcon />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Inspect</TooltipContent>
+                </Tooltip>
                 <Button variant="ghost" size="icon">
                     <SaveIcon />
                 </Button>

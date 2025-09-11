@@ -1,5 +1,4 @@
 import type { APIFileComponent } from "discord-api-types/v10";
-import { useEffect } from "react";
 import { useFiles } from "@/lib/stores/files";
 import { sanitizeFileName } from "@/lib/utils";
 import NewBuilder from "../new-builder";
@@ -15,6 +14,7 @@ export default function File({
     spoiler,
     file,
     setFile,
+    component,
 }: {
     onMoveUp: () => void;
     onMoveDown: () => void;
@@ -23,12 +23,9 @@ export default function File({
     spoiler: boolean;
     file: APIFileComponent;
     setFile: (file: APIFileComponent) => void;
+    component: APIFileComponent;
 }) {
     const { files, setFiles } = useFiles();
-
-    useEffect(() => {
-        console.log(files);
-    }, [files]);
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const inputFile = e.target.files?.[0];
@@ -46,6 +43,7 @@ export default function File({
     return (
         <NewBuilder
             name="File"
+            tag={component.id ?? null}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}

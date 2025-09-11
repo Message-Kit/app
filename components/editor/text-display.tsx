@@ -3,6 +3,8 @@ import {
     type APIButtonComponentWithCustomId,
     type APIButtonComponentWithURL,
     type APISectionAccessoryComponent,
+    type APISectionComponent,
+    type APITextDisplayComponent,
     type APIThumbnailComponent,
     ButtonStyle,
     ComponentType,
@@ -36,6 +38,7 @@ export default function TextDisplay({
     accessory,
     setAccessory,
     removeAccessory,
+    component,
 }: {
     content: string;
     onContentChange: (content: string) => void;
@@ -45,6 +48,7 @@ export default function TextDisplay({
     accessory?: APISectionAccessoryComponent;
     setAccessory?: (accessory: APISectionAccessoryComponent) => void;
     removeAccessory?: () => void;
+    component: APITextDisplayComponent | APISectionComponent;
 }) {
     const [tab, setTab] = useState<"thumbnail" | "button">("thumbnail");
 
@@ -149,6 +153,7 @@ export default function TextDisplay({
     return (
         <>
             <NewBuilder
+                tag={component.id ?? null}
                 name="Text Display"
                 onMoveUp={onMoveUp}
                 onMoveDown={onMoveDown}

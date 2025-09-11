@@ -10,6 +10,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { generateRandomNumber } from "@/lib/random-number";
 import PreviewButton from "./button";
+import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
+import { cn } from "@/lib/utils";
 
 function Mention({ icon, text }: { icon?: ReactNode; text: string }) {
     return (
@@ -87,80 +89,86 @@ export default function PreviewTextDisplay({
     component: APITextDisplayComponent | APISectionComponent;
     container?: boolean;
 }) {
+    const { hoveredComponent } = useHoveredComponentStore();
+
     return (
-        <div className="flex gap-[12px]">
-            <div className="text-[#dbdee1] leading-[0]" style={{ fontSize: container ? "14px" : "16px" }}>
-                <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                        p: ({ children }) => (
-                            <p
-                                className="leading-[1.375rem]"
-                                style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}
-                            >
-                                {renderNodesWithMentions(children)}
-                            </p>
-                        ),
-                        h1: ({ children }) => (
-                            <h1 className="text-[24px] font-bold my-[8px] leading-[1.375em]">
-                                {renderNodesWithMentions(children)}
-                            </h1>
-                        ),
-                        h2: ({ children }) => (
-                            <h2 className="text-[20px] font-bold my-[8px] leading-[1.375em]">
-                                {renderNodesWithMentions(children)}
-                            </h2>
-                        ),
-                        h3: ({ children }) => (
-                            <h3 className="text-[16px] font-bold my-[8px] leading-[1.375em]">
-                                {renderNodesWithMentions(children)}
-                            </h3>
-                        ),
-                        ul: ({ children }) => (
-                            <ul className="m-[4px_0_0_16px] list-outside list-disc">
-                                {renderNodesWithMentions(children)}
-                            </ul>
-                        ),
-                        ol: ({ children }) => (
-                            <ul className="m-[4px_0_0_16px] list-outside list-decimal">
-                                {renderNodesWithMentions(children)}
-                            </ul>
-                        ),
-                        li: ({ children }) => (
-                            <li className="mb-[4px]" style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}>
-                                {renderNodesWithMentions(children)}
-                            </li>
-                        ),
-                        h6: ({ children }) => (
-                            <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>
-                        ),
-                        code: ({ children }) => (
-                            <code className="my-[-2.72px] px-[2.72px] border border-[#494a59] rounded-[4px] text-[13.6px] whitespace-pre-wrap bg-[#353748] text-[#dfe0e2]">
-                                {children}
-                            </code>
-                        ),
-                        pre: ({ children }) => <pre className="bg-[#1e1f29] p-10">{children}</pre>,
-                        blockquote: ({ children }) => (
-                            <blockquote className="border-l-4 border-[#5e5f66] rounded-[4px] box-border p-[0_8px_0_12px]">
-                                {children}
-                            </blockquote>
-                        ),
-                    }}
-                >
-                    {component.type === ComponentType.TextDisplay
-                        ? component.content.replaceAll("-#", "######")
-                        : component.components[0].content.replaceAll("-#", "######")}
-                </ReactMarkdown>
+        <div className={cn(hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]")}>
+            <div className="flex gap-[12px]">
+                <div className="text-[#dbdee1] leading-[0]" style={{ fontSize: container ? "14px" : "16px" }}>
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                            p: ({ children }) => (
+                                <p
+                                    className="leading-[1.375rem]"
+                                    style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}
+                                >
+                                    {renderNodesWithMentions(children)}
+                                </p>
+                            ),
+                            h1: ({ children }) => (
+                                <h1 className="text-[24px] font-bold my-[8px] leading-[1.375em]">
+                                    {renderNodesWithMentions(children)}
+                                </h1>
+                            ),
+                            h2: ({ children }) => (
+                                <h2 className="text-[20px] font-bold my-[8px] leading-[1.375em]">
+                                    {renderNodesWithMentions(children)}
+                                </h2>
+                            ),
+                            h3: ({ children }) => (
+                                <h3 className="text-[16px] font-bold my-[8px] leading-[1.375em]">
+                                    {renderNodesWithMentions(children)}
+                                </h3>
+                            ),
+                            ul: ({ children }) => (
+                                <ul className="m-[4px_0_0_16px] list-outside list-disc">
+                                    {renderNodesWithMentions(children)}
+                                </ul>
+                            ),
+                            ol: ({ children }) => (
+                                <ul className="m-[4px_0_0_16px] list-outside list-decimal">
+                                    {renderNodesWithMentions(children)}
+                                </ul>
+                            ),
+                            li: ({ children }) => (
+                                <li className="mb-[4px]" style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}>
+                                    {renderNodesWithMentions(children)}
+                                </li>
+                            ),
+                            h6: ({ children }) => (
+                                <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>
+                            ),
+                            code: ({ children }) => (
+                                <code className="my-[-2.72px] px-[2.72px] border border-[#494a59] rounded-[4px] text-[13.6px] whitespace-pre-wrap bg-[#353748] text-[#dfe0e2]">
+                                    {children}
+                                </code>
+                            ),
+                            pre: ({ children }) => <pre className="bg-[#1e1f29] p-10">{children}</pre>,
+                            blockquote: ({ children }) => (
+                                <blockquote className="border-l-4 border-[#5e5f66] rounded-[4px] box-border p-[0_8px_0_12px]">
+                                    {children}
+                                </blockquote>
+                            ),
+                        }}
+                    >
+                        {component.type === ComponentType.TextDisplay
+                            ? component.content.replaceAll("-#", "######")
+                            : component.components[0].content.replaceAll("-#", "######")}
+                    </ReactMarkdown>
+                </div>
+                {component.type === ComponentType.Section &&
+                    (component.accessory.type === ComponentType.Thumbnail ? (
+                        <div className="rounded-[8px] overflow-hidden size-[86px]">
+                            {/** biome-ignore lint/performance/noImgElement: balls */}
+                            <img src={component.accessory.media.url} alt={component.accessory.description ?? "image"} />
+                        </div>
+                    ) : component.accessory.type === ComponentType.Button ? (
+                        component.accessory.style !== ButtonStyle.Premium && (
+                            <PreviewButton button={component.accessory} />
+                        )
+                    ) : null)}
             </div>
-            {component.type === ComponentType.Section &&
-                (component.accessory.type === ComponentType.Thumbnail ? (
-                    <div className="rounded-[8px] overflow-hidden size-[86px]">
-                        {/** biome-ignore lint/performance/noImgElement: balls */}
-                        <img src={component.accessory.media.url} alt={component.accessory.description ?? "image"} />
-                    </div>
-                ) : component.accessory.type === ComponentType.Button ? (
-                    component.accessory.style !== ButtonStyle.Premium && <PreviewButton button={component.accessory} />
-                ) : null)}
         </div>
     );
 }

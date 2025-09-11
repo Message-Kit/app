@@ -1,4 +1,4 @@
-import { type APIButtonComponent, ButtonStyle, ComponentType } from "discord-api-types/v10";
+import { APIActionRowComponent, type APIButtonComponent, APIComponentInMessageActionRow, ButtonStyle, ComponentType } from "discord-api-types/v10";
 import {
     CheckIcon,
     ChevronDownIcon,
@@ -36,12 +36,14 @@ export default function ButtonGroup({
     onRemove,
     components,
     setComponents,
+    component,
 }: {
     onMoveUp: () => void;
     onMoveDown: () => void;
     onRemove: () => void;
     components: APIButtonComponent[];
     setComponents: (components: APIButtonComponent[]) => void;
+    component: APIActionRowComponent<APIComponentInMessageActionRow>;
 }) {
     const [buttonLabel, setButtonLabel] = useState("");
     const [buttonStyle, setButtonStyle] = useState<"primary" | "secondary" | "success" | "danger" | "link">("primary");
@@ -64,6 +66,7 @@ export default function ButtonGroup({
     return (
         <NewBuilder
             name="Button Group"
+            tag={component.id ?? null}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}

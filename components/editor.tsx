@@ -63,6 +63,7 @@ function Components({
                     return (
                         <TextDisplay
                             key={component.id}
+                            component={component}
                             content={component.content}
                             onContentChange={(content) =>
                                 setComponents((previousComponents) =>
@@ -93,6 +94,7 @@ function Components({
                     return (
                         <TextDisplay
                             key={component.id}
+                            component={component}
                             content={component.components[0].content}
                             onContentChange={(content) =>
                                 setComponents((previousComponents) =>
@@ -130,6 +132,7 @@ function Components({
                     return (
                         <YesSeparator
                             key={component.id}
+                            component={component}
                             spacing={component.spacing ?? SeparatorSpacingSize.Small}
                             divider={component.divider ?? true}
                             onChangeSpacing={(size) => {
@@ -157,6 +160,7 @@ function Components({
                     return (
                         <MediaGallery
                             key={component.id}
+                            component={component}
                             onMoveUp={() => handleMove(index, "up")}
                             onMoveDown={() => handleMove(index, "down")}
                             onRemove={() => handleRemove(index)}
@@ -174,6 +178,7 @@ function Components({
                 } else if (component.type === ComponentType.Container) {
                     return (
                         <Container
+                            component={component}
                             key={component.id}
                             onMoveUp={() => handleMove(index, "up")}
                             onMoveDown={() => handleMove(index, "down")}
@@ -202,6 +207,7 @@ function Components({
                     return (
                         <ButtonGroup
                             key={component.id}
+                            component={component}
                             components={component.components as APIButtonComponent[]}
                             setComponents={(components) => {
                                 setComponents((previousComponents) =>
@@ -220,6 +226,7 @@ function Components({
                     return (
                         <File
                             key={component.id}
+                            component={component}
                             onMoveUp={() => handleMove(index, "up")}
                             onMoveDown={() => handleMove(index, "down")}
                             onRemove={() => handleRemove(index)}

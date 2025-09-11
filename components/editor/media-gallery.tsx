@@ -1,4 +1,4 @@
-import type { APIMediaGalleryItem } from "discord-api-types/v10";
+import type { APIMediaGalleryComponent, APIMediaGalleryItem } from "discord-api-types/v10";
 import { ImagePlusIcon, LinkIcon, TrashIcon, UploadIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -26,12 +26,14 @@ export default function MediaGallery({
     onRemove,
     images,
     setImages,
+    component,
 }: {
     onMoveUp: () => void;
     onMoveDown: () => void;
     onRemove: () => void;
     images: APIMediaGalleryItem[];
     setImages: (images: APIMediaGalleryItem[]) => void;
+    component: APIMediaGalleryComponent;
 }) {
     const isAtLimit = images.length >= 10;
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -68,21 +70,17 @@ export default function MediaGallery({
     const handleHandle = () => {
         if (tab === "link") {
             handleLinkUpload();
-        }
-        if (tab === "upload") {
+        } else if (tab === "upload") {
             handleFileUpload();
         }
     };
-
-    useEffect(() => {
-        console.log(images);
-    }, [images]);
 
     const urls = useObjectUrls(images, files);
 
     return (
         <NewBuilder
             name="Media Gallery"
+            tag={component.id ?? null}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
