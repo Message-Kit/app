@@ -76,6 +76,7 @@ export default function Container({
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
+            className="bg-card/35"
             extraButton={
                 <>
                     <DropdownMenu>

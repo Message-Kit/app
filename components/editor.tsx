@@ -271,7 +271,7 @@ const exampleComponents = [
                 id: 720534108,
                 type: 10,
                 content:
-                    "# Create rich and interactive mesages!\nThe easiest way to personalize your Discord server. We give you a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
+                    "# Create rich and interactive mesages!\nMessage Kit is the easiest way to personalize your Discord server. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
             },
             {
                 id: 506754460,
@@ -283,7 +283,65 @@ const exampleComponents = [
                 id: 238015939,
                 type: 10,
                 content:
-                    "## Get started\n- Install Message Kit in your server.\n- Click on **Add Component** to add various components to your message.\n- Send it! You can send your message via our bot or use webhooks. Note that you cannot send buttons that are able to trigger actions.",
+                    "## Getting started\n- Install Message Kit in your server.\n- Click on **Add Component** to choose between a variety of components that you can add to your message and start designing it.\n- Send it! You can send your message via our bot or use webhooks. Note that you cannot send buttons that are able to trigger actions with webhooks.",
+            },
+            {
+                id: 314971184,
+                type: 14,
+                spacing: 1,
+                divider: true,
+            },
+            {
+                id: 257251723,
+                type: 9,
+                components: [
+                    {
+                        type: 10,
+                        content:
+                            "- Feeling stuck? Read our docs to get a better understanding on how you can get started with Message Kit.",
+                    },
+                ],
+                accessory: {
+                    type: 2,
+                    label: "Documentation",
+                    style: 5,
+                    url: "https://messagekit.app/docs",
+                },
+            },
+            {
+                id: 599819485,
+                type: 9,
+                components: [
+                    {
+                        type: 10,
+                        content:
+                            "- Looking to contribute? Message Kit is open source! Anyone can contribute or create an issue in our Github organization.",
+                    },
+                ],
+                accessory: {
+                    type: 2,
+                    label: "Contribute",
+                    style: 5,
+                    url: "https://github.com/Message-Kit",
+                },
+            },
+            {
+                id: 705891568,
+                type: 14,
+                spacing: 1,
+                divider: true,
+            },
+            {
+                id: 863677168,
+                type: 10,
+                content: "-# Check out our latest changelog here:",
+            },
+            {
+                id: 251826210,
+                type: 13,
+                file: {
+                    url: "https://raw.githubusercontent.com/Message-Kit/app/master/CHANGELOG.md",
+                },
             },
         ],
         accent_color: 4285144,
