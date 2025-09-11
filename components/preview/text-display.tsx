@@ -9,8 +9,7 @@ import { Children, cloneElement, Fragment, isValidElement } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { generateRandomNumber } from "@/lib/random-number";
-import { cn } from "@/lib/utils";
-import ExternalLinkIcon from "../misc/external-link-icon";
+import PreviewButton from "./button";
 
 function Mention({ icon, text }: { icon?: ReactNode; text: string }) {
     return (
@@ -135,6 +134,17 @@ export default function PreviewTextDisplay({
                         h6: ({ children }) => (
                             <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>
                         ),
+                        code: ({ children }) => (
+                            <code className="my-[-2.72px] px-[2.72px] border border-[#494a59] rounded-[4px] text-[13.6px] whitespace-pre-wrap bg-[#353748] text-[#dfe0e2]">
+                                {children}
+                            </code>
+                        ),
+                        pre: ({ children }) => <pre className="bg-[#1e1f29] p-10">{children}</pre>,
+                        blockquote: ({ children }) => (
+                            <blockquote className="border-l-4 border-[#5e5f66] rounded-[4px] box-border p-[0_8px_0_12px]">
+                                {children}
+                            </blockquote>
+                        ),
                     }}
                 >
                     {component.type === ComponentType.TextDisplay
@@ -149,35 +159,7 @@ export default function PreviewTextDisplay({
                         <img src={component.accessory.media.url} alt={component.accessory.description ?? "image"} />
                     </div>
                 ) : component.accessory.type === ComponentType.Button ? (
-                    component.accessory.style !== ButtonStyle.Premium && (
-                        <div
-                            className={cn(
-                                "flex px-[11px] h-[32px] rounded-[8px] duration-150 cursor-pointer",
-
-                                // button background colors
-                                component.accessory.style === ButtonStyle.Primary
-                                    ? "bg-primary hover:bg-[#4654c0]"
-                                    : component.accessory.style === ButtonStyle.Secondary
-                                      ? "bg-[#3e3f45] hover:bg-[#46474e]"
-                                      : component.accessory.style === ButtonStyle.Success
-                                        ? "bg-[#00863a] hover:bg-[#047e37]"
-                                        : component.accessory.style === ButtonStyle.Danger
-                                          ? "bg-[#d22d39] hover:bg-[#b42831]"
-                                          : component.accessory.style === ButtonStyle.Link
-                                            ? "bg-[#3e3f45] hover:bg-[#46474e]"
-                                            : "",
-                            )}
-                        >
-                            <span className="min-w-[32px] my-auto text-center text-[14px] font-medium leading-[18px]">
-                                {component.accessory.label}
-                            </span>
-                            {component.accessory.style === ButtonStyle.Link && (
-                                <span className="ml-[2px] my-auto">
-                                    <ExternalLinkIcon />
-                                </span>
-                            )}
-                        </div>
-                    )
+                    component.accessory.style !== ButtonStyle.Premium && <PreviewButton button={component.accessory} />
                 ) : null)}
         </div>
     );
