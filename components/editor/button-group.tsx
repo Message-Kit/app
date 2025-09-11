@@ -214,7 +214,7 @@ export default function ButtonGroup({
                                             <Button className="size-7" variant={"ghost"} size={"icon"}>
                                                 <EditIcon />
                                             </Button>
-                                            <div className="flex gap-1 items-center">
+                                            <div className="flex gap-0.5 items-center">
                                                 <span className="font-medium">{component.label}</span>
                                                 <DotIcon size={16} className="text-muted-foreground" />
                                                 <span className="text-muted-foreground font-medium">
@@ -226,7 +226,7 @@ export default function ButtonGroup({
                                                         href={component.url}
                                                         className="text-muted-foreground underline underline-offset-2 flex gap-1.5 items-center hover:text-primary-foreground duration-100"
                                                     >
-                                                        {component.url}
+                                                        {component.url.replace(/^https?:\/\//, "")}
                                                         <ExternalLinkIcon className="size-4" />
                                                     </a>
                                                 ) : (
@@ -234,7 +234,7 @@ export default function ButtonGroup({
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-0.5">
                                             <Button
                                                 className="size-7"
                                                 variant="ghost"

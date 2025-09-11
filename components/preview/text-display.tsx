@@ -94,7 +94,14 @@ export default function PreviewTextDisplay({
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                        p: ({ children }) => <p className="leading-[1.375rem]" style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}>{renderNodesWithMentions(children)}</p>,
+                        p: ({ children }) => (
+                            <p
+                                className="leading-[1.375rem]"
+                                style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}
+                            >
+                                {renderNodesWithMentions(children)}
+                            </p>
+                        ),
                         h1: ({ children }) => (
                             <h1 className="text-[24px] font-bold my-[8px] leading-[1.375em]">
                                 {renderNodesWithMentions(children)}
@@ -121,7 +128,9 @@ export default function PreviewTextDisplay({
                             </ul>
                         ),
                         li: ({ children }) => (
-                            <li className="mb-[4px]" style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}>{renderNodesWithMentions(children)}</li>
+                            <li className="mb-[4px]" style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}>
+                                {renderNodesWithMentions(children)}
+                            </li>
                         ),
                         h6: ({ children }) => (
                             <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>

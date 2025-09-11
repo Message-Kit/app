@@ -12,7 +12,7 @@ import {
 import { DownloadIcon, ImportIcon, PlusIcon, Redo2Icon, SaveIcon, Undo2Icon, UploadIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import Image from "next/image";
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from "react";
 import { generateRandomNumber } from "@/lib/random-number";
 import { useOutputStore } from "@/lib/stores/output";
 import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
@@ -26,22 +26,16 @@ import TextDisplay from "./editor/text-display";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Separator } from "./ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export default function Editor() {
     const [components, setComponents] = useState<APIMessageTopLevelComponent[]>(exampleComponents);
     const { setOutput } = useOutputStore();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         setOutput(components);
     }, [components, setOutput]);
-
-    // useEffect(() => {
-    //     const handler = setTimeout(() => {
-    //         setOutput(components);
-    //     }, 100);
-
-    //     return () => clearTimeout(handler);
-    // }, [components, setOutput]);
 
     const addComponent = <T extends APIMessageTopLevelComponent>(component: T) =>
         setComponents((previousComponents) => append(previousComponents, component));
@@ -53,30 +47,63 @@ export default function Editor() {
         onClick: () => addComponent(descriptor.create() as APIMessageTopLevelComponent),
     }));
 
+    function handleExport() {
+        const download = new Blob([JSON.stringify(components, null, 4)], { type: "application/json" });
+        const url = URL.createObjectURL(download);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "msgkit-export.json";
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        setComponents(data);
+    }
+
     return (
         <div className="h-full overflow-y-auto">
             <div className="flex flex-col">
                 <div className="flex justify-between gap-2 p-4 overflow-x-auto">
                     <div className="flex gap-2 items-center">
-                        <div className="flex items-center gap-2.5">
-                            <Image src="/logo.svg" className="size-[30px]" alt="Logo" width={32} height={32} />
-                            <span className="text-xl font-bold font-display md:block hidden">Message Kit</span>
+                        <div className="flex items-center">
+                            <Image
+                                src="/logo.svg"
+                                className="min-w-[30px] max-w-[30px]"
+                                alt="Logo"
+                                width={32}
+                                height={32}
+                            />
+                            {/* <span className="ml-2.5 text-xl font-bold font-display md:block hidden">Message Kit</span> */}
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="ghost" size="icon">
-                            <UploadIcon />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                            <DownloadIcon />
-                        </Button>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={handleExport}>
+                                    <UploadIcon />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Export as JSON</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()}>
+                                    <DownloadIcon />
+                                    <input className="sr-only" type="file" ref={fileInputRef} onChange={handleImport} />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Import from JSON</TooltipContent>
+                        </Tooltip>
                         <Separator orientation="vertical" />
-                        <Button variant="ghost" size="icon">
-                            <Undo2Icon />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                            <Redo2Icon />
-                        </Button>
                         <Button variant="ghost" size="icon">
                             <SaveIcon />
                         </Button>
