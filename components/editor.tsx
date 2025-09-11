@@ -283,7 +283,7 @@ const exampleComponents = [
                 id: 238015939,
                 type: 10,
                 content:
-                    "## Getting started\n- Install Message Kit in your server.\n- Click on **Add Component** to choose between a variety of components that you can add to your message and start designing it.\n- Send it! You can send your message via our bot or use webhooks. Note that you cannot send buttons that are able to trigger actions with webhooks.",
+                    "## Getting started\n- Install Message Kit in your server.\n- Click on **Add Component** to choose between a variety of components that you can add to your message.\n- Send it! You can send your message via our bot or use webhooks. Note that using webhooks, you cannot send messages with buttons that are able to trigger actions.",
             },
             {
                 id: 314971184,
