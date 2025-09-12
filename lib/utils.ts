@@ -73,3 +73,5 @@ export function parseDiscordWebhook(urlOrPath: string): { id: string; token: str
 
     return null;
 }
+
+export const inspectedStyle = "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]";

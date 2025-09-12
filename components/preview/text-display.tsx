@@ -9,9 +9,9 @@ import { Children, cloneElement, Fragment, isValidElement } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { generateRandomNumber } from "@/lib/random-number";
-import PreviewButton from "./button";
 import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
-import { cn } from "@/lib/utils";
+import { cn, inspectedStyle } from "@/lib/utils";
+import PreviewButton from "./button";
 
 function Mention({ icon, text }: { icon?: ReactNode; text: string }) {
     return (
@@ -92,9 +92,9 @@ export default function PreviewTextDisplay({
     const { hoveredComponent } = useHoveredComponentStore();
 
     return (
-        <div className={cn(hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]")}>
+        <div className={cn(hoveredComponent === component.id && inspectedStyle)}>
             <div className="flex gap-[12px]">
-                <div className="text-[#dbdee1] leading-[0]" style={{ fontSize: container ? "14px" : "16px" }}>
+                <div className="text-[#dbdee1]" style={{ fontSize: container ? "14px" : "16px" }}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{

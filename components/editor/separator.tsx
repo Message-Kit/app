@@ -1,4 +1,4 @@
-import { APISeparatorComponent, SeparatorSpacingSize } from "discord-api-types/v10";
+import { type APISeparatorComponent, SeparatorSpacingSize } from "discord-api-types/v10";
 import NewBuilder from "../new-builder";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";

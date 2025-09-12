@@ -1,4 +1,10 @@
-import { APIActionRowComponent, type APIButtonComponent, APIComponentInMessageActionRow, ButtonStyle, ComponentType } from "discord-api-types/v10";
+import {
+    type APIActionRowComponent,
+    type APIButtonComponent,
+    type APIComponentInMessageActionRow,
+    ButtonStyle,
+    ComponentType,
+} from "discord-api-types/v10";
 import {
     CheckIcon,
     ChevronDownIcon,

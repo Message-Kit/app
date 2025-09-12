@@ -1,7 +1,7 @@
 import type { APIFileComponent } from "discord-api-types/v10";
-import FileIcon from "../misc/file-icon";
 import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
-import { cn } from "@/lib/utils";
+import { cn, inspectedStyle } from "@/lib/utils";
+import FileIcon from "../misc/file-icon";
 
 export default function PreviewFile({ component }: { component: APIFileComponent }) {
     const { hoveredComponent } = useHoveredComponentStore();
@@ -10,7 +10,12 @@ export default function PreviewFile({ component }: { component: APIFileComponent
     const className = "text-[#7bb0f5] hover:underline cursor-pointer text-[16px] leading-none";
 
     return (
-        <div className={cn("bg-[#393a41] border border-[#44454c] rounded-[8px] p-[16px] w-[432px] flex items-center gap-[8px] shadow-md", hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]")}>
+        <div
+            className={cn(
+                "bg-[#393a41] border border-[#44454c] rounded-[8px] p-[16px] w-[432px] flex items-center gap-[8px] shadow-md",
+                hoveredComponent === component.id && inspectedStyle,
+            )}
+        >
             <FileIcon />
             <div className="flex flex-col">
                 {component.file.url.startsWith("attachment://") ? (

@@ -151,224 +151,205 @@ export default function TextDisplay({
     const buttonActionIdValue = isButtonWithCustomId(accessory) ? accessory.custom_id : buttonActionId;
 
     return (
-        <>
-            <NewBuilder
-                tag={component.id ?? null}
-                name="Text Display"
-                onMoveUp={onMoveUp}
-                onMoveDown={onMoveDown}
-                onRemove={onRemove}
-                helperText={`(${content.length}/4000)`}
-                extraButton={
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button
-                                variant={"ghost"}
-                                size={"sm"}
-                                className="h-7 text-xs font-semibold text-muted-foreground"
-                            >
-                                <PlusIcon />
-                                {accessory?.type ? "Edit" : "Set"} Accessory
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Set Accessory</DialogTitle>
-                                <DialogDescription>Set the accessory for the text display.</DialogDescription>
-                            </DialogHeader>
-                            <Tabs
-                                defaultValue={
-                                    accessory && accessory.type === ComponentType.Thumbnail
-                                        ? "thumbnail"
-                                        : accessory && accessory.type === ComponentType.Button
-                                          ? "button"
-                                          : "balls"
-                                }
-                                onValueChange={(value) => setTab(value as "thumbnail" | "button")}
-                            >
-                                <TabsList className="mb-3 w-full">
-                                    <TabsTrigger value="thumbnail">
-                                        <ImageIcon />
-                                        Thumbnail
-                                    </TabsTrigger>
-                                    <TabsTrigger value="button">
-                                        <MousePointerClickIcon />
-                                        Button
-                                    </TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="thumbnail" className="flex flex-col gap-6">
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="image-url">
-                                            Image
-                                            <span className="text-destructive">*</span>
-                                        </Label>
+        <NewBuilder
+            tag={component.id ?? null}
+            name="Text Display"
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            onRemove={onRemove}
+            helperText={`(${content.length}/4000)`}
+            extraButton={
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant={"ghost"} size={"sm"} className="h-7 text-xs font-normal">
+                            <PlusIcon />
+                            {accessory?.type ? "Edit" : "Set"} Accessory
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Set Accessory</DialogTitle>
+                            <DialogDescription>Set the accessory for the text display.</DialogDescription>
+                        </DialogHeader>
+                        <Tabs
+                            defaultValue={
+                                accessory && accessory.type === ComponentType.Thumbnail
+                                    ? "thumbnail"
+                                    : accessory && accessory.type === ComponentType.Button
+                                      ? "button"
+                                      : "balls"
+                            }
+                            onValueChange={(value) => setTab(value as "thumbnail" | "button")}
+                        >
+                            <TabsList className="mb-3 w-full">
+                                <TabsTrigger value="thumbnail">
+                                    <ImageIcon />
+                                    Thumbnail
+                                </TabsTrigger>
+                                <TabsTrigger value="button">
+                                    <MousePointerClickIcon />
+                                    Button
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="thumbnail" className="flex flex-col gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <Label htmlFor="image-url">
+                                        Image
+                                        <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="image-url"
+                                        placeholder="https://example.com/image.png"
+                                        value={imageUrlValue}
+                                        onChange={(e) => setImageUrl(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <Label htmlFor="image-alt">Description (Alt Text)</Label>
+                                    <Input
+                                        id="image-alt"
+                                        placeholder="Add a description"
+                                        value={imageAltValue}
+                                        onChange={(e) => setImageAlt(e.target.value)}
+                                    />
+                                </div>
+                            </TabsContent>
+                            <TabsContent value="button" className="flex flex-col gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <Label htmlFor="btn-label">
+                                        Label
+                                        <span className="text-destructive">*</span>
+                                    </Label>
+                                    <div className="flex gap-2">
                                         <Input
-                                            id="image-url"
-                                            placeholder="https://example.com/image.png"
-                                            value={imageUrlValue}
-                                            onChange={(e) => setImageUrl(e.target.value)}
+                                            id="btn-label"
+                                            placeholder="Enter your label"
+                                            value={buttonLabelValue}
+                                            onChange={(e) => setButtonLabel(e.target.value)}
                                         />
                                     </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="image-alt">Description (Alt Text)</Label>
-                                        <Input
-                                            id="image-alt"
-                                            placeholder="Add a description"
-                                            value={imageAltValue}
-                                            onChange={(e) => setImageAlt(e.target.value)}
-                                        />
+                                </div>
+                                <RadioGroup
+                                    value={buttonStyleValue}
+                                    onValueChange={(v) => setButtonStyle(v as typeof buttonStyle)}
+                                    // defaultValue={buttonStyleToButtonType(accessory?.style)}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <RadioGroupItem value="primary" id="r1" />
+                                        <Label htmlFor="r1">Primary</Label>
                                     </div>
-                                </TabsContent>
-                                <TabsContent value="button" className="flex flex-col gap-6">
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor="btn-label">
-                                            Label
-                                            <span className="text-destructive">*</span>
-                                        </Label>
-                                        <div className="flex gap-2">
-                                            <Input
-                                                id="btn-label"
-                                                placeholder="Enter your label"
-                                                value={buttonLabelValue}
-                                                onChange={(e) => setButtonLabel(e.target.value)}
-                                            />
-                                        </div>
+                                    <div className="flex items-center gap-3">
+                                        <RadioGroupItem value="secondary" id="r2" />
+                                        <Label htmlFor="r2">Secondary</Label>
                                     </div>
-                                    <RadioGroup
-                                        value={buttonStyleValue}
-                                        onValueChange={(v) => setButtonStyle(v as typeof buttonStyle)}
-                                        // defaultValue={buttonStyleToButtonType(accessory?.style)}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <RadioGroupItem value="primary" id="r1" />
-                                            <Label htmlFor="r1">Primary</Label>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <RadioGroupItem value="secondary" id="r2" />
-                                            <Label htmlFor="r2">Secondary</Label>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <RadioGroupItem value="success" id="r3" />
-                                            <Label htmlFor="r3">Success</Label>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <RadioGroupItem value="danger" id="r4" />
-                                            <Label htmlFor="r4">Danger</Label>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <RadioGroupItem value="link" id="r5" />
-                                            <Label htmlFor="r5">Link</Label>
-                                        </div>
-                                    </RadioGroup>
+                                    <div className="flex items-center gap-3">
+                                        <RadioGroupItem value="success" id="r3" />
+                                        <Label htmlFor="r3">Success</Label>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <RadioGroupItem value="danger" id="r4" />
+                                        <Label htmlFor="r4">Danger</Label>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <RadioGroupItem value="link" id="r5" />
+                                        <Label htmlFor="r5">Link</Label>
+                                    </div>
+                                </RadioGroup>
 
-                                    {/* show url input if style is link, otherwise show action id input */}
-                                    {buttonStyle === "link" ? (
-                                        <div className="flex flex-col gap-2">
-                                            <Label htmlFor="btn-url">
-                                                URL
-                                                <span className="text-destructive">*</span>
-                                            </Label>
-                                            <Input
-                                                id="btn-url"
-                                                placeholder="Enter your URL"
-                                                value={buttonUrlValue}
-                                                onChange={(e) => setButtonUrl(e.target.value)}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col gap-2">
-                                            <Label htmlFor="btn-action-id">
-                                                Action ID
-                                                <span className="text-destructive">*</span>
-                                            </Label>
-                                            <Input
-                                                placeholder="Enter your action ID"
-                                                value={buttonActionIdValue}
-                                                id="btn-action-id"
-                                                onChange={(e) => setButtonActionId(e.target.value)}
-                                            />
-                                        </div>
-                                    )}
-                                </TabsContent>
-                            </Tabs>
-                            {/* 50ms for the dialog close animation to complete */}
-                            <DialogFooter>
-                                {accessory && (
-                                    <DialogClose asChild>
-                                        <Button
-                                            variant={"destructive"}
-                                            onClick={() =>
-                                                setTimeout(() => {
-                                                    removeAccessory?.();
-                                                }, 50)
-                                            }
-                                        >
-                                            <TrashIcon />
-                                            Remove
-                                        </Button>
-                                    </DialogClose>
+                                {/* show url input if style is link, otherwise show action id input */}
+                                {buttonStyle === "link" ? (
+                                    <div className="flex flex-col gap-2">
+                                        <Label htmlFor="btn-url">
+                                            URL
+                                            <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Input
+                                            id="btn-url"
+                                            placeholder="Enter your URL"
+                                            value={buttonUrlValue}
+                                            onChange={(e) => setButtonUrl(e.target.value)}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-2">
+                                        <Label htmlFor="btn-action-id">
+                                            Action ID
+                                            <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Input
+                                            placeholder="Enter your action ID"
+                                            value={buttonActionIdValue}
+                                            id="btn-action-id"
+                                            onChange={(e) => setButtonActionId(e.target.value)}
+                                        />
+                                    </div>
                                 )}
+                            </TabsContent>
+                        </Tabs>
+                        {/* 50ms for the dialog close animation to complete */}
+                        <DialogFooter>
+                            {accessory && (
                                 <DialogClose asChild>
                                     <Button
-                                        onClick={() => {
-                                            if (tab === "thumbnail") {
-                                                setAccessory?.({
-                                                    type: ComponentType.Thumbnail,
-                                                    media: { url: imageUrl },
-                                                    description: imageAlt,
-                                                });
-                                            } else if (tab === "button") {
-                                                const style = buttonTypeToButtonStyle(buttonStyle);
-                                                if (style === ButtonStyle.Link) {
-                                                    setAccessory?.({
-                                                        type: ComponentType.Button,
-                                                        label: buttonLabel,
-                                                        style: style,
-                                                        url: buttonUrl,
-                                                    });
-                                                } else {
-                                                    setAccessory?.({
-                                                        type: ComponentType.Button,
-                                                        label: buttonLabel,
-                                                        style: style,
-                                                        custom_id: buttonActionId,
-                                                    });
-                                                }
-                                            }
-                                        }}
-                                        disabled={!isValid}
+                                        variant={"destructive"}
+                                        onClick={() =>
+                                            setTimeout(() => {
+                                                removeAccessory?.();
+                                            }, 50)
+                                        }
                                     >
-                                        <CheckIcon />
-                                        Save
+                                        <TrashIcon />
+                                        Remove
                                     </Button>
                                 </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                }
-            >
-                <Textarea
-                    placeholder="The quick brown fox jumps over the lazy dog"
-                    value={content}
-                    onChange={(e) => onContentChange(e.target.value)}
-                />
-            </NewBuilder>
-            <Dialog>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Set Accessory</DialogTitle>
-                        <DialogDescription>Set the accessory for the text display.</DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant={"outline"}>Remove</Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                            <Button>Set</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </>
+                            )}
+                            <DialogClose asChild>
+                                <Button
+                                    onClick={() => {
+                                        if (tab === "thumbnail") {
+                                            setAccessory?.({
+                                                type: ComponentType.Thumbnail,
+                                                media: { url: imageUrl },
+                                                description: imageAlt,
+                                            });
+                                        } else if (tab === "button") {
+                                            const style = buttonTypeToButtonStyle(buttonStyle);
+                                            if (style === ButtonStyle.Link) {
+                                                setAccessory?.({
+                                                    type: ComponentType.Button,
+                                                    label: buttonLabel,
+                                                    style: style,
+                                                    url: buttonUrl,
+                                                });
+                                            } else {
+                                                setAccessory?.({
+                                                    type: ComponentType.Button,
+                                                    label: buttonLabel,
+                                                    style: style,
+                                                    custom_id: buttonActionId,
+                                                });
+                                            }
+                                        }
+                                    }}
+                                    disabled={!isValid}
+                                >
+                                    <CheckIcon />
+                                    Save
+                                </Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            }
+        >
+            <Textarea
+                placeholder="The quick brown fox jumps over the lazy dog"
+                value={content}
+                onChange={(e) => onContentChange(e.target.value)}
+            />
+            {/* <div className="rounded-md border mt-4 text-sm">
+                show gap
+            </div> */}
+        </NewBuilder>
     );
 }

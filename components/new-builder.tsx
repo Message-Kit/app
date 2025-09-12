@@ -2,12 +2,12 @@ import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, TrashIcon } from "luc
 import { motion } from "motion/react";
 import { type PropsWithChildren, useEffect, useId, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
+import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
+import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
-import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
-import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 
 interface Props extends PropsWithChildren {
     name: string;
@@ -79,7 +79,7 @@ export default function NewBuilder({
                             {name}
                         </Label>
                         {helperText && (
-                            <span className="text-sm text-muted-foreground font-medium tracking-wide hidden md:block">
+                            <span className="text-xs text-muted-foreground mt-1 font-medium hidden md:block">
                                 {helperText}
                             </span>
                         )}

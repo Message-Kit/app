@@ -14,16 +14,6 @@ import { generateRandomNumber } from "./random-number";
 
 export const componentDescriptors = [
     {
-        name: "Container",
-        type: ComponentType.Container,
-        icon: BoxIcon,
-        create: (): APIContainerComponent => ({
-            id: generateRandomNumber(),
-            type: ComponentType.Container,
-            components: [],
-        }),
-    },
-    {
         name: "Text Display",
         type: ComponentType.TextDisplay,
         icon: TextIcon,
@@ -49,6 +39,17 @@ export const componentDescriptors = [
         icon: FileIcon,
         create: (): APIFileComponent => ({ id: generateRandomNumber(), type: ComponentType.File, file: { url: "" } }),
     },
+
+    {
+        name: "Button Group",
+        type: ComponentType.ActionRow,
+        icon: MousePointerClickIcon,
+        create: (): APIActionRowComponent<APIButtonComponent> => ({
+            id: generateRandomNumber(),
+            type: ComponentType.ActionRow,
+            components: [],
+        }),
+    },
     {
         name: "Separator",
         type: ComponentType.Separator,
@@ -61,12 +62,12 @@ export const componentDescriptors = [
         }),
     },
     {
-        name: "Button Group",
-        type: ComponentType.ActionRow,
-        icon: MousePointerClickIcon,
-        create: (): APIActionRowComponent<APIButtonComponent> => ({
+        name: "Container",
+        type: ComponentType.Container,
+        icon: BoxIcon,
+        create: (): APIContainerComponent => ({
             id: generateRandomNumber(),
-            type: ComponentType.ActionRow,
+            type: ComponentType.Container,
             components: [],
         }),
     },

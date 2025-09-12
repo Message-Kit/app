@@ -258,119 +258,121 @@ function Components({
     );
 }
 
-const exampleComponents = [
-    {
-        id: 272089724,
-        type: 17,
-        components: [
-            {
-                id: 542608968,
-                type: 12,
-                items: [
-                    {
-                        media: {
-                            url: "https://use.messagekit.app/example-header.png",
-                        },
-                    },
-                ],
-            },
-            {
-                id: 720534108,
-                type: 10,
-                content:
-                    "# Create modular, interactive messages\nMessage Kit lets you build interactive messages fast. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
-            },
-            {
-                id: 506754460,
-                type: 14,
-                spacing: 1,
-                divider: false,
-            },
-            {
-                id: 238015939,
-                type: 10,
-                content:
-                    "## Getting started\n- Install Message Kit in your server.\n- Click on **Add Component** to choose between a variety of components that you can add to your message.\n- Send it! You can send your message via our bot or use webhooks. Note that using webhooks, you cannot send messages with buttons that are able to trigger actions.",
-            },
-            {
-                id: 314971184,
-                type: 14,
-                spacing: 1,
-                divider: true,
-            },
-            {
-                id: 257251723,
-                type: 9,
-                components: [
-                    {
-                        type: 10,
-                        content:
-                            "- Feeling stuck? Read our docs to get a better understanding on how you can use Message Kit.",
-                    },
-                ],
-                accessory: {
-                    type: 2,
-                    label: "Documentation",
-                    style: 5,
-                    url: "https://messagekit.app/docs",
-                },
-            },
-            {
-                id: 599819485,
-                type: 9,
-                components: [
-                    {
-                        type: 10,
-                        content:
-                            "- Looking to contribute? Message Kit is open source! Create an issue or open a PR in our Github organization.",
-                    },
-                ],
-                accessory: {
-                    type: 2,
-                    label: "Contribute",
-                    style: 5,
-                    url: "https://github.com/Message-Kit",
-                },
-            },
-            {
-                id: 705891568,
-                type: 14,
-                spacing: 1,
-                divider: true,
-            },
-            {
-                id: 863677168,
-                type: 10,
-                content: "-# Check out our latest changelog here:",
-            },
-            {
-                id: 251826210,
-                type: 13,
-                file: {
-                    url: "https://raw.githubusercontent.com/Message-Kit/app/master/CHANGELOG.md",
-                },
-            },
-        ],
-        accent_color: 4285144,
-    },
-    {
-        id: 177701759,
-        type: 1,
-        components: [
-            {
-                id: 185764366,
-                type: 2,
-                label: "Support Server",
-                style: 5,
-                url: "https://discord.gg/5bBM2TVDD3",
-            },
-            {
-                id: 294842992,
-                type: 2,
-                label: "Donate",
-                style: 5,
-                url: "https://ko-fi.com/ronykax",
-            },
-        ],
-    },
-];
+// const exampleComponents = [
+//     {
+//         id: 272089724,
+//         type: 17,
+//         components: [
+//             {
+//                 id: 542608968,
+//                 type: 12,
+//                 items: [
+//                     {
+//                         media: {
+//                             url: "https://use.messagekit.app/example-header.png",
+//                         },
+//                     },
+//                 ],
+//             },
+//             {
+//                 id: 720534108,
+//                 type: 10,
+//                 content:
+//                     "# Create modular, interactive messages\nMessage Kit lets you build interactive messages fast. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
+//             },
+//             {
+//                 id: 506754460,
+//                 type: 14,
+//                 spacing: 1,
+//                 divider: false,
+//             },
+//             {
+//                 id: 238015939,
+//                 type: 10,
+//                 content:
+//                     "## Getting started\n- Install Message Kit in your server.\n- Click on **Add Component** to choose between a variety of components that you can add to your message.\n- Send it! You can send your message via our bot or use webhooks. Note that using webhooks, you cannot send messages with buttons that are able to trigger actions.",
+//             },
+//             {
+//                 id: 314971184,
+//                 type: 14,
+//                 spacing: 1,
+//                 divider: true,
+//             },
+//             {
+//                 id: 257251723,
+//                 type: 9,
+//                 components: [
+//                     {
+//                         type: 10,
+//                         content:
+//                             "- Feeling stuck? Read our docs to get a better understanding on how you can use Message Kit.",
+//                     },
+//                 ],
+//                 accessory: {
+//                     type: 2,
+//                     label: "Documentation",
+//                     style: 5,
+//                     url: "https://messagekit.app/docs",
+//                 },
+//             },
+//             {
+//                 id: 599819485,
+//                 type: 9,
+//                 components: [
+//                     {
+//                         type: 10,
+//                         content:
+//                             "- Looking to contribute? Message Kit is open source! Create an issue or open a PR in our Github organization.",
+//                     },
+//                 ],
+//                 accessory: {
+//                     type: 2,
+//                     label: "Contribute",
+//                     style: 5,
+//                     url: "https://github.com/Message-Kit",
+//                 },
+//             },
+//             {
+//                 id: 705891568,
+//                 type: 14,
+//                 spacing: 1,
+//                 divider: true,
+//             },
+//             {
+//                 id: 863677168,
+//                 type: 10,
+//                 content: "-# Check out our latest changelog here:",
+//             },
+//             {
+//                 id: 251826210,
+//                 type: 13,
+//                 file: {
+//                     url: "https://raw.githubusercontent.com/Message-Kit/app/master/CHANGELOG.md",
+//                 },
+//             },
+//         ],
+//         accent_color: 4285144,
+//     },
+//     {
+//         id: 177701759,
+//         type: 1,
+//         components: [
+//             {
+//                 id: 185764366,
+//                 type: 2,
+//                 label: "Support Server",
+//                 style: 5,
+//                 url: "https://discord.gg/5bBM2TVDD3",
+//             },
+//             {
+//                 id: 294842992,
+//                 type: 2,
+//                 label: "Donate",
+//                 style: 5,
+//                 url: "https://ko-fi.com/ronykax",
+//             },
+//         ],
+//     },
+// ];
+
+const exampleComponents: APIMessageTopLevelComponent[] = [];

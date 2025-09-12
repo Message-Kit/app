@@ -1,8 +1,8 @@
 import type { APIMediaGalleryComponent } from "discord-api-types/v10";
 import { memo, useEffect, useState } from "react";
 import { useFiles } from "@/lib/stores/files";
-import { cn, sanitizeFileName } from "@/lib/utils";
 import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
+import { cn, inspectedStyle, sanitizeFileName } from "@/lib/utils";
 
 type PreviewMediaTileProps = {
     mediaUrl: string;
@@ -17,8 +17,6 @@ const PreviewMediaTile = memo(function PreviewMediaTile({
     aspect,
     className,
 }: PreviewMediaTileProps) {
-    const { hoveredComponent } = useHoveredComponentStore();
-
     const { files } = useFiles();
     const [url, setUrl] = useState<string | null>(null);
 
@@ -75,10 +73,7 @@ export default function PreviewMediaGallery({
     if (count === 1) {
         return (
             <div
-                className={cn(
-                    "rounded-[8px] overflow-hidden",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
-                )}
+                className={cn("rounded-[8px] overflow-hidden", hoveredComponent === component.id && inspectedStyle)}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
                 <PreviewMediaTile mediaUrl={items[0].media.url} description={items[0].description} aspect="auto" />
@@ -91,7 +86,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden grid grid-cols-2 gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
@@ -112,7 +107,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden grid grid-cols-3 grid-rows-2 gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
@@ -144,7 +139,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden grid grid-cols-2 gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
@@ -165,7 +160,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden flex flex-col gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
@@ -212,7 +207,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden grid grid-cols-3 gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
@@ -233,7 +228,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden flex flex-col gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
@@ -262,7 +257,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden flex flex-col gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
@@ -299,7 +294,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden grid grid-cols-3 gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
@@ -320,7 +315,7 @@ export default function PreviewMediaGallery({
             <div
                 className={cn(
                     "rounded-[8px] overflow-hidden flex flex-col gap-[4px]",
-                    hoveredComponent === component.id && "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]",
+                    hoveredComponent === component.id && inspectedStyle,
                 )}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >

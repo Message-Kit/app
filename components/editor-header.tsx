@@ -1,15 +1,21 @@
-import type { APIMessageTopLevelComponent } from "discord-api-types/v10";
+import { type APIMessageTopLevelComponent, ComponentType } from "discord-api-types/v10";
 import { DownloadIcon, PlusIcon, SaveIcon, SquareDashedMousePointerIcon, UploadIcon } from "lucide-react";
 import Image from "next/image";
-import { type Dispatch, type SetStateAction, useRef } from "react";
+import { type Dispatch, Fragment, type SetStateAction, useRef } from "react";
 import { componentDescriptors } from "@/lib/options";
+import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 import { append } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Separator } from "./ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 
 export default function EditorHeader({
     setComponents,
@@ -112,10 +118,13 @@ export default function EditorHeader({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         {componentsList.map((component) => (
-                            <DropdownMenuItem key={component.type} onClick={component.onClick}>
-                                <component.icon />
-                                {component.name}
-                            </DropdownMenuItem>
+                            <Fragment key={component.type}>
+                                {component.type === ComponentType.Separator && <DropdownMenuSeparator />}
+                                <DropdownMenuItem onClick={component.onClick}>
+                                    <component.icon />
+                                    {component.name}
+                                </DropdownMenuItem>
+                            </Fragment>
                         ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
