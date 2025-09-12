@@ -10,6 +10,9 @@ import PreviewTextDisplay from "./preview/text-display";
 export default function Preview() {
     const { output } = useOutputStore();
 
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+
     return (
         <div className="p-4 whitespace-pre-wrap bg-[#323339] font-discord flex h-full gap-[16px] overflow-y-auto">
             {/** biome-ignore lint/performance/noImgElement: e */}
@@ -22,7 +25,7 @@ export default function Preview() {
                             APP
                         </div>
                     </div>
-                    <span className="text-[#949ba4] text-[12px] font-medium">12:30 AM</span>
+                    <span className="text-[#949ba4] text-[12px] font-medium">{timeString}</span>
                 </div>
                 <div className="flex flex-col gap-[8px] w-full">
                     {output.map((component) => {
