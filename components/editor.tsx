@@ -2,104 +2,39 @@ import {
     type APIActionRowComponent,
     type APIButtonComponent,
     type APIContainerComponent,
+    type APIFileComponent,
     type APIMediaGalleryComponent,
     type APIMessageTopLevelComponent,
     type APISeparatorComponent,
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { PlusIcon, Redo2Icon, SaveIcon, SearchIcon, Undo2Icon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { generateRandomNumber } from "@/lib/random-number";
 import { useOutputStore } from "@/lib/stores/output";
-import { append, moveItem, removeAt, updateAt } from "@/lib/utils";
-import { componentDescriptors } from "../lib/options";
+import { moveItem, removeAt, updateAt } from "@/lib/utils";
 import ButtonGroup from "./editor/button-group";
 import Container from "./editor/container";
 import File from "./editor/file";
 import MediaGallery from "./editor/media-gallery";
 import YesSeparator from "./editor/separator";
 import TextDisplay from "./editor/text-display";
-import { Button } from "./ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Input } from "./ui/input";
+import EditorHeader from "./editor-header";
 import { Separator } from "./ui/separator";
 
 export default function Editor() {
-    const [components, setComponents] = useState<APIMessageTopLevelComponent[]>([]);
+    const [components, setComponents] = useState<APIMessageTopLevelComponent[]>(defaultComponents);
     const { setOutput } = useOutputStore();
 
     useEffect(() => {
         setOutput(components);
     }, [components, setOutput]);
 
-    // useEffect(() => {
-    //     const handler = setTimeout(() => {
-    //         setOutput(components);
-    //     }, 100);
-
-    //     return () => clearTimeout(handler);
-    // }, [components, setOutput]);
-
-    const addComponent = <T extends APIMessageTopLevelComponent>(component: T) =>
-        setComponents((previousComponents) => append(previousComponents, component));
-
-    const componentsList = componentDescriptors.map((descriptor) => ({
-        name: descriptor.name,
-        type: descriptor.type,
-        icon: descriptor.icon,
-        onClick: () => addComponent(descriptor.create() as APIMessageTopLevelComponent),
-    }));
-
     return (
         <div className="h-full overflow-y-auto">
             <div className="flex flex-col">
-                <div className="flex justify-between gap-2 p-4 overflow-x-auto">
-                    <div className="flex gap-2">
-                        <div className="relative">
-                            <Input className="peer pe-9 max-w-28 md:max-w-[300px]" placeholder="Search components" />
-                            <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 peer-disabled:opacity-50">
-                                <SearchIcon size={16} aria-hidden="true" />
-                            </div>
-                        </div>
-                        {/* <Button variant={"outline"}>
-                            <DownloadIcon />
-                            Import
-                        </Button> */}
-                        {/* <Button variant={"outline"}>
-                            <UploadIcon />
-                            Export
-                        </Button> */}
-                    </div>
-                    <div className="flex gap-2">
-                        <Button variant="ghost" size="icon">
-                            <Undo2Icon />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                            <Redo2Icon />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                            <SaveIcon />
-                        </Button>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant={"outline"}>
-                                    <PlusIcon />
-                                    Add Component
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                {componentsList.map((component) => (
-                                    <DropdownMenuItem key={component.type} onClick={component.onClick}>
-                                        <component.icon />
-                                        {component.name}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                </div>
+                <EditorHeader setComponents={setComponents} components={components} />
                 <Separator />
                 <div className="p-4 flex flex-col gap-4">
                     <Components components={components} setComponents={setComponents} />
@@ -128,6 +63,7 @@ function Components({
                     return (
                         <TextDisplay
                             key={component.id}
+                            component={component}
                             content={component.content}
                             onContentChange={(content) =>
                                 setComponents((previousComponents) =>
@@ -158,6 +94,7 @@ function Components({
                     return (
                         <TextDisplay
                             key={component.id}
+                            component={component}
                             content={component.components[0].content}
                             onContentChange={(content) =>
                                 setComponents((previousComponents) =>
@@ -195,6 +132,7 @@ function Components({
                     return (
                         <YesSeparator
                             key={component.id}
+                            component={component}
                             spacing={component.spacing ?? SeparatorSpacingSize.Small}
                             divider={component.divider ?? true}
                             onChangeSpacing={(size) => {
@@ -222,6 +160,7 @@ function Components({
                     return (
                         <MediaGallery
                             key={component.id}
+                            component={component}
                             onMoveUp={() => handleMove(index, "up")}
                             onMoveDown={() => handleMove(index, "down")}
                             onRemove={() => handleRemove(index)}
@@ -239,6 +178,7 @@ function Components({
                 } else if (component.type === ComponentType.Container) {
                     return (
                         <Container
+                            component={component}
                             key={component.id}
                             onMoveUp={() => handleMove(index, "up")}
                             onMoveDown={() => handleMove(index, "down")}
@@ -267,6 +207,7 @@ function Components({
                     return (
                         <ButtonGroup
                             key={component.id}
+                            component={component}
                             components={component.components as APIButtonComponent[]}
                             setComponents={(components) => {
                                 setComponents((previousComponents) =>
@@ -285,9 +226,28 @@ function Components({
                     return (
                         <File
                             key={component.id}
+                            component={component}
                             onMoveUp={() => handleMove(index, "up")}
                             onMoveDown={() => handleMove(index, "down")}
                             onRemove={() => handleRemove(index)}
+                            spoiler={component.spoiler ?? false}
+                            onChangeSpoiler={(value) => {
+                                setComponents((previousComponents) =>
+                                    updateAt(previousComponents, index, (old) => ({
+                                        ...(old as APIFileComponent),
+                                        spoiler: value,
+                                    })),
+                                );
+                            }}
+                            file={component}
+                            setFile={(file) => {
+                                setComponents((previousComponents) =>
+                                    updateAt(previousComponents, index, (old) => ({
+                                        ...(old as APIFileComponent),
+                                        file: file.file,
+                                    })),
+                                );
+                            }}
                         />
                     );
                 }
@@ -297,3 +257,67 @@ function Components({
         </AnimatePresence>
     );
 }
+
+const defaultComponents: APIMessageTopLevelComponent[] = [
+    {
+        id: 500528667,
+        type: 10,
+        content:
+            "# Create modular, interactive messages 🧩\nMessage Kit lets you build **interactive** messages *fast*. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
+    },
+    {
+        id: 869213619,
+        type: 17,
+        components: [
+            {
+                id: 843217988,
+                type: 12,
+                items: [
+                    {
+                        media: {
+                            url: "https://messagekit.app/example-header.png",
+                        },
+                    },
+                ],
+            },
+            {
+                id: 280096184,
+                type: 10,
+                content:
+                    "# Getting started\n- Install Message Kit in your server.\n- Click **Add Component** at the top of this pane and choose one.\n- Customize the component as you like.\n- Send it! You can send your message via our bot or with webhooks.",
+            },
+            {
+                id: 674221493,
+                type: 14,
+                spacing: 1,
+                divider: true,
+            },
+            {
+                id: 781085487,
+                type: 10,
+                content: "-# Note: webhooks can’t send buttons that trigger actions.",
+            },
+        ],
+        accent_color: 5727743,
+    },
+    {
+        id: 724873915,
+        type: 1,
+        components: [
+            {
+                id: 277957816,
+                type: 2,
+                label: "Support Server",
+                style: 5,
+                url: "https://discord.gg/5bBM2TVDD3",
+            },
+            {
+                id: 172033159,
+                type: 2,
+                label: "Donate",
+                style: 5,
+                url: "https://ko-fi.com/ronykax",
+            },
+        ],
+    },
+];

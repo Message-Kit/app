@@ -1,8 +1,8 @@
-import type { APIMediaGalleryItem } from "discord-api-types/v10";
-import { ImagePlusIcon, LinkIcon, TrashIcon, UploadIcon } from "lucide-react";
+import type { APIMediaGalleryComponent, APIMediaGalleryItem } from "discord-api-types/v10";
+import { ImageIcon, ImagePlusIcon, LinkIcon, TrashIcon, UploadIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import useFilesStore from "@/lib/stores/files";
+import { useFiles } from "@/lib/stores/files";
 import { sanitizeFileName } from "@/lib/utils";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
@@ -26,19 +26,21 @@ export default function MediaGallery({
     onRemove,
     images,
     setImages,
+    component,
 }: {
     onMoveUp: () => void;
     onMoveDown: () => void;
     onRemove: () => void;
     images: APIMediaGalleryItem[];
     setImages: (images: APIMediaGalleryItem[]) => void;
+    component: APIMediaGalleryComponent;
 }) {
     const isAtLimit = images.length >= 10;
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [tab, setTab] = useState<"link" | "upload">("link");
     const [linkUrl, setLinkUrl] = useState("");
-    const { files, setFiles } = useFilesStore();
+    const { files, setFiles } = useFiles();
 
     const handleFileUpload = () => {
         const newFiles = fileInputRef.current?.files;
@@ -68,21 +70,18 @@ export default function MediaGallery({
     const handleHandle = () => {
         if (tab === "link") {
             handleLinkUpload();
-        }
-        if (tab === "upload") {
+        } else if (tab === "upload") {
             handleFileUpload();
         }
     };
-
-    useEffect(() => {
-        console.log(images);
-    }, [images]);
 
     const urls = useObjectUrls(images, files);
 
     return (
         <NewBuilder
-            name="Media Gallery"
+            name="Media"
+            tag={component.id ?? null}
+            icon={<ImageIcon />}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
@@ -101,26 +100,6 @@ export default function MediaGallery({
                         >
                             <UploadIcon />
                             Upload Media
-                            {/* <input
-                                    className="hidden"
-                                    type="file"
-                                    multiple
-                                    accept=".png,.jpg,.jpeg,.webp"
-                                    ref={fileInputRef}
-                                    disabled={isAtLimit}
-                                    onChange={(e) => {
-                                        const newFiles = e.target.files;
-                                        if (!newFiles) return;
-                            
-                                        setFiles([...files, ...Array.from(newFiles)]);
-                                        setImages([
-                                            ...images,
-                                            { media: { url: `attachment://${sanitizeFileName(newFiles[0].name)}` } },
-                                            ]);
-                                            
-                                            e.currentTarget.value = "";
-                                    }}
-                                            /> */}
                         </Button>
                     </DialogTrigger>
                     <DialogContent>

@@ -1,4 +1,10 @@
-import { type APIButtonComponent, ButtonStyle, ComponentType } from "discord-api-types/v10";
+import {
+    type APIActionRowComponent,
+    type APIButtonComponent,
+    type APIComponentInMessageActionRow,
+    ButtonStyle,
+    ComponentType,
+} from "discord-api-types/v10";
 import {
     CheckIcon,
     ChevronDownIcon,
@@ -6,6 +12,7 @@ import {
     DotIcon,
     EditIcon,
     ExternalLinkIcon,
+    MousePointerClickIcon,
     PlusIcon,
     TrashIcon,
 } from "lucide-react";
@@ -14,6 +21,7 @@ import { useMemo, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
 import { generateRandomNumber } from "@/lib/random-number";
 import { moveItem, removeAt } from "@/lib/utils";
+import EmojiPicker from "../emoji-picker";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
 import {
@@ -36,12 +44,14 @@ export default function ButtonGroup({
     onRemove,
     components,
     setComponents,
+    component,
 }: {
     onMoveUp: () => void;
     onMoveDown: () => void;
     onRemove: () => void;
     components: APIButtonComponent[];
     setComponents: (components: APIButtonComponent[]) => void;
+    component: APIActionRowComponent<APIComponentInMessageActionRow>;
 }) {
     const [buttonLabel, setButtonLabel] = useState("");
     const [buttonStyle, setButtonStyle] = useState<"primary" | "secondary" | "success" | "danger" | "link">("primary");
@@ -63,7 +73,9 @@ export default function ButtonGroup({
 
     return (
         <NewBuilder
-            name="Button Group"
+            name="Buttons"
+            tag={component.id ?? null}
+            icon={<MousePointerClickIcon />}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
@@ -99,6 +111,7 @@ export default function ButtonGroup({
                                         value={buttonLabel}
                                         onChange={(e) => setButtonLabel(e.target.value)}
                                     />
+                                    <EmojiPicker guildId="" onEmojiSelect={() => {}} emoji={{}} />
                                 </div>
                             </div>
                             <RadioGroup
@@ -214,7 +227,7 @@ export default function ButtonGroup({
                                             <Button className="size-7" variant={"ghost"} size={"icon"}>
                                                 <EditIcon />
                                             </Button>
-                                            <div className="flex gap-1 items-center">
+                                            <div className="flex gap-0.5 items-center">
                                                 <span className="font-medium">{component.label}</span>
                                                 <DotIcon size={16} className="text-muted-foreground" />
                                                 <span className="text-muted-foreground font-medium">
@@ -226,7 +239,7 @@ export default function ButtonGroup({
                                                         href={component.url}
                                                         className="text-muted-foreground underline underline-offset-2 flex gap-1.5 items-center hover:text-primary-foreground duration-100"
                                                     >
-                                                        {component.url}
+                                                        {component.url.replace(/^https?:\/\//, "")}
                                                         <ExternalLinkIcon className="size-4" />
                                                     </a>
                                                 ) : (
@@ -234,7 +247,7 @@ export default function ButtonGroup({
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-0.5">
                                             <Button
                                                 className="size-7"
                                                 variant="ghost"

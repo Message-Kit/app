@@ -5,26 +5,25 @@ import {
     type APIFileComponent,
     type APIMediaGalleryComponent,
     type APISeparatorComponent,
+    APIStringSelectComponent,
     type APITextDisplayComponent,
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { BoxIcon, FileIcon, ImageIcon, MousePointerClickIcon, SeparatorHorizontalIcon, TextIcon } from "lucide-react";
+import {
+    BoxIcon,
+    FileIcon,
+    ImageIcon,
+    MousePointerClickIcon,
+    SeparatorHorizontalIcon,
+    SquareChevronDownIcon,
+    TextIcon,
+} from "lucide-react";
 import { generateRandomNumber } from "./random-number";
 
 export const componentDescriptors = [
     {
-        name: "Container",
-        type: ComponentType.Container,
-        icon: BoxIcon,
-        create: (): APIContainerComponent => ({
-            id: generateRandomNumber(),
-            type: ComponentType.Container,
-            components: [],
-        }),
-    },
-    {
-        name: "Text Display",
+        name: "Text",
         type: ComponentType.TextDisplay,
         icon: TextIcon,
         create: (): APITextDisplayComponent => ({
@@ -34,7 +33,7 @@ export const componentDescriptors = [
         }),
     },
     {
-        name: "Media Gallery",
+        name: "Media",
         type: ComponentType.MediaGallery,
         icon: ImageIcon,
         create: (): APIMediaGalleryComponent => ({
@@ -61,7 +60,17 @@ export const componentDescriptors = [
         }),
     },
     {
-        name: "Button Group",
+        name: "Container",
+        type: ComponentType.Container,
+        icon: BoxIcon,
+        create: (): APIContainerComponent => ({
+            id: generateRandomNumber(),
+            type: ComponentType.Container,
+            components: [],
+        }),
+    },
+    {
+        name: "Buttons",
         type: ComponentType.ActionRow,
         icon: MousePointerClickIcon,
         create: (): APIActionRowComponent<APIButtonComponent> => ({
@@ -70,14 +79,14 @@ export const componentDescriptors = [
             components: [],
         }),
     },
-    // {
-    //     name: "Select Menu",
-    //     type: ComponentType.ActionRow,
-    //     icon: SquareChevronDownIcon,
-    //     create: (): APIActionRowComponent<APIStringSelectComponent> => ({
-    //         id: generateRandomNumber(),
-    //         type: ComponentType.ActionRow,
-    //         components: [],
-    //     }),
-    // },
+    {
+        name: "Select",
+        type: ComponentType.ActionRow,
+        icon: SquareChevronDownIcon,
+        create: (): APIActionRowComponent<APIStringSelectComponent> => ({
+            id: generateRandomNumber(),
+            type: ComponentType.ActionRow,
+            components: [],
+        }),
+    },
 ] as const;

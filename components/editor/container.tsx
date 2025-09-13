@@ -3,12 +3,14 @@ import {
     type APIActionRowComponent,
     type APIButtonComponent,
     type APIComponentInContainer,
+    type APIContainerComponent,
+    type APIFileComponent,
     type APIMediaGalleryComponent,
     type APISeparatorComponent,
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { CheckIcon, PaintbrushIcon, PlusIcon, XIcon } from "lucide-react";
+import { BoxIcon, CheckIcon, PaintBucketIcon, PlusIcon, XIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
@@ -32,6 +34,7 @@ export default function Container({
     setComponents,
     setColor,
     color,
+    component,
 }: {
     onMoveUp: () => void;
     onMoveDown: () => void;
@@ -40,6 +43,7 @@ export default function Container({
     setComponents: (components: APIComponentInContainer[]) => void;
     color: number | null;
     setColor: (color: number | null) => void;
+    component: APIContainerComponent;
 }) {
     const [colorToSet, setColorToSet] = useState("#000000");
 
@@ -71,7 +75,9 @@ export default function Container({
                     ? { borderLeftColor: `#${color.toString(16).padStart(6, "0")}`, borderLeftWidth: "4px" }
                     : undefined
             }
+            icon={<BoxIcon />}
             name="Container"
+            tag={component.id ?? null}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
@@ -85,7 +91,7 @@ export default function Container({
                                 className="h-7 text-xs font-semibold text-muted-foreground"
                             >
                                 <PlusIcon />
-                                Add Component
+                                Add
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -100,7 +106,7 @@ export default function Container({
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button className="size-7" size={"icon"} variant={"ghost"}>
-                                <PaintbrushIcon />
+                                <PaintBucketIcon />
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="size-fit flex flex-col gap-4">
@@ -136,6 +142,7 @@ export default function Container({
                             return (
                                 <TextDisplay
                                     key={component.id}
+                                    component={component}
                                     content={component.content}
                                     onContentChange={(content) => {
                                         setComponents(updateAt(components, index, () => ({ ...component, content })));
@@ -164,6 +171,7 @@ export default function Container({
                             return (
                                 <TextDisplay
                                     key={component.id}
+                                    component={component}
                                     content={component.components[0].content}
                                     onContentChange={(content) => {
                                         setComponents(
@@ -200,6 +208,7 @@ export default function Container({
                             return (
                                 <Separator
                                     key={component.id}
+                                    component={component}
                                     spacing={component.spacing ?? SeparatorSpacingSize.Small}
                                     divider={component.divider ?? true}
                                     onChangeSpacing={(size) => {
@@ -227,6 +236,7 @@ export default function Container({
                             return (
                                 <MediaGallery
                                     key={component.id}
+                                    component={component}
                                     onMoveUp={() => handleMove(index, "up")}
                                     onMoveDown={() => handleMove(index, "down")}
                                     onRemove={() => handleRemove(index)}
@@ -245,6 +255,7 @@ export default function Container({
                             return (
                                 <ButtonGroup
                                     key={component.id}
+                                    component={component}
                                     onMoveUp={() => handleMove(index, "up")}
                                     onMoveDown={() => handleMove(index, "down")}
                                     onRemove={() => handleRemove(index)}
@@ -263,9 +274,28 @@ export default function Container({
                             return (
                                 <File
                                     key={component.id}
+                                    component={component}
                                     onMoveUp={() => handleMove(index, "up")}
                                     onMoveDown={() => handleMove(index, "down")}
                                     onRemove={() => handleRemove(index)}
+                                    spoiler={component.spoiler ?? false}
+                                    onChangeSpoiler={(value) => {
+                                        setComponents(
+                                            updateAt(components, index, (old) => ({
+                                                ...(old as APIFileComponent),
+                                                spoiler: value,
+                                            })),
+                                        );
+                                    }}
+                                    file={component}
+                                    setFile={(file) => {
+                                        setComponents(
+                                            updateAt(components, index, (old) => ({
+                                                ...(old as APIFileComponent),
+                                                file: file.file,
+                                            })),
+                                        );
+                                    }}
                                 />
                             );
                         }

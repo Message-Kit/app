@@ -43,3 +43,35 @@ export function numberToHex(num: number): string {
 }
 
 export const sanitizeFileName = (name: string) => name.trim().replace(/\s+/g, "_");
+
+export type SendOptions =
+    | {
+          via: "bot";
+          channel_id: string;
+      }
+    | {
+          via: "webhook";
+          webhook_url: string;
+      };
+
+export function parseDiscordWebhook(urlOrPath: string): { id: string; token: string } | null {
+    // try as full URL first
+    try {
+        const url = new URL(urlOrPath);
+        const match = url.pathname.match(/\/api\/webhooks\/(\d+)\/([^/?]+)/);
+        if (match) return { id: match[1], token: decodeURIComponent(match[2]) };
+    } catch {
+        // not a full URL — fall through to path-only parsing
+    }
+
+    // path-only or raw "id/token"
+    const fallbackMatch = urlOrPath
+        .trim()
+        .replace(/^\/+|\/+$/g, "")
+        .match(/^(?:api\/webhooks\/)?(\d+)\/([^/?]+)/);
+    if (fallbackMatch) return { id: fallbackMatch[1], token: decodeURIComponent(fallbackMatch[2]) };
+
+    return null;
+}
+
+export const inspectedStyle = "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]";

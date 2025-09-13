@@ -2,12 +2,16 @@ import { ComponentType } from "discord-api-types/v10";
 import { useOutputStore } from "@/lib/stores/output";
 import PreviewButtonGroup from "./preview/button-group";
 import PreviewContainer from "./preview/container";
+import PreviewFile from "./preview/file";
 import PreviewMediaGallery from "./preview/media-gallery";
 import PreviewSeparator from "./preview/separator";
 import PreviewTextDisplay from "./preview/text-display";
 
 export default function Preview() {
     const { output } = useOutputStore();
+
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
 
     return (
         <div className="p-4 whitespace-pre-wrap bg-[#323339] font-discord flex h-full gap-[16px] overflow-y-auto">
@@ -21,7 +25,7 @@ export default function Preview() {
                             APP
                         </div>
                     </div>
-                    <span className="text-[#949ba4] text-[12px] font-medium">12:30 AM</span>
+                    <span className="text-[#949ba4] text-[12px] font-medium">{timeString}</span>
                 </div>
                 <div className="flex flex-col gap-[8px] w-full">
                     {output.map((component) => {
@@ -37,7 +41,10 @@ export default function Preview() {
                             return <PreviewButtonGroup key={component.id} component={component} />;
                         } else if (component.type === ComponentType.Container) {
                             return <PreviewContainer key={component.id} component={component} />;
-                        } else return null;
+                        } else if (component.type === ComponentType.File) {
+                            return <PreviewFile key={component.id} component={component} />;
+                        }
+                        return null;
                     })}
                 </div>
             </div>

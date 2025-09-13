@@ -1,8 +1,9 @@
-import { SeparatorSpacingSize } from "discord-api-types/v10";
+import { type APISeparatorComponent, SeparatorSpacingSize } from "discord-api-types/v10";
 import NewBuilder from "../new-builder";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+import { SeparatorHorizontalIcon } from "lucide-react";
 
 export default function Separator({
     onMoveUp,
@@ -12,6 +13,7 @@ export default function Separator({
     divider,
     onChangeSpacing,
     onChangeDivider,
+    component,
 }: {
     onMoveUp: () => void;
     onMoveDown: () => void;
@@ -20,10 +22,13 @@ export default function Separator({
     divider: boolean;
     onChangeSpacing: (size: SeparatorSpacingSize) => void;
     onChangeDivider: (value: boolean) => void;
+    component: APISeparatorComponent;
 }) {
     return (
         <NewBuilder
             name="Separator"
+            tag={component.id ?? null}
+            icon={<SeparatorHorizontalIcon />}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}

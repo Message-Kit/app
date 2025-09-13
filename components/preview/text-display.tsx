@@ -7,10 +7,12 @@ import {
 import type { PropsWithChildren, ReactElement, ReactNode } from "react";
 import { Children, cloneElement, Fragment, isValidElement } from "react";
 import ReactMarkdown from "react-markdown";
+import Twemoji from "react-twemoji";
 import remarkGfm from "remark-gfm";
 import { generateRandomNumber } from "@/lib/random-number";
-import { cn } from "@/lib/utils";
-import ExternalLinkIcon from "../misc/external-link-icon";
+import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
+import { cn, inspectedStyle } from "@/lib/utils";
+import PreviewButton from "./button";
 
 function Mention({ icon, text }: { icon?: ReactNode; text: string }) {
     return (
@@ -83,93 +85,108 @@ function renderNodesWithMentions(node: ReactNode): ReactNode {
 
 export default function PreviewTextDisplay({
     component,
-    _container,
+    container,
 }: {
     component: APITextDisplayComponent | APISectionComponent;
-    _container?: boolean;
+    container?: boolean;
 }) {
-    return (
-        <div className="flex gap-[12px]">
-            <div className="text-[#dbdee1] text-[16px] leading-[0]">
-                <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                        p: ({ children }) => <p className="leading-[1.375rem]">{renderNodesWithMentions(children)}</p>,
-                        h1: ({ children }) => (
-                            <h1 className="text-[24px] font-bold my-[8px] leading-[1.375em]">
-                                {renderNodesWithMentions(children)}
-                            </h1>
-                        ),
-                        h2: ({ children }) => (
-                            <h2 className="text-[20px] font-bold my-[8px] leading-[1.375em]">
-                                {renderNodesWithMentions(children)}
-                            </h2>
-                        ),
-                        h3: ({ children }) => (
-                            <h3 className="text-[16px] font-bold my-[8px] leading-[1.375em]">
-                                {renderNodesWithMentions(children)}
-                            </h3>
-                        ),
-                        ul: ({ children }) => (
-                            <ul className="m-[4px_0_0_16px] list-outside list-disc">
-                                {renderNodesWithMentions(children)}
-                            </ul>
-                        ),
-                        ol: ({ children }) => (
-                            <ul className="m-[4px_0_0_16px] list-outside list-decimal">
-                                {renderNodesWithMentions(children)}
-                            </ul>
-                        ),
-                        li: ({ children }) => (
-                            <li className="leading-[1.375rem] mb-[4px]">{renderNodesWithMentions(children)}</li>
-                        ),
-                        h6: ({ children }) => (
-                            <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>
-                        ),
-                    }}
-                >
-                    {component.type === ComponentType.TextDisplay
-                        ? component.content.replaceAll("-#", "######")
-                        : component.components[0].content.replaceAll("-#", "######")}
-                </ReactMarkdown>
-            </div>
-            {component.type === ComponentType.Section &&
-                (component.accessory.type === ComponentType.Thumbnail ? (
-                    <div className="rounded-[8px] overflow-hidden size-[86px]">
-                        {/** biome-ignore lint/performance/noImgElement: balls */}
-                        <img src={component.accessory.media.url} alt={component.accessory.description ?? "image"} />
-                    </div>
-                ) : component.accessory.type === ComponentType.Button ? (
-                    component.accessory.style !== ButtonStyle.Premium && (
-                        <div
-                            className={cn(
-                                "flex px-[11px] h-[32px] rounded-[8px] duration-150 cursor-pointer",
+    const { hoveredComponent } = useHoveredComponentStore();
 
-                                // button background colors
-                                component.accessory.style === ButtonStyle.Primary
-                                    ? "bg-primary hover:bg-[#4654c0]"
-                                    : component.accessory.style === ButtonStyle.Secondary
-                                      ? "bg-[#3e3f45] hover:bg-[#46474e]"
-                                      : component.accessory.style === ButtonStyle.Success
-                                        ? "bg-[#00863a] hover:bg-[#047e37]"
-                                        : component.accessory.style === ButtonStyle.Danger
-                                          ? "bg-[#d22d39] hover:bg-[#b42831]"
-                                          : component.accessory.style === ButtonStyle.Link
-                                            ? "bg-[#3e3f45] hover:bg-[#46474e]"
-                                            : "",
-                            )}
-                        >
-                            <span className="min-w-[32px] my-auto text-center text-[14px] font-medium leading-[18px]">
-                                {component.accessory.label}
-                            </span>
-                            {component.accessory.style === ButtonStyle.Link && (
-                                <span className="ml-[2px] my-auto">
-                                    <ExternalLinkIcon />
-                                </span>
-                            )}
+    return (
+        <div className={cn(hoveredComponent === component.id && inspectedStyle)}>
+            <div className="flex gap-[12px]">
+                <div className="text-[#dbdee1] leading-0" style={{ fontSize: container ? "14px" : "16px" }}>
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                            p: ({ children }) => (
+                                <Twemoji options={{ className: "inline size-[22px]" }}>
+                                    <p
+                                        className="leading-[1.375rem]"
+                                        style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}
+                                    >
+                                        {renderNodesWithMentions(children)}
+                                    </p>
+                                </Twemoji>
+                            ),
+                            h1: ({ children }) => (
+                                <Twemoji options={{ className: "inline size-[33px]" }}>
+                                    <h1 className="text-[24px] font-bold my-[8px] leading-[1.375em]">
+                                        {renderNodesWithMentions(children)}
+                                    </h1>
+                                </Twemoji>
+                            ),
+                            h2: ({ children }) => (
+                                <Twemoji options={{ className: "inline size-[27.5px]" }}>
+                                    <h2 className="text-[20px] font-bold my-[8px] leading-[1.375em]">
+                                        {renderNodesWithMentions(children)}
+                                    </h2>
+                                </Twemoji>
+                            ),
+                            h3: ({ children }) => (
+                                <Twemoji options={{ className: "inline size-[22px]" }}>
+                                    <h3 className="text-[16px] font-bold my-[8px] leading-[1.375em]">
+                                        {renderNodesWithMentions(children)}
+                                    </h3>
+                                </Twemoji>
+                            ),
+                            ul: ({ children }) => (
+                                <ul className="m-[4px_0_0_16px] list-outside list-disc">
+                                    {renderNodesWithMentions(children)}
+                                </ul>
+                            ),
+                            ol: ({ children }) => (
+                                <ul className="m-[4px_0_0_16px] list-outside list-decimal">
+                                    {renderNodesWithMentions(children)}
+                                </ul>
+                            ),
+                            li: ({ children }) => (
+                                <Twemoji options={{ className: "inline size-[22px]" }}>
+                                    <li
+                                        className="mb-[4px]"
+                                        style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}
+                                    >
+                                        {renderNodesWithMentions(children)}
+                                    </li>
+                                </Twemoji>
+                            ),
+                            h6: ({ children }) => (
+                                <Twemoji options={{ className: "inline size-[17.875px]" }}>
+                                    <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>
+                                </Twemoji>
+                            ),
+                            code: ({ children }) => (
+                                <code className="my-[-2.72px] px-[2.72px] border border-[#494a59] rounded-[4px] text-[13.6px] whitespace-pre-wrap bg-[#353748] text-[#dfe0e2]">
+                                    {children}
+                                </code>
+                            ),
+                            pre: ({ children }) => <pre className="bg-[#1e1f29] p-10">{children}</pre>,
+                            blockquote: ({ children }) => (
+                                <Twemoji options={{ className: "inline size-[22px]" }}>
+                                    <blockquote className="border-l-4 border-[#5e5f66] rounded-[4px] box-border p-[0_8px_0_12px]">
+                                        {children}
+                                    </blockquote>
+                                </Twemoji>
+                            ),
+                        }}
+                    >
+                        {component.type === ComponentType.TextDisplay
+                            ? component.content.replaceAll("-#", "######")
+                            : component.components[0].content.replaceAll("-#", "######")}
+                    </ReactMarkdown>
+                </div>
+                {component.type === ComponentType.Section &&
+                    (component.accessory.type === ComponentType.Thumbnail ? (
+                        <div className="rounded-[8px] overflow-hidden size-[86px]">
+                            {/** biome-ignore lint/performance/noImgElement: balls */}
+                            <img src={component.accessory.media.url} alt={component.accessory.description ?? "image"} />
                         </div>
-                    )
-                ) : null)}
+                    ) : component.accessory.type === ComponentType.Button ? (
+                        component.accessory.style !== ButtonStyle.Premium && (
+                            <PreviewButton button={component.accessory} />
+                        )
+                    ) : null)}
+            </div>
         </div>
     );
 }
