@@ -263,7 +263,7 @@ const defaultComponents: APIMessageTopLevelComponent[] = [
         id: 500528667,
         type: 10,
         content:
-            "# Create modular, interactive messages\nMessage Kit lets you build **interactive** messages *fast*. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
+            "# Create modular, interactive messages 🧩\nMessage Kit lets you build **interactive** messages *fast*. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
     },
     {
         id: 869213619,

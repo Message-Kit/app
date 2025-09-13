@@ -1,5 +1,5 @@
 import type { APIMediaGalleryComponent, APIMediaGalleryItem } from "discord-api-types/v10";
-import { ImagePlusIcon, LinkIcon, TrashIcon, UploadIcon } from "lucide-react";
+import { ImageIcon, ImagePlusIcon, LinkIcon, TrashIcon, UploadIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useFiles } from "@/lib/stores/files";
@@ -79,8 +79,9 @@ export default function MediaGallery({
 
     return (
         <NewBuilder
-            name="Media Gallery"
+            name="Media"
             tag={component.id ?? null}
+            icon={<ImageIcon />}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}

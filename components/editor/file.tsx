@@ -5,6 +5,7 @@ import NewBuilder from "../new-builder";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
+import { FileIcon } from "lucide-react";
 
 export default function File({
     onMoveUp,
@@ -44,6 +45,7 @@ export default function File({
         <NewBuilder
             name="File"
             tag={component.id ?? null}
+            icon={<FileIcon />}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}

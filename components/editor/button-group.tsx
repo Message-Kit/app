@@ -12,6 +12,7 @@ import {
     DotIcon,
     EditIcon,
     ExternalLinkIcon,
+    MousePointerClickIcon,
     PlusIcon,
     TrashIcon,
 } from "lucide-react";
@@ -72,8 +73,9 @@ export default function ButtonGroup({
 
     return (
         <NewBuilder
-            name="Button Group"
+            name="Buttons"
             tag={component.id ?? null}
+            icon={<MousePointerClickIcon />}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}

@@ -1,6 +1,6 @@
-import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, CircleIcon, LucideIcon, TrashIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { type PropsWithChildren, useEffect, useId, useState } from "react";
+import { type PropsWithChildren, ReactNode, useEffect, useId, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
 import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
 import { useShouldInspectStore } from "@/lib/stores/should-inspect";
@@ -19,6 +19,7 @@ interface Props extends PropsWithChildren {
     className?: string;
     style?: React.CSSProperties;
     tag: number | null;
+    icon?: ReactNode;
 }
 
 export default function NewBuilder({
@@ -32,18 +33,18 @@ export default function NewBuilder({
     className,
     style,
     tag,
+    icon,
 }: Props) {
     const [collapsed, setCollapsed] = useState(false);
+    const [isHovering, setIsHovering] = useState(false);
     const { setHoveredComponent } = useHoveredComponentStore();
     const { shouldInspect } = useShouldInspectStore();
 
     useEffect(() => {
-        if (name === "Media Gallery" || name === "Separator") {
+        if (name === "Media" || name === "Separator") {
             setCollapsed(true);
         }
     }, [name]);
-
-    const id = useId();
 
     return (
         <motion.div {...motionProps}>
@@ -67,17 +68,16 @@ export default function NewBuilder({
                 <div className="flex justify-between items-center gap-2 p-2">
                     <div className="flex items-center gap-2">
                         <Button
-                            id={`collapse-button-${id}`}
                             variant={"ghost"}
                             size={"icon"}
                             className="size-7"
                             onClick={() => setCollapsed(!collapsed)}
+                            onMouseEnter={() => setIsHovering(true)}
+                            onMouseLeave={() => setIsHovering(false)}
                         >
-                            {collapsed ? <ChevronRightIcon /> : <ChevronDownIcon />}
+                            {isHovering ? collapsed ? <ChevronRightIcon /> : <ChevronDownIcon /> : icon}
                         </Button>
-                        <Label className="font-semibold text-sm" htmlFor={`collapse-button-${id}`}>
-                            {name}
-                        </Label>
+                        <span className="font-semibold text-sm -ml-1">{name}</span>
                         {helperText && (
                             <span className="text-xs text-muted-foreground mt-1 font-medium hidden md:block">
                                 {helperText}

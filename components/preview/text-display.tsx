@@ -141,9 +141,14 @@ export default function PreviewTextDisplay({
                                 </ul>
                             ),
                             li: ({ children }) => (
-                                <li className="mb-[4px]" style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}>
-                                    {renderNodesWithMentions(children)}
-                                </li>
+                                <Twemoji options={{ className: "inline size-[22px]" }}>
+                                    <li
+                                        className="mb-[4px]"
+                                        style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}
+                                    >
+                                        {renderNodesWithMentions(children)}
+                                    </li>
+                                </Twemoji>
                             ),
                             h6: ({ children }) => (
                                 <Twemoji options={{ className: "inline size-[17.875px]" }}>
@@ -157,9 +162,11 @@ export default function PreviewTextDisplay({
                             ),
                             pre: ({ children }) => <pre className="bg-[#1e1f29] p-10">{children}</pre>,
                             blockquote: ({ children }) => (
-                                <blockquote className="border-l-4 border-[#5e5f66] rounded-[4px] box-border p-[0_8px_0_12px]">
-                                    {children}
-                                </blockquote>
+                                <Twemoji options={{ className: "inline size-[22px]" }}>
+                                    <blockquote className="border-l-4 border-[#5e5f66] rounded-[4px] box-border p-[0_8px_0_12px]">
+                                        {children}
+                                    </blockquote>
+                                </Twemoji>
                             ),
                         }}
                     >

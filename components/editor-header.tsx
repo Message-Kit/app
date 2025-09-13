@@ -125,8 +125,14 @@ export default function EditorHeader({
     return (
         <div className="flex justify-between gap-2 p-4 overflow-x-auto">
             <div className="flex gap-2 items-center">
-                <Image src="/logo.svg" className="min-w-[30px] max-w-[30px]" alt="Logo" width={32} height={32} />
-                <Separator orientation="vertical" className="opacity-0" />
+                <Image
+                    src="/logo.svg"
+                    className="min-w-[30px] max-w-[30px] hidden md:block"
+                    alt="Logo"
+                    width={32}
+                    height={32}
+                />
+                <Separator orientation="vertical" className="opacity-0 hidden md:block" />
                 {user ? (
                     <Select
                         disabled={loadedMessages === null}
@@ -209,13 +215,13 @@ export default function EditorHeader({
                     <DropdownMenuTrigger asChild>
                         <Button variant={"outline"}>
                             <PlusIcon />
-                            Add Component
+                            Add
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        {componentsList.map((component) => (
-                            <Fragment key={component.type}>
-                                {component.type === ComponentType.Separator && <DropdownMenuSeparator />}
+                        {componentsList.map((component, index) => (
+                            <Fragment key={`${component.type}-${index}`}>
+                                {component.name === "Buttons" && <DropdownMenuSeparator />}
                                 <DropdownMenuItem onClick={component.onClick}>
                                     <component.icon />
                                     {component.name}

@@ -9,7 +9,7 @@ import {
     ButtonStyle,
     ComponentType,
 } from "discord-api-types/v10";
-import { CheckIcon, ImageIcon, MousePointerClickIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { CheckIcon, ImageIcon, MousePointerClickIcon, PlusIcon, TextIcon, TrashIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
@@ -153,7 +153,8 @@ export default function TextDisplay({
     return (
         <NewBuilder
             tag={component.id ?? null}
-            name="Text Display"
+            name="Text"
+            icon={<TextIcon />}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}

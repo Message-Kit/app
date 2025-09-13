@@ -10,7 +10,7 @@ import {
     ComponentType,
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
-import { CheckIcon, PaintBucketIcon, PlusIcon, XIcon } from "lucide-react";
+import { BoxIcon, CheckIcon, PaintBucketIcon, PlusIcon, XIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
@@ -75,12 +75,12 @@ export default function Container({
                     ? { borderLeftColor: `#${color.toString(16).padStart(6, "0")}`, borderLeftWidth: "4px" }
                     : undefined
             }
+            icon={<BoxIcon />}
             name="Container"
             tag={component.id ?? null}
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
             onRemove={onRemove}
-            className="bg-card/35"
             extraButton={
                 <>
                     <DropdownMenu>
@@ -91,7 +91,7 @@ export default function Container({
                                 className="h-7 text-xs font-semibold text-muted-foreground"
                             >
                                 <PlusIcon />
-                                Add Component
+                                Add
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
