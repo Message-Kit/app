@@ -11,7 +11,7 @@ export default function Preview() {
     const { output } = useOutputStore();
 
     const now = new Date();
-    const timeString = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    const timeString = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
 
     return (
         <div className="p-4 whitespace-pre-wrap bg-[#323339] font-discord flex h-full gap-[16px] overflow-y-auto">

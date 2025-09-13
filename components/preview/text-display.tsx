@@ -7,6 +7,7 @@ import {
 import type { PropsWithChildren, ReactElement, ReactNode } from "react";
 import { Children, cloneElement, Fragment, isValidElement } from "react";
 import ReactMarkdown from "react-markdown";
+import Twemoji from "react-twemoji";
 import remarkGfm from "remark-gfm";
 import { generateRandomNumber } from "@/lib/random-number";
 import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
@@ -99,27 +100,35 @@ export default function PreviewTextDisplay({
                         remarkPlugins={[remarkGfm]}
                         components={{
                             p: ({ children }) => (
-                                <p
-                                    className="leading-[1.375rem]"
-                                    style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}
-                                >
-                                    {renderNodesWithMentions(children)}
-                                </p>
+                                <Twemoji options={{ className: "inline size-[22px]" }}>
+                                    <p
+                                        className="leading-[1.375rem]"
+                                        style={{ lineHeight: container ? "1.203125rem" : "1.375rem" }}
+                                    >
+                                        {renderNodesWithMentions(children)}
+                                    </p>
+                                </Twemoji>
                             ),
                             h1: ({ children }) => (
-                                <h1 className="text-[24px] font-bold my-[8px] leading-[1.375em]">
-                                    {renderNodesWithMentions(children)}
-                                </h1>
+                                <Twemoji options={{ className: "inline size-[33px]" }}>
+                                    <h1 className="text-[24px] font-bold my-[8px] leading-[1.375em]">
+                                        {renderNodesWithMentions(children)}
+                                    </h1>
+                                </Twemoji>
                             ),
                             h2: ({ children }) => (
-                                <h2 className="text-[20px] font-bold my-[8px] leading-[1.375em]">
-                                    {renderNodesWithMentions(children)}
-                                </h2>
+                                <Twemoji options={{ className: "inline size-[27.5px]" }}>
+                                    <h2 className="text-[20px] font-bold my-[8px] leading-[1.375em]">
+                                        {renderNodesWithMentions(children)}
+                                    </h2>
+                                </Twemoji>
                             ),
                             h3: ({ children }) => (
-                                <h3 className="text-[16px] font-bold my-[8px] leading-[1.375em]">
-                                    {renderNodesWithMentions(children)}
-                                </h3>
+                                <Twemoji options={{ className: "inline size-[22px]" }}>
+                                    <h3 className="text-[16px] font-bold my-[8px] leading-[1.375em]">
+                                        {renderNodesWithMentions(children)}
+                                    </h3>
+                                </Twemoji>
                             ),
                             ul: ({ children }) => (
                                 <ul className="m-[4px_0_0_16px] list-outside list-disc">
@@ -137,7 +146,9 @@ export default function PreviewTextDisplay({
                                 </li>
                             ),
                             h6: ({ children }) => (
-                                <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>
+                                <Twemoji options={{ className: "inline size-[17.875px]" }}>
+                                    <span className="leading-[1.11719rem] text-[#9b9ca2] text-[13px]">{children}</span>
+                                </Twemoji>
                             ),
                             code: ({ children }) => (
                                 <code className="my-[-2.72px] px-[2.72px] border border-[#494a59] rounded-[4px] text-[13.6px] whitespace-pre-wrap bg-[#353748] text-[#dfe0e2]">

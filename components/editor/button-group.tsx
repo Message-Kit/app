@@ -20,6 +20,7 @@ import { useMemo, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
 import { generateRandomNumber } from "@/lib/random-number";
 import { moveItem, removeAt } from "@/lib/utils";
+import EmojiPicker from "../emoji-picker";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
 import {
@@ -108,6 +109,7 @@ export default function ButtonGroup({
                                         value={buttonLabel}
                                         onChange={(e) => setButtonLabel(e.target.value)}
                                     />
+                                    <EmojiPicker guildId="" onEmojiSelect={() => {}} emoji={{}} />
                                 </div>
                             </div>
                             <RadioGroup

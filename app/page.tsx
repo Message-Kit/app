@@ -9,6 +9,7 @@ import {
     CopyIcon,
     ExternalLinkIcon,
     EyeIcon,
+    LogOutIcon,
     SendIcon,
     SlidersVerticalIcon,
     WebhookIcon,
@@ -32,6 +33,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useFiles } from "@/lib/stores/files";
@@ -91,6 +93,7 @@ export default function Page() {
 
 function PreviewWrapper() {
     const { output } = useOutputStore();
+    const { user } = useUserStore();
 
     const [copied, setCopied] = useState(false);
 
@@ -114,12 +117,24 @@ function PreviewWrapper() {
                     </Button>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" asChild>
-                        <Link href="/auth/login">
-                            <SiDiscord />
-                            Sign In
-                        </Link>
-                    </Button>
+                    {user === undefined ? (
+                        <Skeleton />
+                    ) : user === null ? (
+                        <Button variant="ghost" asChild>
+                            <Link href="/auth/login">
+                                <SiDiscord />
+                                Sign In
+                            </Link>
+                        </Button>
+                    ) : (
+                        <Button variant="ghost" className="text-destructive" asChild>
+                            <Link href="/auth/logout">
+                                <LogOutIcon />
+                                Logout
+                            </Link>
+                        </Button>
+                    )}
+
                     <SendMessageButton />
                 </div>
             </div>
