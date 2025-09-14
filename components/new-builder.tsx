@@ -1,12 +1,11 @@
-import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, CircleIcon, LucideIcon, TrashIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { type PropsWithChildren, ReactNode, useEffect, useId, useState } from "react";
+import { type PropsWithChildren, type ReactNode, useEffect, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
 import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
 import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 
 interface Props extends PropsWithChildren {

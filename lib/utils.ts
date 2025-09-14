@@ -1,5 +1,6 @@
 import type { ClassValue } from "clsx";
 import { clsx } from "clsx";
+import type { APIEmoji, APIMessageComponentEmoji } from "discord-api-types/v10";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -75,3 +76,19 @@ export function parseDiscordWebhook(urlOrPath: string): { id: string; token: str
 }
 
 export const inspectedStyle = "ring-1 ring-destructive animate-pulse [animation-duration:0.75s]";
+
+export function toComponentEmoji(emoji: APIEmoji | string | null): APIMessageComponentEmoji | undefined {
+    if (!emoji) return undefined;
+
+    if (typeof emoji === "string") {
+        // unicode emoji
+        return { name: emoji };
+    }
+
+    // guild emoji
+    return {
+        id: emoji.id ?? undefined,
+        name: emoji.name ?? undefined,
+        animated: emoji.animated ?? false,
+    };
+}

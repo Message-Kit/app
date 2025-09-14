@@ -5,7 +5,7 @@ import {
     type APIFileComponent,
     type APIMediaGalleryComponent,
     type APISeparatorComponent,
-    APIStringSelectComponent,
+    type APIStringSelectComponent,
     type APITextDisplayComponent,
     ComponentType,
     SeparatorSpacingSize,

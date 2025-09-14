@@ -2,6 +2,7 @@ import {
     type APIActionRowComponent,
     type APIButtonComponent,
     type APIComponentInMessageActionRow,
+    type APIEmoji,
     ButtonStyle,
     ComponentType,
 } from "discord-api-types/v10";
@@ -20,7 +21,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
 import { generateRandomNumber } from "@/lib/random-number";
-import { moveItem, removeAt } from "@/lib/utils";
+import { moveItem, removeAt, toComponentEmoji } from "@/lib/utils";
 import EmojiPicker from "../emoji-picker";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
@@ -54,6 +55,7 @@ export default function ButtonGroup({
     component: APIActionRowComponent<APIComponentInMessageActionRow>;
 }) {
     const [buttonLabel, setButtonLabel] = useState("");
+    const [buttonEmoji, setButtonEmoji] = useState<string | APIEmoji | null>(null);
     const [buttonStyle, setButtonStyle] = useState<"primary" | "secondary" | "success" | "danger" | "link">("primary");
     const [buttonUrl, setButtonUrl] = useState("");
     const [buttonActionId, setButtonActionId] = useState("");
@@ -86,7 +88,7 @@ export default function ButtonGroup({
                         <Button
                             variant={"ghost"}
                             size={"sm"}
-                            className="h-7 text-xs font-semibold text-muted-foreground"
+                            className="h-7 text-xs font-medium"
                             disabled={components.length >= 5}
                         >
                             <PlusIcon />
@@ -111,7 +113,19 @@ export default function ButtonGroup({
                                         value={buttonLabel}
                                         onChange={(e) => setButtonLabel(e.target.value)}
                                     />
-                                    <EmojiPicker guildId="" onEmojiSelect={() => {}} emoji={{}} />
+                                    <EmojiPicker
+                                        guildId="1015071949954748476"
+                                        onEmojiSelect={(emoji) => {
+                                            if (typeof emoji === "string") {
+                                                setButtonEmoji(emoji);
+                                            } else if (emoji !== null) {
+                                                setButtonEmoji({ id: emoji.id, name: emoji.name });
+                                            } else {
+                                                setButtonEmoji(null);
+                                            }
+                                        }}
+                                        emoji={buttonEmoji}
+                                    />
                                 </div>
                             </div>
                             <RadioGroup
@@ -183,6 +197,7 @@ export default function ButtonGroup({
                                                     label: buttonLabel,
                                                     style: ButtonStyle.Link,
                                                     url: buttonUrl,
+                                                    emoji: toComponentEmoji(buttonEmoji),
                                                 },
                                             ]);
                                         } else {
@@ -201,6 +216,7 @@ export default function ButtonGroup({
                                                                 ? ButtonStyle.Success
                                                                 : ButtonStyle.Danger,
                                                     custom_id: buttonActionId,
+                                                    emoji: toComponentEmoji(buttonEmoji),
                                                 },
                                             ]);
                                         }
@@ -224,7 +240,7 @@ export default function ButtonGroup({
                                 <motion.div {...motionProps} key={component.id}>
                                     <div className="rounded-lg border p-2 text-sm flex justify-between bg-input/15">
                                         <div className="flex gap-2 items-center">
-                                            <Button className="size-7" variant={"ghost"} size={"icon"}>
+                                            <Button className="size-7" variant={"ghost"} size={"icon"} disabled>
                                                 <EditIcon />
                                             </Button>
                                             <div className="flex gap-0.5 items-center">

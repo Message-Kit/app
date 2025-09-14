@@ -1,4 +1,4 @@
-import { type APIMessageTopLevelComponent, ComponentType } from "discord-api-types/v10";
+import type { APIMessageTopLevelComponent } from "discord-api-types/v10";
 import { DownloadIcon, PlusIcon, SaveIcon, SquareDashedMousePointerIcon, UploadIcon } from "lucide-react";
 import Image from "next/image";
 import { type Dispatch, Fragment, type SetStateAction, useEffect, useRef, useState } from "react";

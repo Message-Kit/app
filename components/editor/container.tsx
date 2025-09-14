@@ -85,11 +85,7 @@ export default function Container({
                 <>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button
-                                variant={"ghost"}
-                                size={"sm"}
-                                className="h-7 text-xs font-semibold text-muted-foreground"
-                            >
+                            <Button variant={"ghost"} size={"sm"} className="h-7 text-xs font-medium">
                                 <PlusIcon />
                                 Add
                             </Button>

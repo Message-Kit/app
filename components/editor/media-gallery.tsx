@@ -92,14 +92,14 @@ export default function MediaGallery({
                         <Button
                             variant={"ghost"}
                             size={"sm"}
-                            className="h-7 text-xs font-semibold text-muted-foreground"
+                            className="h-7 text-xs font-medium"
                             disabled={isAtLimit}
                             onClick={() => {
                                 fileInputRef.current?.click();
                             }}
                         >
                             <UploadIcon />
-                            Upload Media
+                            Upload
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
