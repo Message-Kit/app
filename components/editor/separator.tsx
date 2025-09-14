@@ -35,7 +35,7 @@ export default function Separator({
             extraButton={
                 <>
                     <div className="flex gap-2 items-center">
-                        <Label className="text-xs text-muted-foreground font-semibold" htmlFor="show-divider">
+                        <Label className="h-7 text-xs font-medium" htmlFor="show-divider">
                             Show Divider
                         </Label>
                         <Switch onCheckedChange={onChangeDivider} checked={divider} id="show-divider" />

@@ -72,7 +72,10 @@ export default function Container({
         <NewBuilder
             style={
                 color
-                    ? { borderLeftColor: `#${color.toString(16).padStart(6, "0")}`, borderLeftWidth: "4px" }
+                    ? {
+                          borderLeftColor: `#${color.toString(16).padStart(6, "0")}`,
+                          borderLeftWidth: "4px",
+                      }
                     : undefined
             }
             icon={<BoxIcon />}

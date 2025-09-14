@@ -1,9 +1,9 @@
 import type { APIMediaGalleryComponent, APIMediaGalleryItem } from "discord-api-types/v10";
-import { ImageIcon, ImagePlusIcon, LinkIcon, TrashIcon, UploadIcon } from "lucide-react";
+import { FileWarningIcon, ImageIcon, ImagePlusIcon, LinkIcon, UploadIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useFiles } from "@/lib/stores/files";
-import { sanitizeFileName } from "@/lib/utils";
+import { cn, sanitizeFileName } from "@/lib/utils";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
 import {
@@ -37,9 +37,11 @@ export default function MediaGallery({
 }) {
     const isAtLimit = images.length >= 10;
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const reuploadFileInputRef = useRef<HTMLInputElement>(null);
 
     const [tab, setTab] = useState<"link" | "upload">("link");
     const [linkUrl, setLinkUrl] = useState("");
+
     const { files, setFiles } = useFiles();
 
     const handleFileUpload = () => {
@@ -74,8 +76,6 @@ export default function MediaGallery({
             handleFileUpload();
         }
     };
-
-    const urls = useObjectUrls(images, files);
 
     return (
         <NewBuilder
@@ -147,7 +147,6 @@ export default function MediaGallery({
                                             <span className="text-destructive">*</span>
                                         </Label>
                                         <Input
-                                            placeholder="Enter your image URL"
                                             type="file"
                                             ref={fileInputRef}
                                             disabled={isAtLimit}
@@ -172,29 +171,77 @@ export default function MediaGallery({
         >
             {images.length !== 0 ? (
                 <div
-                    className="grid gap-2"
+                    className="flex flex-col gap-2"
                     style={{ gridTemplateColumns: `repeat(${Math.max(3, Math.min(images.length, 5))}, 1fr)` }}
                 >
                     {images.map((image, index) => {
-                        const url = urls[index];
-                        if (!url) return null;
+                        let foundFile: File | undefined;
+
+                        if (image.media.url.startsWith("attachment://")) {
+                            foundFile = files.find(
+                                (f) => sanitizeFileName(f.name) === image.media.url.split("/").pop(),
+                            );
+                        }
 
                         return (
                             <div
                                 key={`${image.media.url}-${index}`}
-                                className="bg-accent relative aspect-square rounded-md overflow-hidden"
+                                className={cn(
+                                    "bg-input/30 rounded-md border p-4 w-full flex gap-4",
+                                    image.media.url.startsWith("attachment://") && !foundFile && "border-destructive",
+                                )}
                             >
-                                {/* biome-ignore lint/performance/noImgElement: no */}
+                                {/** biome-ignore lint/performance/noImgElement: dm me if u read this */}
                                 <img
-                                    src={url}
-                                    className="size-full object-cover"
-                                    alt="Media Gallery"
+                                    src={
+                                        image.media.url.startsWith("attachment://")
+                                            ? foundFile
+                                                ? URL.createObjectURL(foundFile)
+                                                : "/question-mark-accent.png"
+                                            : image.media.url
+                                    }
+                                    className="size-[40px] object-cover aspect-square rounded-md text-xs bg-accent"
+                                    alt={image.description || "No description"}
                                     width={256}
                                     height={256}
                                 />
-                                <Button variant={"destructive"} size={"icon"} className="size-7 absolute top-2 right-2">
-                                    <TrashIcon />
-                                </Button>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-sm font-medium">{image.media.url.split("/").pop()}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        {image.description || "No description"}
+                                    </span>
+                                </div>
+                                <div className="ml-auto my-auto flex gap-2 items-center">
+                                    {image.media.url.startsWith("attachment://") && !foundFile && (
+                                        <Button
+                                            variant={"destructive"}
+                                            onClick={() => reuploadFileInputRef.current?.click()}
+                                        >
+                                            <FileWarningIcon />
+                                            Re-upload
+                                            <input
+                                                type="file"
+                                                ref={reuploadFileInputRef}
+                                                accept=".png,.jpg,.jpeg,.webp"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const newFile = e.target.files?.[0];
+                                                    if (!newFile) return;
+
+                                                    if (image.media.url.split("/").pop() !== newFile.name) {
+                                                        console.log("The name of the new file doesn't match!");
+                                                        toast.error("The name of the new file doesn't match!");
+                                                    } else {
+                                                        setFiles([...files, newFile]);
+                                                    }
+                                                }}
+                                            />
+                                        </Button>
+                                    )}
+                                    <Button variant={"ghost"} size={"icon"} className="size-7">
+                                        <XIcon />
+                                    </Button>
+                                </div>
                             </div>
                         );
                     })}
@@ -208,7 +255,7 @@ export default function MediaGallery({
     );
 }
 
-function useObjectUrls(images: APIMediaGalleryItem[], files: File[]) {
+function _useObjectUrls(images: APIMediaGalleryItem[], files: File[]) {
     const cacheRef = useRef<Map<string, string>>(new Map());
 
     useEffect(() => {

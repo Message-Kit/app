@@ -3,7 +3,7 @@
 import { PopoverClose } from "@radix-ui/react-popover";
 import type { APIEmoji } from "discord-api-types/v10";
 import { CDNRoutes, ImageFormat, RouteBases } from "discord-api-types/v10";
-import { CheckIcon, GlobeIcon, ShieldIcon, TrashIcon } from "lucide-react";
+import { CheckIcon, GlobeIcon, ShieldIcon, SmilePlusIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Twemoji from "react-twemoji";
@@ -58,6 +58,7 @@ export default function EmojiPicker({
                                 />
                             )
                         ))}
+                    {emoji === null && <SmilePlusIcon />}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="flex flex-col gap-3">

@@ -39,7 +39,7 @@ export default function NewBuilder({
     const { shouldInspect } = useShouldInspectStore();
 
     useEffect(() => {
-        if (name === "Media" || name === "Separator") {
+        if (name === "Separator") {
             setCollapsed(true);
         }
     }, [name]);
