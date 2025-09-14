@@ -35,7 +35,6 @@ export default function NewBuilder({
     icon,
 }: Props) {
     const [collapsed, setCollapsed] = useState(false);
-    const [isHovering, setIsHovering] = useState(false);
     const { setHoveredComponent } = useHoveredComponentStore();
     const { shouldInspect } = useShouldInspectStore();
 
@@ -69,12 +68,15 @@ export default function NewBuilder({
                         <Button
                             variant={"ghost"}
                             size={"icon"}
-                            className="size-7"
+                            className="size-7 group"
                             onClick={() => setCollapsed(!collapsed)}
-                            onMouseEnter={() => setIsHovering(true)}
-                            onMouseLeave={() => setIsHovering(false)}
                         >
-                            {isHovering ? collapsed ? <ChevronRightIcon /> : <ChevronDownIcon /> : icon}
+                            {collapsed ? (
+                                <ChevronRightIcon className="hidden group-hover:block" />
+                            ) : (
+                                <ChevronDownIcon className="hidden group-hover:block" />
+                            )}
+                            <span className="block group-hover:hidden">{icon}</span>
                         </Button>
                         <span className="font-semibold text-sm -ml-1">{name}</span>
                         {helperText && (
