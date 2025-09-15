@@ -292,7 +292,7 @@ const defaultComponents: APIMessageTopLevelComponent[] = [
                 items: [
                     {
                         media: {
-                            url: "attachment://msgkit.png",
+                            url: "https://messagekit.app/example-header.png",
                         },
                     },
                 ],
