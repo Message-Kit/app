@@ -13,6 +13,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
@@ -52,6 +53,7 @@ export default function EditorHeader({
         type: descriptor.type,
         icon: descriptor.icon,
         onClick: () => addComponent(descriptor.create() as APIMessageTopLevelComponent),
+        disabled: descriptor.disabled,
     }));
 
     useEffect(() => {
@@ -219,10 +221,26 @@ export default function EditorHeader({
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
+                        {/* <DropdownMenuLabel className="text-xs text-muted-foreground">Content</DropdownMenuLabel> */}
                         {componentsList.map((component, index) => (
                             <Fragment key={`${component.type}-${index}`}>
-                                {component.name === "Buttons" && <DropdownMenuSeparator />}
-                                <DropdownMenuItem onClick={component.onClick}>
+                                {component.name === "Container" && (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                            Layout
+                                        </DropdownMenuLabel>
+                                    </>
+                                )}
+                                {component.name === "Buttons" && (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                            Interactive
+                                        </DropdownMenuLabel>
+                                    </>
+                                )}
+                                <DropdownMenuItem onClick={component.onClick} disabled={component.disabled}>
                                     <component.icon />
                                     {component.name}
                                 </DropdownMenuItem>

@@ -315,7 +315,7 @@ function SendMessageButton() {
                                         {guilds.length === 0 && (
                                             <div className="flex items-center justify-center p-4 text-muted-foreground text-sm">
                                                 <span>
-                                                    Failed to fetch guilds, please login{" "}
+                                                    Failed to fetch guilds, please re-login{" "}
                                                     <a
                                                         href="/auth/login?prompt=none"
                                                         className="underline underline-offset-2"

@@ -1,14 +1,5 @@
 import type { APIMediaGalleryComponent, APIMediaGalleryItem } from "discord-api-types/v10";
-import {
-    EyeClosedIcon,
-    EyeIcon,
-    FileWarningIcon,
-    ImageIcon,
-    ImagePlusIcon,
-    LinkIcon,
-    UploadIcon,
-    XIcon,
-} from "lucide-react";
+import { FileWarningIcon, ImageIcon, ImagePlusIcon, LinkIcon, UploadIcon, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -30,7 +21,6 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Switch } from "../ui/switch";
 
 export default function MediaGallery({
     onMoveUp,
@@ -71,7 +61,7 @@ export default function MediaGallery({
             ...images,
             ...Array.from(newFiles).map((file) => ({
                 media: { url: `attachment://${sanitizeFileName(file.name)}` },
-                description: linkDescription,
+                description: linkDescription.length === 0 ? "No description" : linkDescription,
             })),
         ]);
 
@@ -79,7 +69,10 @@ export default function MediaGallery({
     };
 
     const handleLinkUpload = () => {
-        setImages([...images, { media: { url: linkUrl }, description: linkDescription }]);
+        setImages([
+            ...images,
+            { media: { url: linkUrl }, description: linkDescription.length === 0 ? "No description" : linkDescription },
+        ]);
 
         setLinkUrl("");
         setLinkDescription("");
@@ -275,9 +268,7 @@ export default function MediaGallery({
                                             <span className="text-sm font-medium flex items-center gap-2">
                                                 {image.media.url.split("/").pop()}
                                             </span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {image.description || "No description"}
-                                            </span>
+                                            <span className="text-xs text-muted-foreground">{image.description}</span>
                                         </div>
                                         <div className="ml-auto my-auto flex gap-2 items-center">
                                             {image.media.url.startsWith("attachment://") && !foundFile && (
@@ -297,7 +288,6 @@ export default function MediaGallery({
                                                             if (!newFile) return;
 
                                                             if (image.media.url.split("/").pop() !== newFile.name) {
-                                                                console.log("The name of the new file doesn't match!");
                                                                 toast.error("The name of the new file doesn't match!");
                                                             } else {
                                                                 setFiles([...files, newFile]);

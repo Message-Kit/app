@@ -74,7 +74,7 @@ export default function PreviewMediaGallery({
         return (
             <div
                 className={cn("rounded-[8px] overflow-hidden", hoveredComponent === component.id && inspectedStyle)}
-                style={{ maxWidth: container ? "100%" : "550px" }}
+                style={{ maxWidth: container ? "350px" : "100%" }}
             >
                 <PreviewMediaTile mediaUrl={items[0].media.url} description={items[0].description} aspect="auto" />
             </div>

@@ -22,6 +22,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
@@ -72,6 +73,7 @@ export default function Container({
             type: d.type,
             icon: d.icon,
             onClick: () => addComponent(d.create() as APIComponentInContainer),
+            disabled: d.disabled,
         }));
 
     return (
@@ -102,8 +104,23 @@ export default function Container({
                         <DropdownMenuContent>
                             {componentsList.map((component, index) => (
                                 <Fragment key={`${component.type}-${index}`}>
-                                    {component.name === "Buttons" && <DropdownMenuSeparator />}
-                                    <DropdownMenuItem onClick={component.onClick}>
+                                    {component.name === "Separator" && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                                Layout
+                                            </DropdownMenuLabel>
+                                        </>
+                                    )}
+                                    {component.name === "Buttons" && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                                Interactive
+                                            </DropdownMenuLabel>
+                                        </>
+                                    )}
+                                    <DropdownMenuItem onClick={component.onClick} disabled={component.disabled}>
                                         <component.icon />
                                         {component.name}
                                     </DropdownMenuItem>
