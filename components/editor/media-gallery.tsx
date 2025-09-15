@@ -1,7 +1,18 @@
 import type { APIMediaGalleryComponent, APIMediaGalleryItem } from "discord-api-types/v10";
-import { FileWarningIcon, ImageIcon, ImagePlusIcon, LinkIcon, UploadIcon, XIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {
+    EyeClosedIcon,
+    EyeIcon,
+    FileWarningIcon,
+    ImageIcon,
+    ImagePlusIcon,
+    LinkIcon,
+    UploadIcon,
+    XIcon,
+} from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { motionProps } from "@/lib/motion-props";
 import { useFiles } from "@/lib/stores/files";
 import { cn, sanitizeFileName } from "@/lib/utils";
 import NewBuilder from "../new-builder";
@@ -19,6 +30,7 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Switch } from "../ui/switch";
 
 export default function MediaGallery({
     onMoveUp,
@@ -41,6 +53,7 @@ export default function MediaGallery({
 
     const [tab, setTab] = useState<"link" | "upload">("link");
     const [linkUrl, setLinkUrl] = useState("");
+    const [linkDescription, setLinkDescription] = useState("");
 
     const { files, setFiles } = useFiles();
 
@@ -58,6 +71,7 @@ export default function MediaGallery({
             ...images,
             ...Array.from(newFiles).map((file) => ({
                 media: { url: `attachment://${sanitizeFileName(file.name)}` },
+                description: linkDescription,
             })),
         ]);
 
@@ -65,8 +79,10 @@ export default function MediaGallery({
     };
 
     const handleLinkUpload = () => {
-        setImages([...images, { media: { url: linkUrl } }]);
+        setImages([...images, { media: { url: linkUrl }, description: linkDescription }]);
+
         setLinkUrl("");
+        setLinkDescription("");
     };
 
     const handleHandle = () => {
@@ -113,7 +129,7 @@ export default function MediaGallery({
                                 value={tab}
                                 onValueChange={(value) => setTab(value as "link" | "upload")}
                             >
-                                <TabsList className="mb-4 w-full h-10">
+                                <TabsList className="mb-4 w-full">
                                     <TabsTrigger value="link">
                                         <LinkIcon />
                                         Link
@@ -137,7 +153,11 @@ export default function MediaGallery({
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <Label>Description (Alt Text)</Label>
-                                        <Input placeholder="Add a description" />
+                                        <Input
+                                            placeholder="Add a description"
+                                            onChange={(e) => setLinkDescription(e.currentTarget.value)}
+                                            value={linkDescription}
+                                        />
                                     </div>
                                 </TabsContent>
                                 <TabsContent value="upload">
@@ -174,77 +194,139 @@ export default function MediaGallery({
                     className="flex flex-col gap-2"
                     style={{ gridTemplateColumns: `repeat(${Math.max(3, Math.min(images.length, 5))}, 1fr)` }}
                 >
-                    {images.map((image, index) => {
-                        let foundFile: File | undefined;
+                    <AnimatePresence>
+                        {images.map((image, index) => {
+                            let foundFile: File | undefined;
 
-                        if (image.media.url.startsWith("attachment://")) {
-                            foundFile = files.find(
-                                (f) => sanitizeFileName(f.name) === image.media.url.split("/").pop(),
-                            );
-                        }
+                            if (image.media.url.startsWith("attachment://")) {
+                                foundFile = files.find(
+                                    (f) => sanitizeFileName(f.name) === image.media.url.split("/").pop(),
+                                );
+                            }
 
-                        return (
-                            <div
-                                key={`${image.media.url}-${index}`}
-                                className={cn(
-                                    "bg-input/30 rounded-md border p-4 w-full flex gap-4",
-                                    image.media.url.startsWith("attachment://") && !foundFile && "border-destructive",
-                                )}
-                            >
-                                {/** biome-ignore lint/performance/noImgElement: dm me if u read this */}
-                                <img
-                                    src={
-                                        image.media.url.startsWith("attachment://")
-                                            ? foundFile
-                                                ? URL.createObjectURL(foundFile)
-                                                : "/question-mark-accent.png"
-                                            : image.media.url
-                                    }
-                                    className="size-[40px] object-cover aspect-square rounded-md text-xs bg-accent"
-                                    alt={image.description || "No description"}
-                                    width={256}
-                                    height={256}
-                                />
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-sm font-medium">{image.media.url.split("/").pop()}</span>
-                                    <span className="text-xs text-muted-foreground">
-                                        {image.description || "No description"}
-                                    </span>
-                                </div>
-                                <div className="ml-auto my-auto flex gap-2 items-center">
-                                    {image.media.url.startsWith("attachment://") && !foundFile && (
-                                        <Button
-                                            variant={"destructive"}
-                                            onClick={() => reuploadFileInputRef.current?.click()}
-                                        >
-                                            <FileWarningIcon />
-                                            Re-upload
-                                            <input
-                                                type="file"
-                                                ref={reuploadFileInputRef}
-                                                accept=".png,.jpg,.jpeg,.webp"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    const newFile = e.target.files?.[0];
-                                                    if (!newFile) return;
-
-                                                    if (image.media.url.split("/").pop() !== newFile.name) {
-                                                        console.log("The name of the new file doesn't match!");
-                                                        toast.error("The name of the new file doesn't match!");
-                                                    } else {
-                                                        setFiles([...files, newFile]);
-                                                    }
-                                                }}
+                            return (
+                                <motion.div
+                                    {...motionProps}
+                                    key={`${image.media.url}-${image.description}-${image.spoiler}`}
+                                >
+                                    <div
+                                        className={cn(
+                                            "bg-input/30 rounded-md border p-4 w-full flex gap-4",
+                                            image.media.url.startsWith("attachment://") &&
+                                                !foundFile &&
+                                                "border-destructive",
+                                        )}
+                                    >
+                                        <div className="size-[44px] overflow-hidden rounded-md bg-accent relative">
+                                            {/** biome-ignore lint/performance/noImgElement: dm me if u read this */}
+                                            <img
+                                                src={
+                                                    image.media.url.startsWith("attachment://")
+                                                        ? foundFile
+                                                            ? URL.createObjectURL(foundFile)
+                                                            : "/question-mark-accent.png"
+                                                        : image.media.url
+                                                }
+                                                className="object-cover size-full"
+                                                alt={image.description || "No description"}
+                                                width={256}
+                                                height={256}
                                             />
-                                        </Button>
-                                    )}
-                                    <Button variant={"ghost"} size={"icon"} className="size-7">
-                                        <XIcon />
-                                    </Button>
-                                </div>
-                            </div>
-                        );
-                    })}
+
+                                            {/* <button
+                                                type="button"
+                                                className={cn(
+                                                    "absolute inset-0 flex items-center justify-center group cursor-pointer",
+                                                    image.spoiler !== undefined && image.spoiler
+                                                        ? "hover:bg-black/65 hover:backdrop-blur-xs"
+                                                        : "bg-black/65 backdrop-blur-xs",
+                                                )}
+                                                onClick={() =>
+                                                    setImages(
+                                                        images
+                                                            .filter((_, i) => i !== index)
+                                                            .concat([
+                                                                {
+                                                                    ...image,
+                                                                    spoiler: !image.spoiler,
+                                                                },
+                                                            ]),
+                                                    )
+                                                }
+                                            >
+                                                {image.spoiler ? (
+                                                    image.spoiler ? (
+                                                        <EyeClosedIcon
+                                                            size={16}
+                                                            className="text-muted-foreground group-hover:text-foreground"
+                                                        />
+                                                    ) : (
+                                                        <EyeIcon
+                                                            size={16}
+                                                            className="text-muted-foreground group-hover:text-foreground"
+                                                        />
+                                                    )
+                                                ) : (
+                                                    <EyeClosedIcon size={16} className="text-muted-foreground opacity-0" />
+                                                )}
+                                            </button> */}
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-sm font-medium flex items-center gap-2">
+                                                {image.media.url.split("/").pop()}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                                {image.description || "No description"}
+                                            </span>
+                                        </div>
+                                        <div className="ml-auto my-auto flex gap-2 items-center">
+                                            {image.media.url.startsWith("attachment://") && !foundFile && (
+                                                <Button
+                                                    variant={"destructive"}
+                                                    onClick={() => reuploadFileInputRef.current?.click()}
+                                                >
+                                                    <FileWarningIcon />
+                                                    Re-upload
+                                                    <input
+                                                        type="file"
+                                                        ref={reuploadFileInputRef}
+                                                        accept=".png,.jpg,.jpeg,.webp"
+                                                        className="hidden"
+                                                        onChange={(e) => {
+                                                            const newFile = e.target.files?.[0];
+                                                            if (!newFile) return;
+
+                                                            if (image.media.url.split("/").pop() !== newFile.name) {
+                                                                console.log("The name of the new file doesn't match!");
+                                                                toast.error("The name of the new file doesn't match!");
+                                                            } else {
+                                                                setFiles([...files, newFile]);
+                                                            }
+                                                        }}
+                                                    />
+                                                </Button>
+                                            )}
+                                            <Button
+                                                variant={"ghost"}
+                                                size={"icon"}
+                                                className="size-7"
+                                                onClick={() => {
+                                                    setFiles(
+                                                        files.filter(
+                                                            (f) => f.name !== image.media.url.split("/").pop(),
+                                                        ),
+                                                    );
+                                                    setImages(images.filter((_, i) => i !== index));
+                                                }}
+                                            >
+                                                <XIcon />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </AnimatePresence>
                 </div>
             ) : (
                 <div className="text-muted-foreground text-sm flex items-center justify-center p-4">
@@ -253,47 +335,4 @@ export default function MediaGallery({
             )}
         </NewBuilder>
     );
-}
-
-function _useObjectUrls(images: APIMediaGalleryItem[], files: File[]) {
-    const cacheRef = useRef<Map<string, string>>(new Map());
-
-    useEffect(() => {
-        const neededKeys = new Set<string>();
-
-        // create URLs for files we need now
-        images.forEach((image) => {
-            if (!image.media.url.startsWith("attachment://")) return;
-            const file = files.find((f) => sanitizeFileName(f.name) === image.media.url.split("/").pop());
-            if (!file) return;
-            const key = sanitizeFileName(file.name);
-            neededKeys.add(key);
-            if (!cacheRef.current.has(key)) {
-                const obj = URL.createObjectURL(file);
-                cacheRef.current.set(key, obj);
-            }
-        });
-
-        // revoke any cached URLs that are no longer needed
-        for (const key of Array.from(cacheRef.current.keys())) {
-            if (!neededKeys.has(key)) {
-                URL.revokeObjectURL(cacheRef.current.get(key) ?? "");
-                cacheRef.current.delete(key);
-            }
-        }
-
-        // cleanup on unmount
-        return () => {
-            for (const url of cacheRef.current.values()) URL.revokeObjectURL(url);
-            cacheRef.current.clear();
-        };
-    }, [images, files]);
-
-    // return urls aligned with `images` order (or null)
-    return images.map((image) => {
-        if (!image.media.url.startsWith("attachment://")) return image.media.url;
-        const file = files.find((f) => sanitizeFileName(f.name) === image.media.url.split("/").pop());
-        if (!file) return null;
-        return cacheRef.current.get(sanitizeFileName(file.name)) ?? null;
-    });
 }

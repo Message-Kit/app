@@ -12,13 +12,19 @@ import {
 } from "discord-api-types/v10";
 import { BoxIcon, CheckIcon, PaintBucketIcon, PlusIcon, XIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { append, hexToNumber, moveItem, removeAt, updateAt } from "@/lib/utils";
 import { componentDescriptors } from "../../lib/options";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import ButtonGroup from "./button-group";
 import File from "./file";
@@ -94,11 +100,14 @@ export default function Container({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            {componentsList.map((component) => (
-                                <DropdownMenuItem key={component.type} onClick={component.onClick}>
-                                    <component.icon />
-                                    {component.name}
-                                </DropdownMenuItem>
+                            {componentsList.map((component, index) => (
+                                <Fragment key={`${component.type}-${index}`}>
+                                    {component.name === "Buttons" && <DropdownMenuSeparator />}
+                                    <DropdownMenuItem onClick={component.onClick}>
+                                        <component.icon />
+                                        {component.name}
+                                    </DropdownMenuItem>
+                                </Fragment>
                             ))}
                         </DropdownMenuContent>
                     </DropdownMenu>

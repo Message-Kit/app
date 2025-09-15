@@ -24,8 +24,25 @@ import EditorHeader from "./editor-header";
 import { Separator } from "./ui/separator";
 
 export default function Editor() {
-    const [components, setComponents] = useState<APIMessageTopLevelComponent[]>(defaultComponents);
+    const [components, setComponents] = useState<APIMessageTopLevelComponent[]>([]);
     const { setOutput } = useOutputStore();
+
+    useEffect(() => {
+        const saved = localStorage.getItem("output-json");
+
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+
+                if (Array.isArray(parsed)) {
+                    setComponents(parsed);
+                    return;
+                }
+            } catch {}
+        }
+
+        setComponents(defaultComponents);
+    }, []);
 
     useEffect(() => {
         setOutput(components);
@@ -263,7 +280,7 @@ const defaultComponents: APIMessageTopLevelComponent[] = [
         id: 500528667,
         type: 10,
         content:
-            "# Create modular, interactive messages 🧩\nMessage Kit lets you build **interactive** messages *fast*. You get a simple editor, live preview, and flexible send options so you can focus on what you’re saying, not how to format it.",
+            "# Create modular, interactive messages 🧩\nMessage Kit lets you build **interactive** messages *fast*. You get a simple editor, live preview, and flexible send options so you can focus on what you're saying, not how to format it.",
     },
     {
         id: 869213619,
@@ -295,7 +312,7 @@ const defaultComponents: APIMessageTopLevelComponent[] = [
             {
                 id: 781085487,
                 type: 10,
-                content: "-# Note: webhooks can’t send buttons that trigger actions.",
+                content: "-# Note: webhooks can't send buttons that trigger actions.",
             },
         ],
         accent_color: 5727743,
