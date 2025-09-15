@@ -1,9 +1,9 @@
 import { type APISeparatorComponent, SeparatorSpacingSize } from "discord-api-types/v10";
+import { SeparatorHorizontalIcon } from "lucide-react";
 import NewBuilder from "../new-builder";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
-import { SeparatorHorizontalIcon } from "lucide-react";
 
 export default function Separator({
     onMoveUp,
@@ -35,7 +35,7 @@ export default function Separator({
             extraButton={
                 <>
                     <div className="flex gap-2 items-center">
-                        <Label className="text-xs text-muted-foreground font-semibold" htmlFor="show-divider">
+                        <Label className="h-7 text-xs font-medium" htmlFor="show-divider">
                             Show Divider
                         </Label>
                         <Switch onCheckedChange={onChangeDivider} checked={divider} id="show-divider" />

@@ -83,6 +83,59 @@ function renderNodesWithMentions(node: ReactNode): ReactNode {
     return node;
 }
 
+import type { Literal, Node, Parent } from "unist";
+
+const _preserveLineBreaks = () => {
+    return (tree: Node) => {
+        const visit = (node: Node, index?: number, parent?: Parent): number | undefined => {
+            // Process text nodes
+            if (node.type === "text" && (node as Literal).value) {
+                const lines = ((node as Literal).value as string).split("\n");
+
+                if (lines.length > 1) {
+                    const newNodes: Node[] = [];
+
+                    lines.forEach((line, i) => {
+                        if (line) {
+                            newNodes.push({
+                                type: "text",
+                                value: line,
+                            } as Literal);
+                        }
+
+                        // Add break node between lines (not after the last one)
+                        if (i < lines.length - 1) {
+                            newNodes.push({
+                                type: "break",
+                            } as Node);
+                        }
+                    });
+
+                    // Replace the current node with new nodes
+                    if (parent && typeof index === "number" && Array.isArray(parent.children)) {
+                        parent.children.splice(index, 1, ...newNodes);
+                        return index + newNodes.length;
+                    }
+                }
+            }
+
+            // Recursively visit children
+            if ((node as Parent).children) {
+                let childIndex = 0;
+                while (childIndex < ((node as Parent).children as Node[]).length) {
+                    const result = visit(((node as Parent).children as Node[])[childIndex], childIndex, node as Parent);
+                    childIndex = typeof result === "number" ? result : childIndex + 1;
+                }
+            }
+
+            return typeof index === "number" ? index + 1 : undefined;
+        };
+
+        visit(tree);
+        return tree;
+    };
+};
+
 export default function PreviewTextDisplay({
     component,
     container,
@@ -95,7 +148,7 @@ export default function PreviewTextDisplay({
     return (
         <div className={cn(hoveredComponent === component.id && inspectedStyle)}>
             <div className="flex gap-[12px]">
-                <div className="text-[#dbdee1] leading-0" style={{ fontSize: container ? "14px" : "16px" }}>
+                <div className="text-[#dbdee1] leading-none" style={{ fontSize: container ? "14px" : "16px" }}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{

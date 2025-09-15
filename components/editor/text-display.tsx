@@ -162,7 +162,7 @@ export default function TextDisplay({
             extraButton={
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant={"ghost"} size={"sm"} className="h-7 text-xs font-normal">
+                        <Button variant={"ghost"} size={"sm"} className="h-7 text-xs font-medium">
                             <PlusIcon />
                             {accessory?.type ? "Edit" : "Set"} Accessory
                         </Button>

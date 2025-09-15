@@ -2,7 +2,11 @@ import {
     type APIButtonComponentWithCustomId,
     type APIButtonComponentWithURL,
     ButtonStyle,
+    CDNRoutes,
+    ImageFormat,
+    RouteBases,
 } from "discord-api-types/v10";
+import Twemoji from "react-twemoji";
 import { cn } from "@/lib/utils";
 import ExternalLinkIcon from "../misc/external-link-icon";
 
@@ -24,25 +28,50 @@ export default function PreviewButton({
                     ? "bg-[#3e3f45] hover:bg-[#46474e]"
                     : "";
 
-    const className = cn("flex px-[11px] h-[32px] rounded-[8px] duration-150 cursor-pointer", style);
+    const parentClassName = cn("flex items-center px-[11px] h-[32px] rounded-[8px] duration-150 cursor-pointer", style);
 
     function Label() {
         return (
-            <span className="min-w-[32px] my-auto text-center text-[14px] font-medium leading-[18px]">
+            <span
+                className={cn(
+                    "my-auto text-center text-[14px] font-medium leading-[18px]",
+                    !button.emoji && "min-w-[32px]",
+                )}
+            >
                 {button.label}
             </span>
         );
     }
 
+    function Emoji() {
+        return button.emoji?.id ? (
+            // biome-ignore lint/performance/noImgElement: i love goth mommy
+            <img
+                className="size-[19.250px] mr-[4px]"
+                src={
+                    RouteBases.cdn +
+                    CDNRoutes.emoji(button.emoji.id, button.emoji.animated ? ImageFormat.GIF : ImageFormat.WebP)
+                }
+                alt="emojii"
+                width={32}
+                height={32}
+            />
+        ) : (
+            <Twemoji options={{ className: "size-[19.250px] mr-[4px]" }}>{button.emoji?.name}</Twemoji>
+        );
+    }
+
     return button.style === ButtonStyle.Link ? (
-        <a href={button.url} className={className} target="_blank" rel="noreferrer">
+        <a href={button.url} className={parentClassName} target="_blank" rel="noreferrer">
+            <Emoji />
             <Label />
             <span className="ml-[8px] my-auto">
                 <ExternalLinkIcon />
             </span>
         </a>
     ) : (
-        <button type="button" className={className}>
+        <button type="button" className={parentClassName}>
+            <Emoji />
             <Label />
         </button>
     );

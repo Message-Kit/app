@@ -1,12 +1,11 @@
-import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, CircleIcon, LucideIcon, TrashIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { type PropsWithChildren, ReactNode, useEffect, useId, useState } from "react";
+import { type PropsWithChildren, type ReactNode, useEffect, useState } from "react";
 import { motionProps } from "@/lib/motion-props";
 import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
 import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
-import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 
 interface Props extends PropsWithChildren {
@@ -36,12 +35,11 @@ export default function NewBuilder({
     icon,
 }: Props) {
     const [collapsed, setCollapsed] = useState(false);
-    const [isHovering, setIsHovering] = useState(false);
     const { setHoveredComponent } = useHoveredComponentStore();
     const { shouldInspect } = useShouldInspectStore();
 
     useEffect(() => {
-        if (name === "Media" || name === "Separator") {
+        if (name === "Separator") {
             setCollapsed(true);
         }
     }, [name]);
@@ -70,12 +68,15 @@ export default function NewBuilder({
                         <Button
                             variant={"ghost"}
                             size={"icon"}
-                            className="size-7"
+                            className="size-7 group"
                             onClick={() => setCollapsed(!collapsed)}
-                            onMouseEnter={() => setIsHovering(true)}
-                            onMouseLeave={() => setIsHovering(false)}
                         >
-                            {isHovering ? collapsed ? <ChevronRightIcon /> : <ChevronDownIcon /> : icon}
+                            {collapsed ? (
+                                <ChevronRightIcon className="hidden group-hover:block" />
+                            ) : (
+                                <ChevronDownIcon className="hidden group-hover:block" />
+                            )}
+                            <span className="block group-hover:hidden">{icon}</span>
                         </Button>
                         <span className="font-semibold text-sm -ml-1">{name}</span>
                         {helperText && (

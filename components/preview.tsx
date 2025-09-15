@@ -1,4 +1,5 @@
 import { ComponentType } from "discord-api-types/v10";
+import { useEffect } from "react";
 import { useOutputStore } from "@/lib/stores/output";
 import PreviewButtonGroup from "./preview/button-group";
 import PreviewContainer from "./preview/container";
@@ -9,6 +10,12 @@ import PreviewTextDisplay from "./preview/text-display";
 
 export default function Preview() {
     const { output } = useOutputStore();
+
+    useEffect(() => {
+        setTimeout(() => {
+            localStorage.setItem("output-json", JSON.stringify(output));
+        }, 1000);
+    }, [output]);
 
     const now = new Date();
     const timeString = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
