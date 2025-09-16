@@ -13,7 +13,7 @@ import { AnimatePresence } from "motion/react";
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { generateRandomNumber } from "@/lib/random-number";
 import { useOutputStore } from "@/lib/stores/output";
-import { moveItem, removeAt, updateAt } from "@/lib/utils";
+import { defaultComponents, moveItem, removeAt, updateAt } from "@/lib/utils";
 import ButtonGroup from "./editor/button-group";
 import Container from "./editor/container";
 import File from "./editor/file";
@@ -273,68 +273,3 @@ function Components({
         </AnimatePresence>
     );
 }
-
-const defaultComponents: APIMessageTopLevelComponent[] = [
-    {
-        id: 500528667,
-        type: 10,
-        content:
-            "# Create modular, interactive messages 🧩\nMessage Kit lets you build **interactive** messages *fast*. You get a simple editor, live preview, and flexible send options so you can focus on what you're saying, not how to format it.",
-    },
-    {
-        id: 869213619,
-        type: 17,
-        components: [
-            {
-                id: 843217988,
-                type: 12,
-                items: [
-                    {
-                        media: {
-                            url: "https://messagekit.app/example-header.png",
-                        },
-                        description: "header image",
-                    },
-                ],
-            },
-            {
-                id: 280096184,
-                type: 10,
-                content:
-                    "# Getting started\n- Install Message Kit in your server.\n- Click **Add Component** at the top of this pane and choose one.\n- Customize the component as you like.\n- Send it! You can send your message via our bot or with webhooks.",
-            },
-            {
-                id: 674221493,
-                type: 14,
-                spacing: 1,
-                divider: true,
-            },
-            {
-                id: 781085487,
-                type: 10,
-                content: "-# Note: webhooks can't send buttons that trigger actions.",
-            },
-        ],
-        accent_color: 5727743,
-    },
-    {
-        id: 724873915,
-        type: 1,
-        components: [
-            {
-                id: 277957816,
-                type: 2,
-                label: "Support Server",
-                style: 5,
-                url: "https://discord.gg/5bBM2TVDD3",
-            },
-            {
-                id: 172033159,
-                type: 2,
-                label: "Donate",
-                style: 5,
-                url: "https://ko-fi.com/ronykax",
-            },
-        ],
-    },
-];

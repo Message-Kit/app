@@ -1,12 +1,20 @@
-import type { APIMessageTopLevelComponent } from "discord-api-types/v10";
-import { DownloadIcon, EraserIcon, PlusIcon, SaveIcon, SquareDashedMousePointerIcon, UploadIcon } from "lucide-react";
+import type { APIGuild, APIMessageTopLevelComponent } from "discord-api-types/v10";
+import {
+    DownloadIcon,
+    EraserIcon,
+    PlusIcon,
+    RefreshCcwIcon,
+    SaveIcon,
+    SquareDashedMousePointerIcon,
+    UploadIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { type Dispatch, Fragment, type SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { componentDescriptors } from "@/lib/options";
 import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 import { useUserStore } from "@/lib/stores/user-store";
-import { append } from "@/lib/utils";
+import { append, defaultComponents } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "./ui/button";
 import {
@@ -27,9 +35,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { Separator } from "./ui/separator";
-import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export default function EditorHeader({
@@ -40,20 +47,10 @@ export default function EditorHeader({
     components: APIMessageTopLevelComponent[];
 }) {
     const { shouldInspect, setShouldInspect } = useShouldInspectStore();
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const { user } = useUserStore();
 
-    const [loadedMessages, setLoadedMessages] = useState<
-        | {
-              name: string;
-              uid: string;
-              components: APIMessageTopLevelComponent[];
-              created_at: string;
-              updated_at: string;
-              id: string;
-          }[]
-        | null
-    >(null);
+    const [guilds, setGuilds] = useState<APIGuild[] | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const addComponent = <T extends APIMessageTopLevelComponent>(component: T) =>
         setComponents((previousComponents) => append(previousComponents, component));
@@ -69,24 +66,11 @@ export default function EditorHeader({
     useEffect(() => {
         if (!user) return;
 
-        const run = async () => {
-            const supabase = createClient();
-
-            const { data, error } = await supabase
-                .from("messages")
-                .select("*")
-                .eq("uid", user.id)
-                .order("updated_at", { ascending: false });
-
-            if (data) {
-                setLoadedMessages(data);
-            } else if (error) {
-                toast.error("There was an error loading your messages. Please try again.");
-                console.error(error);
-            }
-        };
-
-        run();
+        fetch("/api/discord/guilds")
+            .then((res) => res.json())
+            .then((data) => {
+                setGuilds(data.guilds);
+            });
     }, [user]);
 
     function handleExport() {
@@ -145,7 +129,7 @@ export default function EditorHeader({
                     height={32}
                 />
                 <Separator orientation="vertical" className="opacity-0 hidden md:block" />
-                {user ? (
+                {/* {user ? (
                     <Select
                         disabled={loadedMessages === null}
                         onValueChange={(name) => {
@@ -185,6 +169,31 @@ export default function EditorHeader({
                     </Select>
                 ) : user === null ? null : (
                     user === undefined && <Skeleton className="w-[200px] h-9" />
+                )} */}
+                {user && (
+                    <Select>
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="Select a guild" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel className="w-full flex justify-between">
+                                    <span>Guilds</span>
+                                    <button type="button" className="hover:text-foreground cursor-pointer">
+                                        <RefreshCcwIcon size={14} />
+                                    </button>
+                                </SelectLabel>
+                                {guilds &&
+                                    [...guilds].map((guild, index) => {
+                                        return (
+                                            <SelectItem key={`${guild.name}-${index}`} value={guild.id}>
+                                                {guild.name}
+                                            </SelectItem>
+                                        );
+                                    })}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
                 )}
             </div>
             <div className="flex gap-2">
@@ -236,7 +245,7 @@ export default function EditorHeader({
                                 <Button variant="outline">Cancel</Button>
                             </DialogClose>
                             <DialogClose asChild>
-                                <Button variant={"destructive"} onClick={() => setComponents([])}>
+                                <Button variant={"destructive"} onClick={() => setComponents(defaultComponents)}>
                                     Confirm
                                 </Button>
                             </DialogClose>
