@@ -21,7 +21,6 @@ import MediaGallery from "./editor/media-gallery";
 import YesSeparator from "./editor/separator";
 import TextDisplay from "./editor/text-display";
 import EditorHeader from "./editor-header";
-import { Separator } from "./ui/separator";
 
 export default function Editor() {
     const [components, setComponents] = useState<APIMessageTopLevelComponent[]>([]);

@@ -10,6 +10,16 @@ import { append } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "./ui/button";
 import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "./ui/dialog";
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -21,16 +31,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Separator } from "./ui/separator";
 import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTrigger,
-    DialogTitle
-} from "./ui/dialog";
 
 export default function EditorHeader({
     setComponents,
@@ -220,34 +220,29 @@ export default function EditorHeader({
                     </TooltipTrigger>
                     <TooltipContent>Inspect</TooltipContent>
                 </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Dialog>
-                            <DialogTrigger>
-                                <Button variant="ghost" size="icon">
-                                    <EraserIcon />
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <EraserIcon />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Are you sure?</DialogTitle>
+                            <DialogDescription>This will remove all components in this message.</DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <DialogClose asChild>
+                                <Button variant={"destructive"} onClick={() => setComponents([])}>
+                                    Confirm
                                 </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Are you sure?</DialogTitle>
-                                    <DialogDescription>This will remove all components in this message.</DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                    <DialogClose>
-                                        <Button variant="outline">Cancel</Button>
-                                    </DialogClose>
-                                    <DialogClose>
-                                        <Button variant={"destructive"} onClick={() => setComponents([])}>
-                                            Confirm
-                                        </Button>
-                                    </DialogClose>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </TooltipTrigger>
-                    <TooltipContent>Remove all components</TooltipContent>
-                </Tooltip>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
                 <Button variant="ghost" size="icon" onClick={handleSaveMessage}>
                     <SaveIcon />
                 </Button>

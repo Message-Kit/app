@@ -28,7 +28,10 @@ export default function PreviewButton({
                     ? "bg-[#3e3f45] hover:bg-[#46474e]"
                     : "";
 
-    const parentClassName = cn("flex items-center px-[11px] h-[32px] rounded-[8px] duration-150 cursor-pointer text-nowrap", style);
+    const parentClassName = cn(
+        "flex items-center px-[11px] h-[32px] rounded-[8px] duration-150 cursor-pointer text-nowrap",
+        style,
+    );
 
     function Label() {
         return (
