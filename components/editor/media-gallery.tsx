@@ -14,7 +14,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { motionProps } from "@/lib/motion-props";
 import { useFiles } from "@/lib/stores/files";
-import { cn, sanitizeFileName } from "@/lib/utils";
+import { cn, sanitizeFileName, updateAt } from "@/lib/utils";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
 import {
@@ -30,7 +30,6 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Switch } from "../ui/switch";
 
 export default function MediaGallery({
     onMoveUp,
@@ -66,12 +65,25 @@ export default function MediaGallery({
             return;
         }
 
-        setFiles([...files, ...Array.from(newFiles)]);
+        const existingNames = new Set(files.map((f) => f.name));
+        const uniqueNewFiles = Array.from(newFiles).filter((f) => !existingNames.has(f.name));
+
+        if (uniqueNewFiles.length === 0) {
+            toast.error("All selected files are duplicates.");
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+        }
+
+        if (uniqueNewFiles.length < newFiles.length) {
+            toast.warning("Some duplicate files were ignored.");
+        }
+
+        setFiles([...files, ...uniqueNewFiles]);
         setImages([
             ...images,
-            ...Array.from(newFiles).map((file) => ({
+            ...uniqueNewFiles.map((file) => ({
                 media: { url: `attachment://${sanitizeFileName(file.name)}` },
-                description: linkDescription,
+                description: linkDescription.length === 0 ? "No description" : linkDescription,
             })),
         ]);
 
@@ -79,7 +91,10 @@ export default function MediaGallery({
     };
 
     const handleLinkUpload = () => {
-        setImages([...images, { media: { url: linkUrl }, description: linkDescription }]);
+        setImages([
+            ...images,
+            { media: { url: linkUrl }, description: linkDescription.length === 0 ? "No description" : linkDescription },
+        ]);
 
         setLinkUrl("");
         setLinkDescription("");
@@ -205,10 +220,7 @@ export default function MediaGallery({
                             }
 
                             return (
-                                <motion.div
-                                    {...motionProps}
-                                    key={`${image.media.url}-${image.description}-${image.spoiler}`}
-                                >
+                                <motion.div {...motionProps} key={`${image.media.url}-${image.description}`}>
                                     <div
                                         className={cn(
                                             "bg-input/30 rounded-md border p-4 w-full flex gap-4",
@@ -232,54 +244,14 @@ export default function MediaGallery({
                                                 width={256}
                                                 height={256}
                                             />
-
-                                            {/* <button
-                                                type="button"
-                                                className={cn(
-                                                    "absolute inset-0 flex items-center justify-center group cursor-pointer",
-                                                    image.spoiler !== undefined && image.spoiler
-                                                        ? "hover:bg-black/65 hover:backdrop-blur-xs"
-                                                        : "bg-black/65 backdrop-blur-xs",
-                                                )}
-                                                onClick={() =>
-                                                    setImages(
-                                                        images
-                                                            .filter((_, i) => i !== index)
-                                                            .concat([
-                                                                {
-                                                                    ...image,
-                                                                    spoiler: !image.spoiler,
-                                                                },
-                                                            ]),
-                                                    )
-                                                }
-                                            >
-                                                {image.spoiler ? (
-                                                    image.spoiler ? (
-                                                        <EyeClosedIcon
-                                                            size={16}
-                                                            className="text-muted-foreground group-hover:text-foreground"
-                                                        />
-                                                    ) : (
-                                                        <EyeIcon
-                                                            size={16}
-                                                            className="text-muted-foreground group-hover:text-foreground"
-                                                        />
-                                                    )
-                                                ) : (
-                                                    <EyeClosedIcon size={16} className="text-muted-foreground opacity-0" />
-                                                )}
-                                            </button> */}
                                         </div>
                                         <div className="flex flex-col gap-1">
                                             <span className="text-sm font-medium flex items-center gap-2">
                                                 {image.media.url.split("/").pop()}
                                             </span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {image.description || "No description"}
-                                            </span>
+                                            <span className="text-xs text-muted-foreground">{image.description}</span>
                                         </div>
-                                        <div className="ml-auto my-auto flex gap-2 items-center">
+                                        <div className="ml-auto flex gap-2 items-center">
                                             {image.media.url.startsWith("attachment://") && !foundFile && (
                                                 <Button
                                                     variant={"destructive"}
@@ -297,7 +269,6 @@ export default function MediaGallery({
                                                             if (!newFile) return;
 
                                                             if (image.media.url.split("/").pop() !== newFile.name) {
-                                                                console.log("The name of the new file doesn't match!");
                                                                 toast.error("The name of the new file doesn't match!");
                                                             } else {
                                                                 setFiles([...files, newFile]);
@@ -306,21 +277,38 @@ export default function MediaGallery({
                                                     />
                                                 </Button>
                                             )}
-                                            <Button
-                                                variant={"ghost"}
-                                                size={"icon"}
-                                                className="size-7"
-                                                onClick={() => {
-                                                    setFiles(
-                                                        files.filter(
-                                                            (f) => f.name !== image.media.url.split("/").pop(),
-                                                        ),
-                                                    );
-                                                    setImages(images.filter((_, i) => i !== index));
-                                                }}
-                                            >
-                                                <XIcon />
-                                            </Button>
+                                            <div className="flex items-center gap-0.5">
+                                                <Button
+                                                    variant={"ghost"}
+                                                    size={"icon"}
+                                                    className="size-7"
+                                                    onClick={() => {
+                                                        setImages(
+                                                            updateAt(images, index, (img) => ({
+                                                                ...img,
+                                                                spoiler: !img.spoiler,
+                                                            })),
+                                                        );
+                                                    }}
+                                                >
+                                                    {image.spoiler ? <EyeClosedIcon /> : <EyeIcon />}
+                                                </Button>
+                                                <Button
+                                                    variant={"ghost"}
+                                                    size={"icon"}
+                                                    className="size-7"
+                                                    onClick={() => {
+                                                        setFiles(
+                                                            files.filter(
+                                                                (f) => f.name !== image.media.url.split("/").pop(),
+                                                            ),
+                                                        );
+                                                        setImages(images.filter((_, i) => i !== index));
+                                                    }}
+                                                >
+                                                    <XIcon />
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>

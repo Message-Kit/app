@@ -107,7 +107,7 @@ function PreviewWrapper() {
 
     return (
         <div className="h-full flex flex-col">
-            <div className="p-4 flex items-center justify-between border-b overflow-x-auto">
+            <div className="p-4 flex items-center justify-between border-b border-dashed overflow-x-auto">
                 <div className="flex items-center gap-2">
                     <Button variant="link" asChild>
                         <a href="https://discord.gg/5bBM2TVDD3" target="_blank" rel="noopener noreferrer">
@@ -315,7 +315,7 @@ function SendMessageButton() {
                                         {guilds.length === 0 && (
                                             <div className="flex items-center justify-center p-4 text-muted-foreground text-sm">
                                                 <span>
-                                                    Failed to fetch guilds, please login{" "}
+                                                    Failed to fetch guilds, please re-login{" "}
                                                     <a
                                                         href="/auth/login?prompt=none"
                                                         className="underline underline-offset-2"

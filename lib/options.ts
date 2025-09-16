@@ -31,6 +31,7 @@ export const componentDescriptors = [
             type: ComponentType.TextDisplay,
             content: "",
         }),
+        disabled: false,
     },
     {
         name: "Media",
@@ -41,12 +42,25 @@ export const componentDescriptors = [
             type: ComponentType.MediaGallery,
             items: [],
         }),
+        disabled: false,
     },
     {
         name: "File",
         type: ComponentType.File,
         icon: FileIcon,
         create: (): APIFileComponent => ({ id: generateRandomNumber(), type: ComponentType.File, file: { url: "" } }),
+        disabled: false,
+    },
+    {
+        name: "Container",
+        type: ComponentType.Container,
+        icon: BoxIcon,
+        create: (): APIContainerComponent => ({
+            id: generateRandomNumber(),
+            type: ComponentType.Container,
+            components: [],
+        }),
+        disabled: false,
     },
     {
         name: "Separator",
@@ -58,16 +72,7 @@ export const componentDescriptors = [
             spacing: SeparatorSpacingSize.Small,
             divider: true,
         }),
-    },
-    {
-        name: "Container",
-        type: ComponentType.Container,
-        icon: BoxIcon,
-        create: (): APIContainerComponent => ({
-            id: generateRandomNumber(),
-            type: ComponentType.Container,
-            components: [],
-        }),
+        disabled: false,
     },
     {
         name: "Buttons",
@@ -78,6 +83,7 @@ export const componentDescriptors = [
             type: ComponentType.ActionRow,
             components: [],
         }),
+        disabled: false,
     },
     {
         name: "Select",
@@ -88,5 +94,6 @@ export const componentDescriptors = [
             type: ComponentType.ActionRow,
             components: [],
         }),
+        disabled: true,
     },
 ] as const;

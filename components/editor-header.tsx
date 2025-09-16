@@ -1,5 +1,5 @@
 import type { APIMessageTopLevelComponent } from "discord-api-types/v10";
-import { DownloadIcon, PlusIcon, SaveIcon, SquareDashedMousePointerIcon, UploadIcon } from "lucide-react";
+import { DownloadIcon, EraserIcon, PlusIcon, SaveIcon, SquareDashedMousePointerIcon, UploadIcon } from "lucide-react";
 import Image from "next/image";
 import { type Dispatch, Fragment, type SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
@@ -20,6 +21,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Separator } from "./ui/separator";
 import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTrigger,
+    DialogTitle
+} from "./ui/dialog";
 
 export default function EditorHeader({
     setComponents,
@@ -52,6 +63,7 @@ export default function EditorHeader({
         type: descriptor.type,
         icon: descriptor.icon,
         onClick: () => addComponent(descriptor.create() as APIMessageTopLevelComponent),
+        disabled: descriptor.disabled,
     }));
 
     useEffect(() => {
@@ -123,7 +135,7 @@ export default function EditorHeader({
     }
 
     return (
-        <div className="flex justify-between gap-2 p-4 overflow-x-auto">
+        <div className="flex justify-between gap-2 p-4 overflow-x-auto border-b border-dashed">
             <div className="flex gap-2 items-center">
                 <Image
                     src="/logo.svg"
@@ -208,6 +220,34 @@ export default function EditorHeader({
                     </TooltipTrigger>
                     <TooltipContent>Inspect</TooltipContent>
                 </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Dialog>
+                            <DialogTrigger>
+                                <Button variant="ghost" size="icon">
+                                    <EraserIcon />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Are you sure?</DialogTitle>
+                                    <DialogDescription>This will remove all components in this message.</DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <DialogClose>
+                                        <Button variant="outline">Cancel</Button>
+                                    </DialogClose>
+                                    <DialogClose>
+                                        <Button variant={"destructive"} onClick={() => setComponents([])}>
+                                            Confirm
+                                        </Button>
+                                    </DialogClose>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </TooltipTrigger>
+                    <TooltipContent>Remove all components</TooltipContent>
+                </Tooltip>
                 <Button variant="ghost" size="icon" onClick={handleSaveMessage}>
                     <SaveIcon />
                 </Button>
@@ -215,14 +255,30 @@ export default function EditorHeader({
                     <DropdownMenuTrigger asChild>
                         <Button variant={"outline"}>
                             <PlusIcon />
-                            Add
+                            Add Component
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
+                        {/* <DropdownMenuLabel className="text-xs text-muted-foreground">Content</DropdownMenuLabel> */}
                         {componentsList.map((component, index) => (
                             <Fragment key={`${component.type}-${index}`}>
-                                {component.name === "Buttons" && <DropdownMenuSeparator />}
-                                <DropdownMenuItem onClick={component.onClick}>
+                                {component.name === "Container" && (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                            Layout
+                                        </DropdownMenuLabel>
+                                    </>
+                                )}
+                                {component.name === "Buttons" && (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                            Interactive
+                                        </DropdownMenuLabel>
+                                    </>
+                                )}
+                                <DropdownMenuItem onClick={component.onClick} disabled={component.disabled}>
                                     <component.icon />
                                     {component.name}
                                 </DropdownMenuItem>
