@@ -98,7 +98,7 @@ export default function Container({
                         <DropdownMenuTrigger asChild>
                             <Button variant={"ghost"} size={"sm"} className="h-7 text-xs font-medium">
                                 <PlusIcon />
-                                Add
+                                Add Component
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>

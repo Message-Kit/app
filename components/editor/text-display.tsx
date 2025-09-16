@@ -2,6 +2,7 @@ import {
     type APIButtonComponent,
     type APIButtonComponentWithCustomId,
     type APIButtonComponentWithURL,
+    APIEmoji,
     type APISectionAccessoryComponent,
     type APISectionComponent,
     type APITextDisplayComponent,
@@ -28,6 +29,8 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
+import EmojiPicker from "../emoji-picker";
+import { toComponentEmoji } from "@/lib/utils";
 
 export default function TextDisplay({
     content,
@@ -58,6 +61,7 @@ export default function TextDisplay({
 
     // button accesory
     const [buttonLabel, setButtonLabel] = useState("");
+    const [buttonEmoji, setButtonEmoji] = useState<string | APIEmoji | null>(null);
     const [buttonStyle, setButtonStyle] = useState<"primary" | "secondary" | "success" | "danger" | "link">("primary");
     const [buttonUrl, setButtonUrl] = useState("");
     const [buttonActionId, setButtonActionId] = useState("");
@@ -225,15 +229,28 @@ export default function TextDisplay({
                                         <Input
                                             id="btn-label"
                                             placeholder="Enter your label"
-                                            value={buttonLabelValue}
+                                            value={buttonLabel}
                                             onChange={(e) => setButtonLabel(e.target.value)}
+                                        />
+                                        <EmojiPicker
+                                            guildId="1015071949954748476"
+                                            onEmojiSelect={(emoji) => {
+                                                if (typeof emoji === "string") {
+                                                    setButtonEmoji(emoji);
+                                                } else if (emoji !== null) {
+                                                    setButtonEmoji({ id: emoji.id, name: emoji.name });
+                                                } else {
+                                                    setButtonEmoji(null);
+                                                }
+                                            }}
+                                            emoji={buttonEmoji}
                                         />
                                     </div>
                                 </div>
                                 <RadioGroup
-                                    value={buttonStyleValue}
+                                    // change this to value if there's error
+                                    defaultValue={buttonStyleValue}
                                     onValueChange={(v) => setButtonStyle(v as typeof buttonStyle)}
-                                    // defaultValue={buttonStyleToButtonType(accessory?.style)}
                                 >
                                     <div className="flex items-center gap-3">
                                         <RadioGroupItem value="primary" id="r1" />
@@ -321,6 +338,7 @@ export default function TextDisplay({
                                                     label: buttonLabel,
                                                     style: style,
                                                     url: buttonUrl,
+                                                    emoji: toComponentEmoji(buttonEmoji),
                                                 });
                                             } else {
                                                 setAccessory?.({
@@ -328,6 +346,7 @@ export default function TextDisplay({
                                                     label: buttonLabel,
                                                     style: style,
                                                     custom_id: buttonActionId,
+                                                    emoji: toComponentEmoji(buttonEmoji),
                                                 });
                                             }
                                         }
@@ -347,6 +366,7 @@ export default function TextDisplay({
                 placeholder="The quick brown fox jumps over the lazy dog"
                 value={content}
                 onChange={(e) => onContentChange(e.target.value)}
+                className="border-accent"
             />
             {/* <div className="rounded-md border mt-4 text-sm">
                 show gap

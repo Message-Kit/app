@@ -107,7 +107,7 @@ function PreviewWrapper() {
 
     return (
         <div className="h-full flex flex-col">
-            <div className="p-4 flex items-center justify-between border-b overflow-x-auto">
+            <div className="p-4 flex items-center justify-between border-b border-dashed overflow-x-auto">
                 <div className="flex items-center gap-2">
                     <Button variant="link" asChild>
                         <a href="https://discord.gg/5bBM2TVDD3" target="_blank" rel="noopener noreferrer">

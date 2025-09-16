@@ -52,7 +52,7 @@ export default function Editor() {
         <div className="h-full overflow-y-auto">
             <div className="flex flex-col">
                 <EditorHeader setComponents={setComponents} components={components} />
-                <Separator />
+                {/* <Separator /> */}
                 <div className="p-4 flex flex-col gap-4">
                     <Components components={components} setComponents={setComponents} />
                 </div>
@@ -294,6 +294,7 @@ const defaultComponents: APIMessageTopLevelComponent[] = [
                         media: {
                             url: "https://messagekit.app/example-header.png",
                         },
+                        description: "header image",
                     },
                 ],
             },
