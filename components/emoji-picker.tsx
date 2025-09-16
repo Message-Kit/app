@@ -24,6 +24,7 @@ export default function EmojiPicker({
 }) {
     const [emojis, setEmojis] = useState<APIEmoji[] | null>(null);
     const [search, setSearch] = useState("");
+    const [defaultEmoji, setDefaultEmoji] = useState("");
 
     useEffect(() => {
         fetch(`/api/discord/guilds/${guildId}/emojis`)
@@ -61,9 +62,9 @@ export default function EmojiPicker({
                     {emoji === null && <SmilePlusIcon />}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="flex flex-col gap-3">
-                <Tabs>
-                    <TabsList className="w-full mb-2">
+            <PopoverContent className="flex flex-col gap-2">
+                <Tabs defaultValue={typeof emoji === "string" ? "default" : "guild"}>
+                    <TabsList className="w-full">
                         <TabsTrigger value="guild">
                             <ShieldIcon />
                             Guild
@@ -73,31 +74,31 @@ export default function EmojiPicker({
                             Default
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="default" className="flex flex-col gap-4">
+                    <TabsContent value="default" className="flex flex-col gap-2">
                         <div className="flex flex-col gap-2">
                             <Input
                                 placeholder="Enter emoji (e.g. 😩)"
                                 className="w-full"
-                                onChange={(e) => onEmojiSelect(e.target.value)}
+                                onChange={(e) => setDefaultEmoji(e.currentTarget.value)}
+                                maxLength={3} // 3 because windows emoji picker is shit
                             />
-                            {/* <p className="text-xs text-muted-foreground">Default emojis are converted to Twemoji</p> */}
                         </div>
                         <div className="flex gap-2 w-full">
                             <PopoverClose asChild>
-                                <Button variant="destructive" className="flex-1">
+                                <Button variant="outline" className="flex-1" onClick={() => onEmojiSelect(null)}>
                                     <TrashIcon />
                                     Remove
                                 </Button>
                             </PopoverClose>
                             <PopoverClose asChild>
-                                <Button className="flex-1">
+                                <Button className="flex-1" onClick={() => onEmojiSelect(Array.from(defaultEmoji)[0])}>
                                     <CheckIcon />
                                     Confirm
                                 </Button>
                             </PopoverClose>
                         </div>
                     </TabsContent>
-                    <TabsContent value="guild" className="flex flex-col gap-3">
+                    <TabsContent value="guild" className="flex flex-col gap-2">
                         <Input
                             placeholder="Search for an emoji"
                             className="w-full"
@@ -116,39 +117,54 @@ export default function EmojiPicker({
                                     </span>
                                 ) : (
                                     emojis
-                                        .filter((emoji) => emoji.name?.toLowerCase().includes(search.toLowerCase()))
-                                        .map((emoji) => {
-                                            if (!emoji.id) return null;
-                                            if (!emoji.name) return null;
+                                        .filter((fetchedEmoji) =>
+                                            fetchedEmoji.name?.toLowerCase().includes(search.toLowerCase()),
+                                        )
+                                        .map((fetchedEmoji) => {
+                                            if (!fetchedEmoji.id) return null;
+                                            if (!fetchedEmoji.name) return null;
 
                                             const url =
                                                 RouteBases.cdn +
                                                 CDNRoutes.emoji(
-                                                    emoji.id,
-                                                    emoji.animated ? ImageFormat.GIF : ImageFormat.WebP,
+                                                    fetchedEmoji.id,
+                                                    fetchedEmoji.animated ? ImageFormat.GIF : ImageFormat.WebP,
                                                 );
 
                                             return (
-                                                <PopoverClose asChild key={emoji.id}>
+                                                <PopoverClose asChild key={fetchedEmoji.id}>
                                                     <Button
-                                                        variant="ghost"
+                                                        variant={
+                                                            typeof emoji !== "string" &&
+                                                            emoji !== null &&
+                                                            fetchedEmoji.id === emoji.id
+                                                                ? "secondary"
+                                                                : "ghost"
+                                                        }
                                                         size="icon"
                                                         onClick={() => {
-                                                            if (!emoji.id || !emoji.name) return;
+                                                            if (!fetchedEmoji.id || !fetchedEmoji.name) return;
+
+                                                            if (typeof emoji !== "string" && emoji !== null) {
+                                                                if (fetchedEmoji.id === emoji.id) {
+                                                                    onEmojiSelect(null);
+                                                                    return;
+                                                                }
+                                                            }
 
                                                             onEmojiSelect({
-                                                                animated: emoji.animated,
-                                                                id: emoji.id,
-                                                                name: emoji.name,
+                                                                animated: fetchedEmoji.animated,
+                                                                id: fetchedEmoji.id,
+                                                                name: fetchedEmoji.name,
                                                             });
                                                         }}
-                                                        title={emoji.name}
+                                                        title={fetchedEmoji.name}
                                                         className="overflow-hidden"
                                                     >
                                                         <Image
                                                             className="size-[18px]"
                                                             src={url}
-                                                            alt={emoji.name}
+                                                            alt={fetchedEmoji.name}
                                                             width={32}
                                                             height={32}
                                                         />
