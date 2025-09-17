@@ -49,15 +49,13 @@ export default function EditorPanel() {
     }, [components, setOutput]);
 
     return (
-        <div className="h-full overflow-y-auto">
-            <div className="flex flex-col">
-                <EditorHeader setComponents={setComponents} components={components} />
-                <div className="p-4 flex flex-col gap-4">
-                    <AnimatePresence>
-                        <ComponentsValidator />
-                        <Components key="components" components={components} setComponents={setComponents} />
-                    </AnimatePresence>
-                </div>
+        <div className="max-h-screen flex flex-col h-full">
+            <EditorHeader setComponents={setComponents} components={components} />
+            <div className="p-4 flex flex-col gap-4 flex-1 overflow-y-auto">
+                <AnimatePresence>
+                    <ComponentsValidator />
+                    <Components key="components" components={components} setComponents={setComponents} />
+                </AnimatePresence>
             </div>
         </div>
     );

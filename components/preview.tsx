@@ -34,7 +34,7 @@ export default function Preview() {
                     </div>
                     <span className="text-[#949ba4] text-[12px] font-medium">{timeString}</span>
                 </div>
-                <div className="flex flex-col gap-[8px] w-full">
+                <div className="flex flex-col gap-[8px] w-full max-w-[600px]">
                     {output.map((component) => {
                         if (component.type === ComponentType.TextDisplay) {
                             return <PreviewTextDisplay key={component.id} component={component} />;

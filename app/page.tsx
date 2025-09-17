@@ -14,14 +14,16 @@ export default function Page() {
     const editor = <EditorPanel />;
     const preview = <PreviewPanel />;
 
+    const left = 62.5;
+
     return (
         <div className="h-screen flex flex-col">
             {/* Desktop */}
             <div className="hidden md:flex flex-1">
                 <ResizablePanelGroup direction="horizontal">
-                    <ResizablePanel defaultSize={55}>{editor}</ResizablePanel>
-                    <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={45}>{preview}</ResizablePanel>
+                    <ResizablePanel defaultSize={left}>{editor}</ResizablePanel>
+                    <ResizableHandle disabled />
+                    <ResizablePanel defaultSize={100 - left}>{preview}</ResizablePanel>
                 </ResizablePanelGroup>
             </div>
 

@@ -12,32 +12,24 @@ import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Spinner } from "./ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { useGuildStore } from "@/lib/stores/guild";
 
 export default function EmojiPicker({
-    guildId,
     emoji,
-    onEmojiSelect,
+    setEmoji,
 }: {
-    guildId: string;
     emoji: APIEmoji | string | null;
-    onEmojiSelect: (emoji: APIEmoji | string | null) => void;
+    setEmoji: (emoji: APIEmoji | string | null) => void;
 }) {
+    const { guild } = useGuildStore();
     const [emojis, setEmojis] = useState<APIEmoji[] | null>(null);
     const [search, setSearch] = useState("");
     const [defaultEmoji, setDefaultEmoji] = useState("");
 
     useEffect(() => {
-        fetch(`/api/discord/guilds/${guildId}/emojis`)
-            .then((res) => res.json())
-            .then((data) => {
-                if (Array.isArray(data)) {
-                    setEmojis(data);
-                } else {
-                    setEmojis([]);
-                }
-            })
-            .catch(() => setEmojis([]));
-    }, [guildId]);
+        if (!guild) return;
+        setEmojis(guild.emojis);
+    }, [guild]);
 
     return (
         <Popover>
@@ -85,13 +77,13 @@ export default function EmojiPicker({
                         </div>
                         <div className="flex gap-2 w-full">
                             <PopoverClose asChild>
-                                <Button variant="outline" className="flex-1" onClick={() => onEmojiSelect(null)}>
+                                <Button variant="outline" className="flex-1" onClick={() => setEmoji(null)}>
                                     <TrashIcon />
                                     Remove
                                 </Button>
                             </PopoverClose>
                             <PopoverClose asChild>
-                                <Button className="flex-1" onClick={() => onEmojiSelect(Array.from(defaultEmoji)[0])}>
+                                <Button className="flex-1" onClick={() => setEmoji(Array.from(defaultEmoji)[0])}>
                                     <CheckIcon />
                                     Confirm
                                 </Button>
@@ -147,12 +139,12 @@ export default function EmojiPicker({
 
                                                             if (typeof emoji !== "string" && emoji !== null) {
                                                                 if (fetchedEmoji.id === emoji.id) {
-                                                                    onEmojiSelect(null);
+                                                                    setEmoji(null);
                                                                     return;
                                                                 }
                                                             }
 
-                                                            onEmojiSelect({
+                                                            setEmoji({
                                                                 animated: fetchedEmoji.animated,
                                                                 id: fetchedEmoji.id,
                                                                 name: fetchedEmoji.name,

@@ -51,7 +51,7 @@ export default function PreviewPanel() {
     }, [copied]);
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="max-h-screen flex flex-col h-full">
             <div className="p-4 flex items-center justify-between border-b border-dashed overflow-x-auto">
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" asChild>
@@ -89,7 +89,7 @@ export default function PreviewPanel() {
                     <SendMessageButton />
                 </div>
             </div>
-            <div className="p-4 whitespace-pre-wrap overflow-y-auto">
+            <div className="p-4 whitespace-pre-wrap flex-1 overflow-y-auto">
                 <div className="flex flex-col bg-card rounded-xl border overflow-hidden">
                     <div className="p-2 border-b flex items-center justify-between">
                         <div className="ml-1.5 flex items-center gap-1.5">

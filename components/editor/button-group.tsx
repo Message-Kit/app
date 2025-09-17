@@ -114,8 +114,7 @@ export default function ButtonGroup({
                                         onChange={(e) => setButtonLabel(e.target.value)}
                                     />
                                     <EmojiPicker
-                                        guildId="1015071949954748476"
-                                        onEmojiSelect={(emoji) => {
+                                        setEmoji={(emoji) => {
                                             if (typeof emoji === "string") {
                                                 setButtonEmoji(emoji);
                                             } else if (emoji !== null) {

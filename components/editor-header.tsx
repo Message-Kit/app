@@ -122,17 +122,16 @@ export default function EditorHeader({
                                 <SelectLabel className="w-full flex justify-between">
                                     <span>Guilds</span>
                                     <button type="button" className="hover:text-foreground cursor-pointer">
-                                        <RefreshCcwIcon size={14} />
+                                        <RefreshCcwIcon className="size-4" />
                                     </button>
                                 </SelectLabel>
-                                {guilds &&
-                                    [...guilds].map((guild) => {
-                                        return (
-                                            <SelectItem key={guild.id} value={guild.id}>
-                                                {guild.name}
-                                            </SelectItem>
-                                        );
-                                    })}
+                                {guilds?.map((guild) => {
+                                    return (
+                                        <SelectItem key={guild.id} value={guild.id}>
+                                            {guild.name}
+                                        </SelectItem>
+                                    );
+                                })}
                             </SelectGroup>
                         </SelectContent>
                     </Select>
