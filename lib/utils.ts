@@ -98,7 +98,7 @@ export const defaultComponents: APIMessageTopLevelComponent[] = [
         id: 500528667,
         type: 10,
         content:
-            "# Create modular, interactive messages 🧩\nMessage Kit lets you build **interactive** messages *fast*. You get a simple editor, live preview, and flexible send options so you can focus on what you're saying, not how to format it.",
+            "# Create modular, interactive messages\nBuild interactive messages with a simple editor, live preview, and flexible sending options so you can focus on what you're saying, not how to format it.",
     },
     {
         id: 869213619,
@@ -121,17 +121,6 @@ export const defaultComponents: APIMessageTopLevelComponent[] = [
                 type: 10,
                 content:
                     "# Getting started\n- Install Message Kit in your server.\n- Click **Add Component** at the top of this pane and choose one.\n- Customize the component as you like.\n- Send it! You can send your message via our bot or with webhooks.",
-            },
-            {
-                id: 674221493,
-                type: 14,
-                spacing: 1,
-                divider: true,
-            },
-            {
-                id: 781085487,
-                type: 10,
-                content: "-# Note: webhooks can't send buttons that trigger actions.",
             },
         ],
         accent_color: 5727743,

@@ -223,7 +223,7 @@ export default function MediaGallery({
                                 <motion.div {...motionProps} key={`${image.media.url}-${image.description}`}>
                                     <div
                                         className={cn(
-                                            "bg-input/30 rounded-md border p-4 w-full flex gap-4",
+                                            "bg-input/30 rounded-md border border-accent p-4 w-full flex gap-4",
                                             image.media.url.startsWith("attachment://") &&
                                                 !foundFile &&
                                                 "border-destructive",

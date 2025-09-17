@@ -78,7 +78,7 @@ export default function NewBuilder({
                             )}
                             <span className="block group-hover:hidden">{icon}</span>
                         </Button>
-                        <span className="font-semibold text-sm -ml-1">{name}</span>
+                        <span className="font-medium text-sm -ml-1">{name}</span>
                         {helperText && (
                             <span className="text-xs text-muted-foreground mt-1 font-medium hidden md:block">
                                 {helperText}
