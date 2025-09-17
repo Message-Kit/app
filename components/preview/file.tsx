@@ -1,7 +1,7 @@
 import type { APIFileComponent } from "discord-api-types/v10";
 import { useHoveredComponentStore } from "@/lib/stores/hovered-component";
 import { cn, inspectedStyle } from "@/lib/utils";
-import FileIcon from "../misc/file-icon";
+import FileIcon from "./icons/file";
 
 export default function PreviewFile({ component }: { component: APIFileComponent }) {
     const { hoveredComponent } = useHoveredComponentStore();

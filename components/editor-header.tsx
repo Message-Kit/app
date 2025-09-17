@@ -126,9 +126,9 @@ export default function EditorHeader({
                                     </button>
                                 </SelectLabel>
                                 {guilds &&
-                                    [...guilds].map((guild, index) => {
+                                    [...guilds].map((guild) => {
                                         return (
-                                            <SelectItem key={`${guild.name}-${index}`} value={guild.id}>
+                                            <SelectItem key={guild.id} value={guild.id}>
                                                 {guild.name}
                                             </SelectItem>
                                         );

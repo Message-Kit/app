@@ -8,7 +8,7 @@ import {
 } from "discord-api-types/v10";
 import Twemoji from "react-twemoji";
 import { cn } from "@/lib/utils";
-import ExternalLinkIcon from "../misc/external-link-icon";
+import ExternalLinkIcon from "./icons/external-link";
 
 export default function PreviewButton({
     button,
