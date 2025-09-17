@@ -1,7 +1,7 @@
 "use client";
 
 import { SiDiscord } from "@icons-pack/react-simple-icons";
-import { MessageFlags, type RESTGetAPICurrentUserGuildsResult } from "discord-api-types/v10";
+import { MessageFlags } from "discord-api-types/v10";
 import {
     BotIcon,
     CheckIcon,
@@ -10,6 +10,7 @@ import {
     ExternalLinkIcon,
     EyeIcon,
     LogOutIcon,
+    PlusIcon,
     SendIcon,
     SlidersVerticalIcon,
     WebhookIcon,
@@ -32,15 +33,14 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useFiles } from "@/lib/stores/files";
+import { useGuildStore } from "@/lib/stores/guild";
 import { useOutputStore } from "@/lib/stores/output";
 import { useUserStore } from "@/lib/stores/user-store";
 import { cn, type SendOptions } from "@/lib/utils";
-import { fetchDiscordGuilds } from "./actions";
 
 export default function Page() {
     const [selectedTab, setSelectedTab] = useState("editor");
@@ -109,10 +109,16 @@ function PreviewWrapper() {
         <div className="h-full flex flex-col">
             <div className="p-4 flex items-center justify-between border-b border-dashed overflow-x-auto">
                 <div className="flex items-center gap-2">
+                    <Button variant="ghost" asChild>
+                        <a href="https://discord.gg/5bBM2TVDD3" target="_blank" rel="noopener noreferrer">
+                            <PlusIcon />
+                            Add App
+                        </a>
+                    </Button>
                     <Button variant="link" asChild>
                         <a href="https://discord.gg/5bBM2TVDD3" target="_blank" rel="noopener noreferrer">
-                            <ExternalLinkIcon />
                             Get Support
+                            <ExternalLinkIcon />
                         </a>
                     </Button>
                 </div>
@@ -176,12 +182,9 @@ function SendMessageButton() {
     const { output } = useOutputStore();
     const { user } = useUserStore();
     const [webhookUrl, setWebhookUrl] = useState("");
-    const [channelSelectorDisabled, setChannelSelectorDisabled] = useState(true);
     const [selectedChannel, setSelectedChannel] = useState("");
-    const [selectedGuild, setSelectedGuild] = useState("");
     const [selectedTab, setSelectedTab] = useState<"webhook" | "bot" | "server">("webhook");
-    const [guilds, setGuilds] = useState<RESTGetAPICurrentUserGuildsResult>([]);
-    const [guildsLoading, setGuildsLoading] = useState(false);
+    const { guild } = useGuildStore();
 
     const webhookIsValid = useMemo(() => {
         if (webhookUrl.trim().length === 0) return false;
@@ -194,33 +197,9 @@ function SendMessageButton() {
     }, [webhookUrl]);
 
     const botIsValid = useMemo(() => {
-        if (selectedGuild.trim().length === 0) return false;
         if (selectedChannel.trim().length === 0) return false;
         return true;
-    }, [selectedChannel, selectedGuild]);
-
-    useEffect(() => {
-        if (selectedGuild.trim().length !== 0) {
-            setChannelSelectorDisabled(false);
-        }
-    }, [selectedGuild]);
-
-    useEffect(() => {
-        if (selectedTab === "bot") {
-            setGuildsLoading(true);
-            fetchDiscordGuilds()
-                .then((data) => {
-                    setGuilds(data.data ?? []);
-                    setGuildsLoading(false);
-                })
-                .catch(() => {
-                    setGuildsLoading(false);
-                })
-                .finally(() => {
-                    setGuildsLoading(false);
-                });
-        }
-    }, [selectedTab]);
+    }, [selectedChannel]);
 
     const { files } = useFiles();
 
@@ -276,7 +255,7 @@ function SendMessageButton() {
                             <WebhookIcon />
                             Webhook
                         </TabsTrigger>
-                        <TabsTrigger value="bot" disabled={user === null || user === undefined}>
+                        <TabsTrigger value="bot" disabled={user === null || user === undefined || guild === null}>
                             <BotIcon />
                             Bot
                         </TabsTrigger>
@@ -299,65 +278,18 @@ function SendMessageButton() {
                             </p>
                         </div>
                     </TabsContent>
-                    <TabsContent value="bot">
-                        <div className="flex flex-col gap-6">
-                            <div className="flex flex-col gap-2">
-                                <Label>
-                                    Guild<span className="text-destructive">*</span>
-                                </Label>
-                                <Select onValueChange={(value) => setSelectedGuild(value)} value={selectedGuild}>
-                                    <SelectTrigger className="w-full" disabled={guildsLoading}>
-                                        <SelectValue
-                                            placeholder={guildsLoading ? "Loading guilds..." : "Select a guild"}
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {guilds.length === 0 && (
-                                            <div className="flex items-center justify-center p-4 text-muted-foreground text-sm">
-                                                <span>
-                                                    Failed to fetch guilds, please re-login{" "}
-                                                    <a
-                                                        href="/auth/login?prompt=none"
-                                                        className="underline underline-offset-2"
-                                                    >
-                                                        here
-                                                    </a>
-                                                    .
-                                                </span>
-                                            </div>
-                                        )}
-                                        {guilds.map((guild) => (
-                                            <SelectItem key={guild.id} value={guild.id}>
-                                                {guild.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <p className="text-xs text-muted-foreground">
-                                    Invite the bot to your server by clicking{" "}
-                                    <a
-                                        href="https://discord.com/oauth2/authorize?client_id=1067725778512519248"
-                                        className="underline underline-offset-2"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        here
-                                    </a>
-                                    .
-                                </p>
+                    {guild && (
+                        <TabsContent value="bot">
+                            <div className="flex flex-col gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <Label>
+                                        Channel<span className="text-destructive">*</span>
+                                    </Label>
+                                    <ChannelSelector onChannelChange={setSelectedChannel} />
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-2">
-                                <Label>
-                                    Channel<span className="text-destructive">*</span>
-                                </Label>
-                                <ChannelSelector
-                                    setSelectedChannel={setSelectedChannel}
-                                    guildId={selectedGuild}
-                                    disabled={channelSelectorDisabled}
-                                />
-                            </div>
-                        </div>
-                    </TabsContent>
+                        </TabsContent>
+                    )}
                 </Tabs>
                 <DialogFooter>
                     <DialogClose asChild>

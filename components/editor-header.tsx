@@ -4,18 +4,16 @@ import {
     EraserIcon,
     PlusIcon,
     RefreshCcwIcon,
-    SaveIcon,
     SquareDashedMousePointerIcon,
     UploadIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { type Dispatch, Fragment, type SetStateAction, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { componentDescriptors } from "@/lib/options";
+import { useGuildStore } from "@/lib/stores/guild";
 import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 import { useUserStore } from "@/lib/stores/user-store";
 import { append, defaultComponents } from "@/lib/utils";
-import { createClient } from "@/utils/supabase/client";
 import { Button } from "./ui/button";
 import {
     Dialog,
@@ -37,6 +35,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { Separator } from "./ui/separator";
+import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export default function EditorHeader({
@@ -48,6 +47,7 @@ export default function EditorHeader({
 }) {
     const { shouldInspect, setShouldInspect } = useShouldInspectStore();
     const { user } = useUserStore();
+    const { setGuild } = useGuildStore();
 
     const [guilds, setGuilds] = useState<APIGuild[] | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,6 +73,12 @@ export default function EditorHeader({
             });
     }, [user]);
 
+    function getAndSetGuild(guildId: string) {
+        fetch(`/api/discord/guilds/${guildId}`)
+            .then((res) => res.json())
+            .then((data) => setGuild(data.guild));
+    }
+
     function handleExport() {
         const download = new Blob([JSON.stringify(components, null, 4)], { type: "application/json" });
         const url = URL.createObjectURL(download);
@@ -95,29 +101,6 @@ export default function EditorHeader({
         setComponents(data);
     }
 
-    async function handleSaveMessage() {
-        if (!user) {
-            toast.error("You must be logged in to save a message.");
-            return;
-        }
-
-        const supabase = createClient();
-
-        const { error } = await supabase.from("messages").insert({
-            uid: user.id,
-            components: components,
-            updated_at: new Date().toISOString(),
-            name: "Untitled",
-        });
-
-        if (error) {
-            toast.error("There was an error saving your message. Please try again.");
-            console.error(error);
-        } else {
-            toast.success("Message saved successfully!");
-        }
-    }
-
     return (
         <div className="flex justify-between gap-2 p-4 overflow-x-auto border-b border-dashed">
             <div className="flex gap-2 items-center">
@@ -129,51 +112,10 @@ export default function EditorHeader({
                     height={32}
                 />
                 <Separator orientation="vertical" className="opacity-0 hidden md:block" />
-                {/* {user ? (
-                    <Select
-                        disabled={loadedMessages === null}
-                        onValueChange={(name) => {
-                            const message = loadedMessages?.find(
-                                (m) => m.name.toLowerCase().replace(/\s+/g, "-") === name,
-                            );
-                            if (message) {
-                                setComponents(message.components);
-                            }
-                        }}
-                    >
-                        <SelectTrigger className="w-[200px]">
-                            <SelectValue
-                                placeholder={loadedMessages === null ? "Loading messages" : "Select a message"}
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {loadedMessages && loadedMessages.length > 0 ? (
-                                loadedMessages.map((message, index) => (
-                                    <SelectItem
-                                        key={`${message.name}-${index}`}
-                                        value={message.name.toLowerCase().replace(/\s+/g, "-")}
-                                        // onClick={() => {
-                                        //     setComponents(message.components);
-                                        //     console.log(message.components);
-                                        // }}
-                                    >
-                                        {message.name}
-                                    </SelectItem>
-                                ))
-                            ) : (
-                                <span className="text-muted-foreground p-4 text-sm text-center">
-                                    No messages found.
-                                </span>
-                            )}
-                        </SelectContent>
-                    </Select>
-                ) : user === null ? null : (
-                    user === undefined && <Skeleton className="w-[200px] h-9" />
-                )} */}
                 {user && (
-                    <Select>
+                    <Select disabled={guilds === null} onValueChange={(value) => getAndSetGuild(value)}>
                         <SelectTrigger className="w-[200px]">
-                            <SelectValue placeholder="Select a guild" />
+                            <SelectValue placeholder={guilds === null ? "Loading guilds..." : "Select a guild"} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
@@ -195,6 +137,7 @@ export default function EditorHeader({
                         </SelectContent>
                     </Select>
                 )}
+                {user === undefined && <Skeleton className="w-[200px] h-full" />}
             </div>
             <div className="flex gap-2">
                 <Tooltip>
@@ -252,9 +195,9 @@ export default function EditorHeader({
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-                <Button variant="ghost" size="icon" onClick={handleSaveMessage}>
+                {/* <Button variant="ghost" size="icon" onClick={handleSaveMessage}>
                     <SaveIcon />
-                </Button>
+                </Button> */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant={"outline"}>
