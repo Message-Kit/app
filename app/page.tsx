@@ -9,20 +9,19 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 export default function Page() {
-    const [selectedTab, setSelectedTab] = useState("editor");
+    const [selectedTab, setSelectedTab] = useState<"editor" | "preview">("editor");
+
+    const editor = <EditorPanel />;
+    const preview = <PreviewPanel />;
 
     return (
         <div className="h-screen flex flex-col">
             {/* Desktop */}
             <div className="hidden md:flex flex-1">
                 <ResizablePanelGroup direction="horizontal">
-                    <ResizablePanel defaultSize={55}>
-                        <EditorPanel />
-                    </ResizablePanel>
+                    <ResizablePanel defaultSize={55}>{editor}</ResizablePanel>
                     <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={45}>
-                        <PreviewPanel />
-                    </ResizablePanel>
+                    <ResizablePanel defaultSize={45}>{preview}</ResizablePanel>
                 </ResizablePanelGroup>
             </div>
 
@@ -46,12 +45,8 @@ export default function Page() {
                         </TabsList>
                     </div>
                 </Tabs>
-                <div className={cn("size-full overflow-auto hidden", selectedTab === "editor" && "block")}>
-                    <EditorPanel />
-                </div>
-                <div className={cn("size-full overflow-auto hidden", selectedTab === "preview" && "block")}>
-                    <PreviewPanel />
-                </div>
+                <div className={cn("size-full overflow-auto", selectedTab !== "editor" && "hidden")}>{editor}</div>
+                <div className={cn("size-full overflow-auto", selectedTab !== "preview" && "hidden")}>{preview}</div>
             </div>
         </div>
     );

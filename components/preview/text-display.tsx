@@ -148,7 +148,7 @@ export default function PreviewTextDisplay({
     return (
         <div className={cn(hoveredComponent === component.id && inspectedStyle)}>
             <div className="flex gap-[12px]">
-                <div className="text-[#dbdee1] leading-none" style={{ fontSize: container ? "14px" : "16px" }}>
+                <div className="text-[#dbdee1] leading-[0]" style={{ fontSize: container ? "14px" : "16px" }}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
@@ -221,6 +221,7 @@ export default function PreviewTextDisplay({
                                     </blockquote>
                                 </Twemoji>
                             ),
+                            a: ({ children, href }) => <a className="text-[#7bb0f5] underline" href={href}>{children}</a>,
                         }}
                     >
                         {component.type === ComponentType.TextDisplay
