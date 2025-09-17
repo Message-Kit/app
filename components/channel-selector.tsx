@@ -2,41 +2,29 @@ import type { APIGuildChannel, GuildChannelType } from "discord-api-types/v10";
 import { ChannelType } from "discord-api-types/v10";
 import { Folder, Hash, Image as ImageIcon, Megaphone, MessagesSquare, Mic2, Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useGuildStore } from "@/lib/stores/guild";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 
 interface Props {
-    setSelectedChannel: (channel: string) => void;
-    guildId: string;
-    disabled: boolean;
+    onChannelChange: (channel: string) => void;
 }
 
-export default function ChannelSelector({ setSelectedChannel, guildId, disabled }: Props) {
+export default function ChannelSelector({ onChannelChange }: Props) {
     const [channels, setChannels] = useState<APIGuildChannel<GuildChannelType>[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const { guild } = useGuildStore();
 
     useEffect(() => {
-        if (!guildId || disabled) return;
-        let isMounted = true;
+        if (!guild) return;
         setIsLoading(true);
-        fetch(`/api/discord/guilds/${guildId}/channels`)
-            .then(async (res) => {
-                if (!res.ok) throw new Error("Failed to fetch channels");
-                return (await res.json()) as APIGuildChannel<GuildChannelType>[];
-            })
-            .then((data) => {
-                if (isMounted) setChannels(data);
-            })
-            .catch(() => {
-                if (isMounted) setChannels([]);
-            })
-            .finally(() => {
-                if (isMounted) setIsLoading(false);
-            });
 
-        return () => {
-            isMounted = false;
-        };
-    }, [guildId, disabled]);
+        fetch(`/api/discord/guilds/${guild.id}/channels`)
+            .then((res) => res.json())
+            .then((data) => {
+                setChannels(data);
+                setIsLoading(false);
+            });
+    }, [guild]);
 
     const renderIcon = (type: ChannelType) => {
         switch (type) {
@@ -107,7 +95,7 @@ export default function ChannelSelector({ setSelectedChannel, guildId, disabled 
     })();
 
     return (
-        <Select onValueChange={setSelectedChannel} disabled={!guildId || isLoading || disabled}>
+        <Select onValueChange={onChannelChange} disabled={isLoading}>
             <SelectTrigger className="w-full">
                 <SelectValue placeholder={isLoading ? "Loading channels..." : "Select a channel"} />
             </SelectTrigger>

@@ -2,7 +2,7 @@ import {
     type APIButtonComponent,
     type APIButtonComponentWithCustomId,
     type APIButtonComponentWithURL,
-    APIEmoji,
+    type APIEmoji,
     type APISectionAccessoryComponent,
     type APISectionComponent,
     type APITextDisplayComponent,
@@ -12,6 +12,8 @@ import {
 } from "discord-api-types/v10";
 import { CheckIcon, ImageIcon, MousePointerClickIcon, PlusIcon, TextIcon, TrashIcon } from "lucide-react";
 import { useMemo, useState } from "react";
+import { toComponentEmoji } from "@/lib/utils";
+import EmojiPicker from "../emoji-picker";
 import NewBuilder from "../new-builder";
 import { Button } from "../ui/button";
 import {
@@ -29,8 +31,6 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
-import EmojiPicker from "../emoji-picker";
-import { toComponentEmoji } from "@/lib/utils";
 
 export default function TextDisplay({
     content,
@@ -148,7 +148,7 @@ export default function TextDisplay({
 
     const imageUrlValue = isThumbnailComponent(accessory) ? accessory.media.url : imageUrl;
     const imageAltValue = isThumbnailComponent(accessory) ? (accessory.description ?? "") : imageAlt;
-    const buttonLabelValue =
+    const _buttonLabelValue =
         isButtonWithURL(accessory) || isButtonWithCustomId(accessory) ? (accessory.label ?? "") : buttonLabel;
     const buttonStyleValue = isButtonComponent(accessory) ? buttonStyleToButtonType(accessory.style) : buttonStyle;
     const buttonUrlValue = isButtonWithURL(accessory) ? accessory.url : buttonUrl;

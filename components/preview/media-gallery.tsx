@@ -8,6 +8,7 @@ type PreviewMediaTileProps = {
     mediaUrl: string;
     description?: string | null;
     aspect: "square" | "video" | "auto";
+    spoiler: boolean | undefined;
     className?: string;
 };
 
@@ -16,9 +17,17 @@ const PreviewMediaTile = memo(function PreviewMediaTile({
     description,
     aspect,
     className,
+    spoiler = false,
 }: PreviewMediaTileProps) {
     const { files } = useFiles();
     const [url, setUrl] = useState<string | null>(null);
+    const [show, setShow] = useState(spoiler);
+
+    useEffect(() => {
+        if (show) {
+            setTimeout(() => setShow(spoiler), 5000);
+        }
+    }, [show, spoiler]);
 
     useEffect(() => {
         if (mediaUrl.startsWith("attachment://")) {
@@ -42,16 +51,31 @@ const PreviewMediaTile = memo(function PreviewMediaTile({
 
     return (
         <div
-            className={`rounded-[4px] overflow-hidden ${aspect === "video" ? "aspect-video" : aspect === "square" ? "aspect-square" : ""} ${className ?? ""}`}
+            className={`rounded-[4px] overflow-hidden relative ${aspect === "video" ? "aspect-video" : aspect === "square" ? "aspect-square" : ""} ${className ?? ""}`}
         >
             {/* biome-ignore lint/performance/noImgElement: image preview */}
             <img
                 src={url}
-                className={`${aspect === "auto" ? "w-full h-auto" : "size-full"} object-cover`}
+                className={cn(
+                    `${aspect === "auto" ? "w-full h-auto" : "size-full"} object-cover`,
+                    spoiler && show && "blur-[44px]",
+                )}
                 alt={description ?? "image"}
                 width={256}
                 height={256}
             />
+            <button
+                className={cn(
+                    "absolute size-full inset-0 bg-white/10 flex justify-center items-center group hover:bg-white/15 cursor-pointer duration-75",
+                    spoiler && show ? "opacity-100" : "opacity-0",
+                )}
+                onClick={() => setShow(!show)}
+                type="button"
+            >
+                <div className="px-[12px] py-[8px] leading-none rounded-full bg-[#00000099] text-[15px] font-semibold tracking-[0.5px] group-hover:bg-black">
+                    SPOILER
+                </div>
+            </button>
         </div>
     );
 });
@@ -76,7 +100,12 @@ export default function PreviewMediaGallery({
                 className={cn("rounded-[8px] overflow-hidden", hoveredComponent === component.id && inspectedStyle)}
                 style={{ maxWidth: container ? "100%" : "550px" }}
             >
-                <PreviewMediaTile mediaUrl={items[0].media.url} description={items[0].description} aspect="auto" />
+                <PreviewMediaTile
+                    mediaUrl={items[0].media.url}
+                    description={items[0].description}
+                    aspect="auto"
+                    spoiler={items[0].spoiler}
+                />
             </div>
         );
     }
@@ -96,6 +125,7 @@ export default function PreviewMediaGallery({
                         mediaUrl={item.media.url}
                         description={item.description}
                         aspect="square"
+                        spoiler={item.spoiler}
                     />
                 ))}
             </div>
@@ -116,6 +146,7 @@ export default function PreviewMediaGallery({
                         mediaUrl={items[0].media.url}
                         description={items[0].description}
                         aspect="square"
+                        spoiler={items[0].spoiler}
                     />
                 </div>
                 <PreviewMediaTile
@@ -123,12 +154,14 @@ export default function PreviewMediaGallery({
                     mediaUrl={items[1].media.url}
                     description={items[1].description}
                     aspect="square"
+                    spoiler={items[1].spoiler}
                 />
                 <PreviewMediaTile
                     key={`${items[2].media.url}-2`}
                     mediaUrl={items[2].media.url}
                     description={items[2].description}
                     aspect="square"
+                    spoiler={items[2].spoiler}
                 />
             </div>
         );
@@ -149,6 +182,7 @@ export default function PreviewMediaGallery({
                         mediaUrl={item.media.url}
                         description={item.description}
                         aspect="video"
+                        spoiler={item.spoiler}
                     />
                 ))}
             </div>
@@ -170,12 +204,14 @@ export default function PreviewMediaGallery({
                         mediaUrl={items[0].media.url}
                         description={items[0].description}
                         aspect="square"
+                        spoiler={items[0].spoiler}
                     />
                     <PreviewMediaTile
                         key={`${items[1].media.url}-1`}
                         mediaUrl={items[1].media.url}
                         description={items[1].description}
                         aspect="square"
+                        spoiler={items[0].spoiler}
                     />
                 </div>
                 <div className="grid grid-cols-3 gap-[4px]">
@@ -184,18 +220,21 @@ export default function PreviewMediaGallery({
                         mediaUrl={items[2].media.url}
                         description={items[2].description}
                         aspect="square"
+                        spoiler={items[2].spoiler}
                     />
                     <PreviewMediaTile
                         key={`${items[3].media.url}-3`}
                         mediaUrl={items[3].media.url}
                         description={items[3].description}
                         aspect="square"
+                        spoiler={items[3].spoiler}
                     />
                     <PreviewMediaTile
                         key={`${items[4].media.url}-4`}
                         mediaUrl={items[4].media.url}
                         description={items[4].description}
                         aspect="square"
+                        spoiler={items[4].spoiler}
                     />
                 </div>
             </div>
@@ -217,6 +256,7 @@ export default function PreviewMediaGallery({
                         mediaUrl={item.media.url}
                         description={item.description}
                         aspect="square"
+                        spoiler={item.spoiler}
                     />
                 ))}
             </div>
@@ -237,6 +277,7 @@ export default function PreviewMediaGallery({
                     mediaUrl={items[0].media.url}
                     description={items[0].description}
                     aspect="video"
+                    spoiler={items[0].spoiler}
                 />
                 <div className="grid grid-cols-3 gap-[4px]">
                     {items.slice(1).map((item, i) => (
@@ -245,6 +286,7 @@ export default function PreviewMediaGallery({
                             mediaUrl={item.media.url}
                             description={item.description}
                             aspect="square"
+                            spoiler={item.spoiler}
                         />
                     ))}
                 </div>
@@ -267,12 +309,14 @@ export default function PreviewMediaGallery({
                         mediaUrl={items[0].media.url}
                         description={items[0].description}
                         aspect="square"
+                        spoiler={items[0].spoiler}
                     />
                     <PreviewMediaTile
                         key={`${items[1].media.url}-1`}
                         mediaUrl={items[1].media.url}
                         description={items[1].description}
                         aspect="square"
+                        spoiler={items[1].spoiler}
                     />
                 </div>
                 <div className="grid grid-cols-3 gap-[4px]">
@@ -282,6 +326,7 @@ export default function PreviewMediaGallery({
                             mediaUrl={item.media.url}
                             description={item.description}
                             aspect="square"
+                            spoiler={item.spoiler}
                         />
                     ))}
                 </div>
@@ -304,6 +349,7 @@ export default function PreviewMediaGallery({
                         mediaUrl={item.media.url}
                         description={item.description}
                         aspect="square"
+                        spoiler={item.spoiler}
                     />
                 ))}
             </div>
@@ -324,6 +370,7 @@ export default function PreviewMediaGallery({
                     mediaUrl={items[0].media.url}
                     description={items[0].description}
                     aspect="video"
+                    spoiler={items[0].spoiler}
                 />
                 <div className="grid grid-cols-3 gap-[4px]">
                     {items.slice(1).map((item, i) => (
@@ -332,6 +379,7 @@ export default function PreviewMediaGallery({
                             mediaUrl={item.media.url}
                             description={item.description}
                             aspect="square"
+                            spoiler={item.spoiler}
                         />
                     ))}
                 </div>
@@ -351,6 +399,7 @@ export default function PreviewMediaGallery({
                     mediaUrl={item.media.url}
                     description={item.description}
                     aspect="square"
+                    spoiler={item.spoiler}
                 />
             ))}
         </div>

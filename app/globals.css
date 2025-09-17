@@ -46,7 +46,7 @@
     --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
     --tracking-normal: 0em;
-    --spacing: 0.25rem;
+    --spacing: 0.235rem;
     --shadow-color: oklch(0 0 0);
     --shadow-opacity: 0.1;
     --shadow-blur: 3px;
@@ -72,7 +72,7 @@
     --accent: oklch(0.371 0 0);
     --accent-foreground: oklch(0.985 0 0);
     /* --destructive: oklch(0.5659 0.1997 23.1144); */
-    --destructive: #d83a42;
+    --destructive: rgb(252, 74, 83);
     --destructive-foreground: oklch(0.985 0 0);
     --border: oklch(0.3211 0 0);
     --input: oklch(0.325 0 0);
