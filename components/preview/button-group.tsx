@@ -10,8 +10,10 @@ import PreviewButton from "./button";
 
 export default function PreviewButtonGroup({
     component,
+    container,
 }: {
     component: APIActionRowComponent<APIComponentInMessageActionRow>;
+    container?: boolean;
 }) {
     const { hoveredComponent } = useHoveredComponentStore();
 
@@ -20,7 +22,7 @@ export default function PreviewButtonGroup({
             {component.components
                 .filter((child) => child.type === ComponentType.Button && child.style !== ButtonStyle.Premium)
                 .map((child) => {
-                    return <PreviewButton button={child} key={`${child.type}-${child.id}`} />;
+                    return <PreviewButton container={container} button={child} key={`${child.type}-${child.id}`} />;
                 })}
         </div>
     );

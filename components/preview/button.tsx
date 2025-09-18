@@ -12,10 +12,12 @@ import ExternalLinkIcon from "./icons/external-link";
 
 export default function PreviewButton({
     button,
+    container,
 }: {
     button: APIButtonComponentWithCustomId | APIButtonComponentWithURL;
+    container?: boolean;
 }) {
-    const style =
+    const topLevelStyle =
         button.style === ButtonStyle.Primary
             ? "bg-primary hover:bg-[#4654c0]"
             : button.style === ButtonStyle.Secondary
@@ -28,9 +30,22 @@ export default function PreviewButton({
                     ? "bg-[#3e3f45] hover:bg-[#46474e]"
                     : "";
 
+    const containerStyle =
+        button.style === ButtonStyle.Primary
+            ? "bg-primary hover:bg-[#4654c0]"
+            : button.style === ButtonStyle.Secondary
+              ? "bg-[#44454c] hover:bg-[#4c4c54]"
+              : button.style === ButtonStyle.Success
+                ? "bg-[#00863a] hover:bg-[#047e37]"
+                : button.style === ButtonStyle.Danger
+                  ? "bg-[#d22d39] hover:bg-[#b42831]"
+                  : button.style === ButtonStyle.Link
+                    ? "bg-[#44454c] hover:bg-[#4c4c54]"
+                    : "";
+
     const parentClassName = cn(
         "flex items-center px-[11px] h-[32px] rounded-[8px] duration-150 cursor-pointer text-nowrap",
-        style,
+        container ? containerStyle : topLevelStyle,
     );
 
     function Label() {

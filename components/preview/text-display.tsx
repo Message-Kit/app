@@ -221,7 +221,11 @@ export default function PreviewTextDisplay({
                                     </blockquote>
                                 </Twemoji>
                             ),
-                            a: ({ children, href }) => <a className="text-[#7bb0f5] underline" href={href}>{children}</a>,
+                            a: ({ children, href }) => (
+                                <a className="text-[#7bb0f5] underline" href={href}>
+                                    {children}
+                                </a>
+                            ),
                         }}
                     >
                         {component.type === ComponentType.TextDisplay

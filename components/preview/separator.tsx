@@ -9,7 +9,7 @@ export default function PreviewSeparator({ component }: { component: APISeparato
         <div
             className={cn(
                 "h-[1px] bg-[#46474e]",
-                component.spacing === SeparatorSpacingSize.Large ? "my-[8px]" : "my-[2px]",
+                component.spacing === SeparatorSpacingSize.Large ? "my-[8px]" : "my-[0px]",
                 component.divider ? "bg-[#46474e]" : "bg-transparent",
                 hoveredComponent === component.id && inspectedStyle,
             )}

@@ -26,6 +26,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import ButtonGroup from "./button-group";
 import File from "./file";
@@ -135,7 +136,14 @@ export default function Container({
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="size-fit flex flex-col gap-4">
-                            <HexColorPicker color={colorToSet} onChange={setColorToSet} />
+                            <HexColorPicker color={colorToSet} onChange={setColorToSet} className="size-full" />
+                            <Input
+                                value={colorToSet}
+                                onChange={(e) => setColorToSet(e.currentTarget.value)}
+                                className="w-[200px]"
+                                maxLength={7}
+                                minLength={7}
+                            />
                             <div className="flex gap-2 w-full">
                                 <PopoverClose asChild>
                                     <Button

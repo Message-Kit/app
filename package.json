@@ -31,6 +31,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "discord-api-types": "^0.38.22",
+        "ioredis": "^5.7.0",
         "lucide-react": "^0.542.0",
         "motion": "^12.23.12",
         "nanoid": "^5.1.5",

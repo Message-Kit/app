@@ -5,6 +5,7 @@ import {
     CheckIcon,
     CircleIcon,
     CopyIcon,
+    EditIcon,
     ExternalLinkIcon,
     LogOutIcon,
     PlusIcon,
@@ -92,7 +93,7 @@ export default function PreviewPanel() {
             <div className="p-4 whitespace-pre-wrap flex-1 overflow-y-auto">
                 <div className="flex flex-col bg-card rounded-xl border overflow-hidden">
                     <div className="p-2 border-b flex items-center justify-between">
-                        <div className="ml-1.5 flex items-center gap-1.5">
+                        <div className="ml-1.5 flex items-center gap-2">
                             <CircleIcon className="size-4" fill="#fe5f58" strokeWidth={0} />
                             <CircleIcon className="size-4" fill="#ffbc2e" strokeWidth={0} />
                             <CircleIcon className="size-4" fill="#29c940" strokeWidth={0} />
@@ -181,7 +182,7 @@ function SendMessageButton() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button>
+                <Button disabled={output.length === 0}>
                     <SendIcon />
                     Send Message
                 </Button>
@@ -189,7 +190,13 @@ function SendMessageButton() {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Send Message</DialogTitle>
-                    <DialogDescription>Send this message to a channel</DialogDescription>
+                    <DialogDescription>
+                        {selectedTab === "webhook"
+                            ? "Send a message via webhook."
+                            : selectedTab === "bot"
+                              ? "Send a message via the Message Kit app."
+                              : "Edit an existing message."}
+                    </DialogDescription>
                 </DialogHeader>
                 <Tabs
                     onValueChange={(value) => setSelectedTab(value as "webhook" | "bot" | "server")}
@@ -203,6 +210,10 @@ function SendMessageButton() {
                         <TabsTrigger value="bot" disabled={user === null || user === undefined || guild === null}>
                             <BotIcon />
                             Bot
+                        </TabsTrigger>
+                        <TabsTrigger value="edit" disabled>
+                            <EditIcon />
+                            Edit
                         </TabsTrigger>
                     </TabsList>
                     <div className={cn("flex flex-col gap-2", selectedTab === "webhook" ? "flex" : "hidden")}>
@@ -227,7 +238,7 @@ function SendMessageButton() {
                         </Label>
                         <ChannelSelector onChannelChange={setSelectedChannel} />
                         <p className="text-xs text-muted-foreground">
-                            Make sure Message Kit can send messages in the chosen channel.
+                            Make sure Message Kit can send messages in the selected channel.
                         </p>
                     </div>
                 </Tabs>

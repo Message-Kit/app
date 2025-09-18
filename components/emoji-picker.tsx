@@ -7,12 +7,12 @@ import { CheckIcon, GlobeIcon, ShieldIcon, SmilePlusIcon, TrashIcon } from "luci
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Twemoji from "react-twemoji";
+import { useGuildStore } from "@/lib/stores/guild";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Spinner } from "./ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { useGuildStore } from "@/lib/stores/guild";
 
 export default function EmojiPicker({
     emoji,

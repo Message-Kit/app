@@ -47,9 +47,10 @@ export default function EditorHeader({
 }) {
     const { shouldInspect, setShouldInspect } = useShouldInspectStore();
     const { user } = useUserStore();
-    const { setGuild } = useGuildStore();
+    const { guild, setGuild } = useGuildStore();
 
     const [guilds, setGuilds] = useState<APIGuild[] | null>(null);
+
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const addComponent = <T extends APIMessageTopLevelComponent>(component: T) =>
@@ -113,7 +114,11 @@ export default function EditorHeader({
                 />
                 <Separator orientation="vertical" className="opacity-0 hidden md:block" />
                 {user && (
-                    <Select disabled={guilds === null} onValueChange={(value) => getAndSetGuild(value)}>
+                    <Select
+                        disabled={guilds === null}
+                        onValueChange={(value) => getAndSetGuild(value)}
+                        defaultValue={guild?.id}
+                    >
                         <SelectTrigger className="w-[200px]">
                             <SelectValue placeholder={guilds === null ? "Loading guilds..." : "Select a guild"} />
                         </SelectTrigger>
@@ -121,9 +126,15 @@ export default function EditorHeader({
                             <SelectGroup>
                                 <SelectLabel className="w-full flex justify-between">
                                     <span>Guilds</span>
-                                    <button type="button" className="hover:text-foreground cursor-pointer">
-                                        <RefreshCcwIcon className="size-4" />
-                                    </button>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button type="button" className="hover:text-foreground cursor-pointer">
+                                                <RefreshCcwIcon className="size-4" />
+                                                {/* <ExternalLinkIcon className="size-4" /> */}
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>Reload</TooltipContent>
+                                    </Tooltip>
                                 </SelectLabel>
                                 {guilds?.map((guild) => {
                                     return (

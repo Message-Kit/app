@@ -26,7 +26,7 @@ export default function PreviewContainer({ component: comp }: { component: APICo
                     } else if (component.type === ComponentType.Separator) {
                         return <PreviewSeparator key={component.id} component={component} />;
                     } else if (component.type === ComponentType.ActionRow) {
-                        return <PreviewButtonGroup key={component.id} component={component} />;
+                        return <PreviewButtonGroup container key={component.id} component={component} />;
                     } else if (component.type === ComponentType.File) {
                         return <PreviewFile key={component.id} component={component} />;
                     } else return null;
