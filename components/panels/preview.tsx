@@ -5,8 +5,10 @@ import {
     CheckIcon,
     CircleIcon,
     CopyIcon,
+    DotIcon,
     EditIcon,
     ExternalLinkIcon,
+    HeartIcon,
     LogOutIcon,
     PlusIcon,
     SendIcon,
@@ -53,7 +55,7 @@ export default function PreviewPanel() {
     }, [copied]);
 
     return (
-        <div className="max-h-screen flex flex-col h-full">
+        <div className="max-h-[100svh] flex flex-col h-full">
             <div className="p-4 flex items-center justify-between border-b border-dashed overflow-x-auto">
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" asChild>
@@ -62,10 +64,10 @@ export default function PreviewPanel() {
                             Add App
                         </a>
                     </Button>
-                    <Button variant="link" asChild>
+                    <Button variant="ghost" asChild>
                         <a href="https://discord.gg/5bBM2TVDD3" target="_blank" rel="noopener noreferrer">
+                            <SiDiscord />
                             Get Support
-                            <ExternalLinkIcon />
                         </a>
                     </Button>
                 </div>
@@ -119,6 +121,32 @@ export default function PreviewPanel() {
                         </div>
                     </div>
                     <Preview />
+                </div>
+                <div className="flex flex-col gap-2 md:flex-row md:justify-between mt-3">
+                    <div className="flex flex-col gap-1.5 items-center md:items-start text-xs text-muted-foreground">
+                        <div className="flex items-center">
+                            <a href="/" className="underline underline-offset-2 hover:text-foreground duration-100">
+                                Terms of Service
+                            </a>
+                            <DotIcon className="size-4" />
+                            <a href="/" className="underline underline-offset-2 hover:text-foreground duration-100">
+                                Privacy Policy
+                            </a>
+                        </div>
+                        <span>© 2025 All Rights Reserved</span>
+                    </div>
+                    <div className="flex flex-col gap-1.5 items-center md:items-end text-xs text-muted-foreground">
+                        <span>
+                            Made with{" "}
+                            <HeartIcon className="inline size-3.5 align-text-top" fill="#d93126" strokeWidth={0} /> by{" "}
+                            <a
+                                href="https://ronykax.xyz"
+                                className="underline underline-offset-2 hover:text-foreground duration-100"
+                            >
+                                Rony Kati
+                            </a>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

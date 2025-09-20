@@ -73,7 +73,7 @@ export default function Page() {
     }, [templateId]);
 
     return (
-        <div className="h-[100dvh] flex flex-col">
+        <div className="h-[100svh] flex flex-col">
             {/* Desktop */}
             <div className="hidden md:flex flex-1">
                 <ResizablePanelGroup direction="horizontal">

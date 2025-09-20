@@ -32,7 +32,7 @@ export default function EditorPanel({
     templateId: string;
 }) {
     return (
-        <div className="max-h-screen flex flex-col h-full">
+        <div className="max-h-[100svh] flex flex-col h-full">
             <EditorHeader setComponents={setComponents} components={components} templateId={templateId} />
             <div className="p-4 flex flex-col gap-4 flex-1 overflow-y-auto">
                 <AnimatePresence>

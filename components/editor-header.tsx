@@ -158,14 +158,16 @@ export default function EditorHeader({
         <>
             <div className="flex justify-between gap-2 p-4 overflow-x-auto border-b border-dashed">
                 <div className="flex gap-2 items-center">
-                    <Image
-                        src="/logo.svg"
-                        className="min-w-[30px] max-w-[30px] hidden md:block"
-                        alt="Logo"
-                        width={32}
-                        height={32}
-                    />
-                    <Separator orientation="vertical" className="opacity-0 hidden md:block" />
+                    {/* <a href="/">
+                        <Image
+                            src="/logo.svg"
+                            className="min-w-[30px] max-w-[30px] hidden md:block"
+                            alt="Logo"
+                            width={32}
+                            height={32}
+                        />
+                    </a>
+                    <Separator orientation="vertical" className="opacity-0 hidden md:block" /> */}
                     {user && (
                         <Select
                             disabled={guilds === null}
