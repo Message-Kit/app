@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useFiles } from "@/lib/stores/files";
 import { useGuildStore } from "@/lib/stores/guild";
 import { useOutputStore } from "@/lib/stores/output";
@@ -176,7 +177,17 @@ function SendMessageButton() {
         await fetch("/api/discord/send", {
             method: "POST",
             body: formData,
-        });
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                console.log("Error sending message:", JSON.stringify(data));
+
+                if (data.success) {
+                    toast.success("Sent!");
+                } else {
+                    toast.error("Something went wrong!", { description: data.error.message ?? null });
+                }
+            });
     }
 
     return (

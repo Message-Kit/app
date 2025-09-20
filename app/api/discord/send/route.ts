@@ -1,4 +1,4 @@
-import { type RawFile, REST } from "@discordjs/rest";
+import { type DiscordAPIError, type RawFile, REST } from "@discordjs/rest";
 import { type RESTPostAPIChannelMessageJSONBody, Routes } from "discord-api-types/v10";
 import { type NextRequest, NextResponse } from "next/server";
 import { parseDiscordWebhook, type SendOptions, sanitizeFileName } from "@/lib/utils";
@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
     if (options.via === "webhook") {
         const webhook = parseDiscordWebhook(options.webhook_url);
         if (!webhook) return NextResponse.json({ success: false });
+        // return NextResponse.json({ success: false, error: { code: 500027, message: "Invalid Webhook Token" } });
 
         try {
             await rest.post(Routes.webhook(webhook.id, webhook.token), {
@@ -43,8 +44,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({ success: true });
         } catch (error) {
-            console.log("error:", error);
-            return NextResponse.json({ success: false });
+            return NextResponse.json({ success: false, error: (error as DiscordAPIError).rawError });
         }
     } else if (options.via === "bot") {
         try {
@@ -55,8 +55,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({ success: true });
         } catch (error) {
-            console.log("error:", error);
-            return NextResponse.json({ success: false });
+            return NextResponse.json({ success: false, error: (error as DiscordAPIError).rawError });
         }
     }
 

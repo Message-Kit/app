@@ -66,22 +66,34 @@ export default function MediaGallery({
         }
 
         const existingNames = new Set(files.map((f) => f.name));
-        const uniqueNewFiles = Array.from(newFiles).filter((f) => !existingNames.has(f.name));
+        const renamedFiles: File[] = [];
 
-        if (uniqueNewFiles.length === 0) {
-            toast.error("All selected files are duplicates.");
-            if (fileInputRef.current) fileInputRef.current.value = "";
-            return;
-        }
+        Array.from(newFiles).forEach((file) => {
+            let baseName = file.name;
+            let ext = "";
+            const dotIndex = file.name.lastIndexOf(".");
+            if (dotIndex !== -1) {
+                baseName = file.name.substring(0, dotIndex);
+                ext = file.name.substring(dotIndex);
+            }
 
-        if (uniqueNewFiles.length < newFiles.length) {
-            toast.warning("Some duplicate files were ignored.");
-        }
+            let newName = file.name;
+            let counter = 1;
+            while (existingNames.has(newName)) {
+                newName = `${baseName}-${counter}${ext}`;
+                counter++;
+            }
 
-        setFiles([...files, ...uniqueNewFiles]);
+            // Create a new File object with the unique name
+            const renamed = new File([file], newName, { type: file.type });
+            renamedFiles.push(renamed);
+            existingNames.add(newName);
+        });
+
+        setFiles([...files, ...renamedFiles]);
         setImages([
             ...images,
-            ...uniqueNewFiles.map((file) => ({
+            ...renamedFiles.map((file) => ({
                 media: { url: `attachment://${sanitizeFileName(file.name)}` },
                 description: linkDescription.length === 0 ? "No description" : linkDescription,
             })),
