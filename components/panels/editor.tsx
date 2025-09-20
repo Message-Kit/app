@@ -10,10 +10,9 @@ import {
     SeparatorSpacingSize,
 } from "discord-api-types/v10";
 import { AnimatePresence } from "motion/react";
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { generateRandomNumber } from "@/lib/random-number";
-import { useOutputStore } from "@/lib/stores/output";
-import { defaultComponents, moveItem, removeAt, updateAt } from "@/lib/utils";
+import { moveItem, removeAt, updateAt } from "@/lib/utils";
 import ComponentsValidator from "../components-validator";
 import ButtonGroup from "../editor/button-group";
 import Container from "../editor/container";
@@ -23,37 +22,21 @@ import YesSeparator from "../editor/separator";
 import TextDisplay from "../editor/text-display";
 import EditorHeader from "../editor-header";
 
-export default function EditorPanel() {
-    const [components, setComponents] = useState<APIMessageTopLevelComponent[]>([]);
-    const { setOutput } = useOutputStore();
-
-    useEffect(() => {
-        const saved = localStorage.getItem("output-json");
-
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-
-                if (Array.isArray(parsed)) {
-                    setComponents(parsed);
-                    return;
-                }
-            } catch {}
-        }
-
-        setComponents(defaultComponents);
-    }, []);
-
-    useEffect(() => {
-        setOutput(components);
-    }, [components, setOutput]);
-
+export default function EditorPanel({
+    components,
+    setComponents,
+    templateId,
+}: {
+    components: APIMessageTopLevelComponent[];
+    setComponents: Dispatch<SetStateAction<APIMessageTopLevelComponent[]>>;
+    templateId: string;
+}) {
     return (
         <div className="max-h-screen flex flex-col h-full">
-            <EditorHeader setComponents={setComponents} components={components} />
+            <EditorHeader setComponents={setComponents} components={components} templateId={templateId} />
             <div className="p-4 flex flex-col gap-4 flex-1 overflow-y-auto">
                 <AnimatePresence>
-                    <ComponentsValidator />
+                    <ComponentsValidator key="alert" />
                     <Components key="components" components={components} setComponents={setComponents} />
                 </AnimatePresence>
             </div>

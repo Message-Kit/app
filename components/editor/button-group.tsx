@@ -248,18 +248,22 @@ export default function ButtonGroup({
                                                 <span className="text-muted-foreground font-medium">
                                                     {ButtonStyle[component.style]}
                                                 </span>
-                                                <DotIcon size={16} className="text-muted-foreground" />
-                                                {component.style === ButtonStyle.Link ? (
-                                                    <a
-                                                        href={component.url}
-                                                        className="text-muted-foreground underline underline-offset-2 flex gap-1.5 items-center hover:text-primary-foreground duration-100"
-                                                    >
-                                                        {component.url.replace(/^https?:\/\//, "")}
-                                                        <ExternalLinkIcon className="size-4" />
-                                                    </a>
-                                                ) : (
-                                                    <span className="text-muted-foreground">{component.custom_id}</span>
-                                                )}
+                                                <div className="hidden md:flex items-center gap-0.5">
+                                                    <DotIcon size={16} className="text-muted-foreground" />
+                                                    {component.style === ButtonStyle.Link ? (
+                                                        <a
+                                                            href={component.url}
+                                                            className="text-muted-foreground underline underline-offset-2 flex gap-1.5 items-center hover:text-primary-foreground duration-100"
+                                                        >
+                                                            {component.url.replace(/^https?:\/\//, "")}
+                                                            <ExternalLinkIcon className="size-4" />
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">
+                                                            {component.custom_id}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-0.5">

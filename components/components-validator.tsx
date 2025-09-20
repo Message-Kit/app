@@ -64,7 +64,7 @@ export default function ComponentsValidator() {
     }
 
     return (
-        <Alert key="alert" variant="destructive" className="rounded-xl">
+        <Alert variant="destructive" className="rounded-xl">
             <TriangleAlertIcon />
             <AlertTitle>Fix errors before sending</AlertTitle>
             <AlertDescription>

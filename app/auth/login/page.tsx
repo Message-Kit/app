@@ -9,13 +9,10 @@ function LoginClient() {
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        // const redirectAfter = searchParams.get("redirect") || "/";
-
         supabase.auth.signInWithOAuth({
             provider: "discord",
             options: {
                 redirectTo: `${location.origin}/auth/callback`,
-                // redirectTo: `${location.origin}/auth/callback?redirect=${encodeURIComponent(redirectAfter)}`,
                 scopes: "identify email guilds",
                 queryParams: {
                     prompt: searchParams.get("prompt") || "consent",
