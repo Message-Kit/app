@@ -11,6 +11,7 @@
         "format": "biome format --write"
     },
     "dependencies": {
+        "@buape/carbon": "^0.11.0",
         "@discordjs/builders": "^1.11.3",
         "@discordjs/rest": "^2.6.0",
         "@icons-pack/react-simple-icons": "^13.7.0",

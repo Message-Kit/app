@@ -1,25 +1,26 @@
-import type { APIGuild, APIMessageTopLevelComponent } from "discord-api-types/v10";
+import type { APIMessageTopLevelComponent } from "discord-api-types/v10";
 import {
     DownloadIcon,
     EraserIcon,
-    PickaxeIcon,
     PlusIcon,
-    RefreshCcwIcon,
+    // RefreshCcwIcon,
     SaveIcon,
+    SettingsIcon,
     SquareDashedMousePointerIcon,
     UploadIcon,
 } from "lucide-react";
 import { nanoid } from "nanoid";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { type Dispatch, Fragment, type SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { componentDescriptors } from "@/lib/options";
-import { useGuildStore } from "@/lib/stores/guild";
+// import { useGuildStore } from "@/lib/stores/guild";
 import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 import { useUserStore } from "@/lib/stores/user-store";
 import { append, defaultComponents } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
+import ActionsButton from "./actions-button";
 import { Button } from "./ui/button";
 import {
     Dialog,
@@ -46,6 +47,8 @@ import { Separator } from "./ui/separator";
 import { Skeleton } from "./ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
+const supabase = createClient();
+
 export default function EditorHeader({
     setComponents,
     components,
@@ -55,14 +58,18 @@ export default function EditorHeader({
     components: APIMessageTopLevelComponent[];
     templateId: string;
 }) {
+    const router = useRouter();
+
+    // stores
     const { shouldInspect, setShouldInspect } = useShouldInspectStore();
     const { user } = useUserStore();
-    const { guild, setGuild } = useGuildStore();
 
-    const [guilds, setGuilds] = useState<APIGuild[] | null>(null);
+    // templates
+    const [templates, setTemplates] = useState<Record<string, unknown>[] | null>(null);
     const [showNewTemplateDialog, setShowNewTemplateDialog] = useState(false);
     const [newTemplateName, setNewTemplateName] = useState("");
 
+    // misc
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const addComponent = <T extends APIMessageTopLevelComponent>(component: T) =>
@@ -79,18 +86,18 @@ export default function EditorHeader({
     useEffect(() => {
         if (!user) return;
 
-        fetch("/api/discord/guilds")
-            .then((res) => res.json())
-            .then((data) => {
-                setGuilds(data.guilds);
+        supabase
+            .from("templates")
+            .select("template_id, name")
+            .limit(10)
+            .then(({ data, error }) => {
+                if (error) {
+                    toast.error("Failed to fetch messages!");
+                } else {
+                    setTemplates(data);
+                }
             });
     }, [user]);
-
-    function getAndSetGuild(guildId: string) {
-        fetch(`/api/discord/guilds/${guildId}`)
-            .then((res) => res.json())
-            .then((data) => setGuild(data.guild));
-    }
 
     function handleExport() {
         const download = new Blob([JSON.stringify(components, null, 4)], { type: "application/json" });
@@ -116,8 +123,6 @@ export default function EditorHeader({
 
     async function handleSaveTemplate() {
         if (!user) return;
-
-        const supabase = createClient();
         const randomTemplateId = nanoid(10);
 
         const { error } = await supabase.from("templates").insert({
@@ -138,7 +143,6 @@ export default function EditorHeader({
 
     async function handleUpdateMessage() {
         if (!user) return;
-        const supabase = createClient();
 
         const { error } = await supabase.from("templates").upsert({
             template_id: templateId,
@@ -158,7 +162,7 @@ export default function EditorHeader({
         <>
             <div className="flex justify-between gap-2 p-4 overflow-x-auto border-b border-dashed">
                 <div className="flex gap-2 items-center">
-                    {/* <a href="/">
+                    <a href="/">
                         <Image
                             src="/logo.svg"
                             className="min-w-[30px] max-w-[30px] hidden md:block"
@@ -167,43 +171,45 @@ export default function EditorHeader({
                             height={32}
                         />
                     </a>
-                    <Separator orientation="vertical" className="opacity-0 hidden md:block" /> */}
+                    <Separator orientation="vertical" className="opacity-0 hidden md:block" />
+                    {/* TEMPLATE SELECTOR */}
                     {user && (
                         <Select
-                            disabled={guilds === null}
-                            onValueChange={(value) => getAndSetGuild(value)}
-                            defaultValue={guild?.id}
+                            defaultValue={templateId === "new" ? undefined : templateId}
+                            onValueChange={(value) => router.push(`/${value}`)}
                         >
                             <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder={guilds === null ? "Loading guilds..." : "Select a guild"} />
+                                <SelectValue placeholder="Select a message" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="max-w-[200px]">
                                 <SelectGroup>
-                                    <SelectLabel className="w-full flex justify-between">
-                                        <span>Guilds</span>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <button type="button" className="hover:text-foreground cursor-pointer">
-                                                    <RefreshCcwIcon className="size-4" />
-                                                    {/* <ExternalLinkIcon className="size-4" /> */}
-                                                </button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>Reload</TooltipContent>
-                                        </Tooltip>
+                                    <SelectLabel className="flex justify-between">
+                                        <span>Messages</span>
+                                        <Button variant={"ghost"} size="icon" className="size-4" asChild>
+                                            <a href={"/new"}>
+                                                <PlusIcon />
+                                            </a>
+                                        </Button>
                                     </SelectLabel>
-                                    {guilds?.map((guild) => {
-                                        return (
-                                            <SelectItem key={guild.id} value={guild.id}>
-                                                {guild.name}
-                                            </SelectItem>
-                                        );
-                                    })}
+                                    {templates?.map((template, index) => (
+                                        <SelectItem
+                                            value={template.template_id as string}
+                                            key={`${template.name ?? "undefined"}-${index}`}
+                                        >
+                                            <span className="overflow-ellipsis">{template.name as string}</span>
+                                        </SelectItem>
+                                    ))}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
                     )}
                     {user === undefined && <Skeleton className="w-[200px] h-full" />}
+
+                    <Button variant="outline" size="icon">
+                        <SettingsIcon />
+                    </Button>
                 </div>
+
                 <div className="flex gap-2">
                     {/* EXPORT/IMPORT BUTTONS */}
                     <Tooltip>
@@ -287,12 +293,21 @@ export default function EditorHeader({
                     <Separator orientation="vertical" />
 
                     {/* ACTIONS LINK BUTTON */}
-                    <Button variant="ghost" asChild>
-                        <Link href={"/actions"}>
-                            <PickaxeIcon />
-                            Actions
-                        </Link>
-                    </Button>
+                    {/* <Button variant="ghost" asChild={templateId !== "new"} disabled={templateId === "new"}>
+                        {templateId === "new" ? (
+                            <>
+                                <PickaxeIcon />
+                                Actions
+                            </>
+                        ) : (
+                            <Link href={`${templateId}/actions`}>
+                                <PickaxeIcon />
+                                Actions
+                            </Link>
+                        )}
+                    </Button> */}
+
+                    <ActionsButton templateId={templateId} templates={templates} />
 
                     {/* ADD COMPONENT BUTTON */}
                     <DropdownMenu>

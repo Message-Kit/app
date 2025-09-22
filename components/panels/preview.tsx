@@ -7,7 +7,6 @@ import {
     CopyIcon,
     DotIcon,
     EditIcon,
-    ExternalLinkIcon,
     HeartIcon,
     LogOutIcon,
     PlusIcon,
