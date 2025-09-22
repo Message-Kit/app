@@ -1,5 +1,6 @@
-import { Client } from "@buape/carbon";
+import { Client, type Context } from "@buape/carbon";
 import { createHandler } from "@buape/carbon/adapters/fetch";
+import type { NextRequest } from "next/server";
 
 const client = new Client(
     {
@@ -12,5 +13,14 @@ const client = new Client(
     {},
 );
 
-const handler = createHandler(client);
-export { handler as GET, handler as POST };
+const carbonHandler = createHandler(client);
+
+const ctx: Context = {};
+
+export async function GET(req: NextRequest) {
+    return carbonHandler(req, ctx);
+}
+
+export async function POST(req: NextRequest) {
+    return carbonHandler(req, ctx);
+}
