@@ -1,4 +1,4 @@
-import type { APIMessageTopLevelComponent } from "discord-api-types/v10";
+import type { APIMessageTopLevelComponent, RESTAPIPartialCurrentUserGuild } from "discord-api-types/v10";
 import {
     DownloadIcon,
     EraserIcon,
@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { type Dispatch, Fragment, type SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { componentDescriptors } from "@/lib/options";
+import { useGuildStore } from "@/lib/stores/guild";
 // import { useGuildStore } from "@/lib/stores/guild";
 import { useShouldInspectStore } from "@/lib/stores/should-inspect";
 import { useUserStore } from "@/lib/stores/user-store";
@@ -59,15 +60,20 @@ export default function EditorHeader({
     templateId: string;
 }) {
     const router = useRouter();
+    const [fetched, setFetched] = useState(false);
 
     // stores
     const { shouldInspect, setShouldInspect } = useShouldInspectStore();
     const { user } = useUserStore();
+    const { guild, setGuild } = useGuildStore();
 
     // templates
     const [templates, setTemplates] = useState<Record<string, unknown>[] | null>(null);
     const [showNewTemplateDialog, setShowNewTemplateDialog] = useState(false);
     const [newTemplateName, setNewTemplateName] = useState("");
+
+    // guilds
+    const [guilds, setGuilds] = useState<RESTAPIPartialCurrentUserGuild[] | null>(null);
 
     // misc
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,6 +91,7 @@ export default function EditorHeader({
 
     useEffect(() => {
         if (!user) return;
+        if (fetched) return;
 
         supabase
             .from("templates")
@@ -97,7 +104,16 @@ export default function EditorHeader({
                     setTemplates(data);
                 }
             });
-    }, [user]);
+
+        fetch("/api/discord/guilds")
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+                setGuilds(data.guilds);
+            });
+
+        setFetched(true);
+    }, [user, fetched]);
 
     function handleExport() {
         const download = new Blob([JSON.stringify(components, null, 4)], { type: "application/json" });
@@ -158,6 +174,14 @@ export default function EditorHeader({
         }
     }
 
+    function getAndSetGuild(guildId: string) {
+        fetch(`/api/discord/guilds/${guildId}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setGuild(data.guild);
+            });
+    }
+
     return (
         <>
             <div className="flex justify-between gap-2 p-4 overflow-x-auto border-b border-dashed">
@@ -171,7 +195,9 @@ export default function EditorHeader({
                             height={32}
                         />
                     </a>
+
                     <Separator orientation="vertical" className="opacity-0 hidden md:block" />
+
                     {/* TEMPLATE SELECTOR */}
                     {user && (
                         <Select
@@ -197,6 +223,33 @@ export default function EditorHeader({
                                             key={`${template.name ?? "undefined"}-${index}`}
                                         >
                                             <span className="overflow-ellipsis">{template.name as string}</span>
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    )}
+                    {user === undefined && <Skeleton className="w-[200px] h-full" />}
+
+                    {/* GUILD SELECTOR */}
+                    {user && (
+                        <Select onValueChange={(value) => getAndSetGuild(value)}>
+                            <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder="Select a guild" />
+                            </SelectTrigger>
+                            <SelectContent className="max-w-[200px]">
+                                <SelectGroup>
+                                    <SelectLabel className="flex justify-between">
+                                        <span>Guilds</span>
+                                        <Button variant={"ghost"} size="icon" className="size-4" asChild>
+                                            <a href={"https://discord.gg/5bBM2TVDD3"}>
+                                                <PlusIcon />
+                                            </a>
+                                        </Button>
+                                    </SelectLabel>
+                                    {guilds?.map((guild) => (
+                                        <SelectItem value={guild.id} key={`${guild.id}`}>
+                                            <span className="overflow-ellipsis">{guild.name as string}</span>
                                         </SelectItem>
                                     ))}
                                 </SelectGroup>
